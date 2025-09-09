@@ -1,0 +1,98 @@
+<div class="flex h-screen">
+  <div class="w-1/2">
+    <div class="flex items-center justify-center min-h-screen bg-gray-100">
+      <form
+        class="w-full max-w-md bg-white rounded-lg shadow-md p-6"
+        [formGroup]="signUpForm"
+        (ngSubmit)="submit()"
+      >
+        <div class="flex items-center justify-center">
+          <h1 class="text-2xl font-bold">Pedi App</h1>
+        </div>
+        <div class="flex items-center justify-center">
+          <span class="mb-2">
+            ¿Ya tenés cuenta?
+            <a href="/sign-in" class="text-[#E69191] hover:underline"
+              >Inicia sesión</a
+            >
+          </span>
+        </div>
+
+        <app-input
+          formControlName="nombre"
+          [control]="signUpForm.get('nombre')"
+          type="text"
+          placeholder="Ej: Juan"
+          label="Nombre"
+        >
+        </app-input>
+       
+
+        <app-input
+          formControlName="apellido"
+          [control]="signUpForm.get('apellido')"
+          type="text"
+          placeholder="Ej: Pérez"
+          label="Apellido"
+        >
+        </app-input>
+     
+
+        <app-input
+          formControlName="email"
+          [control]="signUpForm.get('email')"
+          type="email"
+          placeholder="Ej: email@example.com"
+          label="Email"
+        ></app-input>
+     
+
+        <app-input
+          formControlName="telefono"
+          [control]="signUpForm.get('telefono')"
+          type="number"
+          placeholder="Ej: 123456789"
+          label="Teléfono"
+        ></app-input>
+    
+
+        <app-input
+          formControlName="password"
+          [control]="signUpForm.get('password')"
+          type="password"
+          placeholder="Contraseña"
+          label="Contraseña"
+        ></app-input>
+   
+
+        <app-input
+          formControlName="confirm_password"
+          [control]="signUpForm.get('confirm_password')"
+          type="password"
+          placeholder="Confirmar contraseña"
+          label="Confirmar contraseña"
+        ></app-input>
+        
+        <button
+          type="submit"
+          mat-raised-button
+          color="primary"
+          class="w-full mt-4 rounded-full"
+          [disabled]="signUpForm.invalid"
+        >
+          Crear Usuario
+        </button>
+
+        <p *ngIf="error" class="text-red-500 mt-2">{{ error }}</p>
+        <p *ngIf="success" class="text-green-600 mt-2">{{ success }}</p>
+      </form>
+    </div>
+  </div>
+  <!--<div class="flex h-screen">
+  <div class="w-1/2">
+    <app-register-step></app-register-step>
+  </div> -->
+  <div class="w-1/2">
+    <app-branding-side></app-branding-side>
+  </div>
+</div>

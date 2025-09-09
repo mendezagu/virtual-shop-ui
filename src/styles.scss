@@ -1,1 +1,29 @@
 /* You can add global styles to this file, and also import other style files */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+/* 2️⃣ Tailwind */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:host {
+  display: block;
+  width: 250px;       /* ancho del sidebar */
+  height: 64px;       /* igual a la altura del toolbar */
+}
+
+.mat-mdc-raised-button {
+  border-radius: 9999px !important; /* forma ovalada */
+  background-color: #488e5d !important;
+}
+
+//toolbar
+::ng-deep mat-toolbar.custom-toolbar {
+  background-color: #8CDE81 !important;
+}
+
+
+
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

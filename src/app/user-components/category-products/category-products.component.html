@@ -1,0 +1,32 @@
+<!-- category-products.component.html -->
+<section class="max-w-6xl mx-auto px-4 sm:px-8 py-6">
+  <h1 class="text-2xl font-semibold text-slate-800">
+    Categoría: {{ meta?.categoria || (categorySlug | titlecase) }}
+  </h1>
+
+  <div *ngIf="isLoading" class="text-slate-500 mt-4">Cargando…</div>
+  <div *ngIf="!isLoading && hasError" class="text-rose-600 mt-4">Error al cargar.</div>
+  <div *ngIf="!isLoading && !hasError && products.length === 0" class="text-slate-500 mt-4">
+    No hay productos en esta categoría.
+  </div>
+
+  <div *ngIf="!isLoading && !hasError && products.length" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 mt-4">
+    <article *ngFor="let p of products" [routerLink]="['/producto', p.id_producto]"
+      class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden hover:shadow-md transition">
+      <img [src]="(p.imagen_url && p.imagen_url[0]) || 'https://placehold.co/600x400?text=Producto'"
+           [alt]="p.nombre_producto" class="w-full h-40 object-cover" />
+      <div class="p-3">
+        <h3 class="text-sm font-semibold text-slate-900 line-clamp-1">{{ p.nombre_producto }}</h3>
+        <p class="text-base font-bold text-slate-900 mt-2">
+          {{ p.presentacion_multiple ? (p.variants?.[0]?.precio || p.precio) : (p.precio | currency:'ARS':'symbol-narrow':'1.0-0') }}
+        </p>
+      </div>
+    </article>
+  </div>
+
+  <div *ngIf="meta?.totalPages > 1" class="flex items-center gap-2 mt-6">
+    <button class="px-3 py-1.5 rounded border" (click)="prevPage()" [disabled]="page===1">Anterior</button>
+    <span class="text-sm text-slate-600">Página {{ page }} de {{ meta?.totalPages }}</span>
+    <button class="px-3 py-1.5 rounded border" (click)="nextPage()" [disabled]="page===meta?.totalPages">Siguiente</button>
+  </div>
+</section>

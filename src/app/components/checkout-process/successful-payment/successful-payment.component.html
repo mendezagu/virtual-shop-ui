@@ -1,0 +1,24 @@
+ <div class="max-w-md mx-auto p-6">
+      <h1 class="text-2xl font-bold mb-2">¡Pago recibido! 🎉</h1>
+      <p class="text-slate-600 mb-4">Gracias por tu compra.</p>
+
+      <div class="rounded-lg border p-4 space-y-2">
+        <div class="flex justify-between">
+          <span class="font-medium">Estado</span>
+          <span class="font-semibold" [ngClass]="statusClass">{{ status }}</span>
+        </div>
+        <div class="flex justify-between" *ngIf="paymentId">
+          <span class="font-medium">Payment ID</span>
+          <span>{{ paymentId }}</span>
+        </div>
+        <div class="flex justify-between" *ngIf="externalRef">
+          <span class="font-medium">Referencia</span>
+          <span>{{ externalRef }}</span>
+        </div>
+      </div>
+
+      <div class="mt-6 flex gap-2">
+        <a routerLink="/" class="px-4 py-2 rounded bg-black text-white">Seguir comprando</a>
+        <a routerLink="/orders" class="px-4 py-2 rounded border">Ver mis pedidos</a>
+      </div>
+    </div>

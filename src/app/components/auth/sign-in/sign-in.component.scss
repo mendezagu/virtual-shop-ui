@@ -1,0 +1,8 @@
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline-start,
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline-end {
+  display: none;
+}
+
+::ng-deep .mat-raised-button {
+  border-radius: 9999px; // redondeado completo
+}

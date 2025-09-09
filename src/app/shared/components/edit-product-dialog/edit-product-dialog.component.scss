@@ -1,0 +1,38 @@
+/* Permite que el contenido del header envuelva y no comprima los chips */
+::ng-deep .mat-expansion-panel-header .mat-content {
+  flex-wrap: wrap;           /* ✅ puede saltar de línea */
+  align-items: center;
+  gap: 8px;
+}
+
+/* Que la descripción (lado derecho) NO tenga ancho limitado ni se comprima */
+::ng-deep .mat-expansion-panel-header-description {
+  flex: 0 0 auto !important; /* ✅ no se achica */
+  max-width: none !important;
+  overflow: visible !important;
+}
+
+/* Ajuste general del header para evitar clipping vertical */
+.custom-expansion-header .mat-expansion-panel-header {
+  align-items: center;
+  min-height: 4.5rem;
+  padding: 0.75rem 1rem;
+}
+
+/* Chips: nunca cortar dentro y espaciar números consistentemente */
+.chip {
+  white-space: nowrap;           /* ✅ no parte cifras largas */
+  font-variant-numeric: tabular-nums; /* columnas de números más parejas */
+}
+
+/* Si usas "truncate" en títulos, evítalo en precios */
+.price-chip {
+  white-space: nowrap;
+}
+
+/* Si algún contenedor padre aplicó overflow hidden, lo neutralizamos en este contexto */
+::ng-deep .mat-expansion-panel-header,
+::ng-deep .mat-expansion-panel-header .mat-content,
+::ng-deep .mat-expansion-panel-header-description {
+  overflow: visible;
+}

@@ -1,0 +1,66 @@
+<div class="flex h-screen">
+  <div class="w-1/2">
+    <div class="flex items-center justify-center min-h-screen bg-gray-100">
+      <form
+        class="w-full max-w-sm bg-white rounded-lg shadow-md p-6"
+        [formGroup]="form"
+        (ngSubmit)="submit()"
+      >
+        <div class="flex items-center justify-center">
+          <img class="w-32 h-32" src="assets/logo-app.png" alt="Pedi App" />
+        </div>
+        <div class="flex items-center justify-center">
+          <span class="mb-2">
+            ¿No tenés cuenta?
+            <a href="/sign-up" class="text-[#E69191] hover:underline"
+              >Crear cuenta</a
+            >
+          </span>
+        </div>
+
+        <div class="flex flex-col mb-3">
+          <app-input
+            formControlName="email"
+            [control]="form.get('email')"
+            type="email"
+            placeholder="Ej: email@example.com"
+            label="Email"
+          ></app-input>
+         
+        </div>
+
+        <div class="flex flex-col mb-3">
+          <app-input
+            formControlName="password"
+            [control]="form.get('password')"
+            type="password"
+            placeholder="Contraseña"
+            label="Contraseña"
+          ></app-input>
+
+          
+        </div>
+
+        <div class="flex items-center justify-between">
+          <mat-checkbox class="example-margin">Recordarme</mat-checkbox>
+          <a href="/forgot-password" class="text-[#E69191] hover:underline"
+            >¿Olvidaste tu contraseña?</a
+          >
+        </div>
+
+        <button
+          type="submit"
+          mat-raised-button
+          color="primary"
+          class="w-full mt-4 rounded-full"
+        >
+          Iniciar sesión
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="w-1/2">
+    <app-branding-side></app-branding-side>
+  </div>
+</div>

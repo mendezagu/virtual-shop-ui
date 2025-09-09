@@ -1,0 +1,78 @@
+<!-- Contenedor centrado con padding -->
+<div class="container mx-6 px-4">
+  <!-- Budget -->
+  <div class="flex flex-col flex-auto p-6 bg-card rounded-2xl shadow bg-white">
+    <div class="flex items-center">
+      <div class="flex flex-col">
+        <div class="mr-4 text-lg font-medium tracking-tight leading-6 truncate">
+          Productos destacados
+        </div>
+        <div class="text-secondary font-medium">Tus productos mas vendidos</div>
+      </div>
+      <div class="ml-auto -mt-2 -mr-2">
+        <button mat-icon-button></button>
+      </div>
+    </div>
+    <div class="mt-6">
+      Last month; you had <strong>223</strong> expense transactions,
+      <strong>12</strong> savings entries and <strong>4</strong> bills.
+    </div>
+    <div class="my-8 space-y-8">
+      <!-- Expenses -->
+      <div class="flex flex-col">
+        <div class="flex items-center">
+          <div class="flex items-center justify-center w-14 h-14 rounded bg-red-100">
+            <mat-icon class="text-current" ></mat-icon>
+          </div>
+          <div class="flex-auto ml-4 leading-none">
+            <div class="text-sm font-medium text-secondary">Expenses</div>
+            <div class="mt-2 font-medium text-2xl"></div>
+            <mat-progress-bar class="mt-3 rounded-full" [color]="'warn'" [mode]="'determinate'"></mat-progress-bar>
+          </div>
+          <div class="flex items-end justify-end min-w-18 mt-auto ml-6">
+            <div class="text-lg leading-none">2.6%</div>
+            <mat-icon class="text-green-600 icon-size-4 ml-1" ></mat-icon>
+          </div>
+        </div>
+      </div>
+      <!-- Savings -->
+      <div class="flex flex-col">
+        <div class="flex items-center">
+          <div class="flex items-center justify-center w-14 h-14 rounded bg-indigo-100">
+            <mat-icon class="text-current" ></mat-icon>
+          </div>
+          <div class="flex-auto ml-4 leading-none">
+            <div class="text-sm font-medium text-secondary">Savings</div>
+            <div class="mt-2 font-medium text-2xl"></div>
+            <mat-progress-bar class="mt-3 rounded-full" [mode]="'determinate'"></mat-progress-bar>
+          </div>
+          <div class="flex items-end justify-end min-w-18 mt-auto ml-6">
+            <div class="text-lg leading-none">12.7%</div>
+            <mat-icon class="text-red-600 icon-size-4 ml-1"></mat-icon>
+          </div>
+        </div>
+      </div>
+      <!-- Bills -->
+      <div class="flex flex-col">
+        <div class="flex items-center">
+          <div class="flex items-center justify-center w-14 h-14 rounded bg-teal-100">
+            <mat-icon class="text-current" ></mat-icon>
+          </div>
+          <div class="flex-auto ml-4 leading-none">
+            <div class="text-sm font-medium text-secondary">Bills</div>
+            <div class="mt-2 font-medium text-2xl">22$</div>
+            <mat-progress-bar class="mt-3 rounded-full" [mode]="'determinate'"></mat-progress-bar>
+          </div>
+          <div class="flex items-end justify-end min-w-18 mt-auto ml-6">
+            <div class="text-lg leading-none">105.7%</div>
+            <mat-icon class="text-red-600 icon-size-4 ml-1" ></mat-icon>
+          </div>
+        </div>
+        <div class="mt-3 text-md text-secondary">
+          Exceeded your personal limit! Be careful next month.
+        </div>
+      </div>
+    </div>
+   
+  </div>
+</div>

@@ -1,0 +1,26 @@
+<div class="max-w-md mx-auto p-6">
+      <h1 class="text-2xl font-bold mb-2">Pago pendiente ⏳</h1>
+      <p class="text-slate-600 mb-4">
+        Estamos procesando tu pago. Te notificaremos cuando se confirme.
+      </p>
+
+      <div class="rounded-lg border p-4 space-y-2">
+        <div class="flex justify-between">
+          <span class="font-medium">Estado</span>
+          <span class="font-semibold warn">{{ status }}</span>
+        </div>
+        <div class="flex justify-between" *ngIf="paymentId">
+          <span class="font-medium">Payment ID</span>
+          <span>{{ paymentId }}</span>
+        </div>
+        <div class="flex justify-between" *ngIf="externalRef">
+          <span class="font-medium">Referencia</span>
+          <span>{{ externalRef }}</span>
+        </div>
+      </div>
+
+      <div class="mt-6 flex gap-2">
+        <a routerLink="/" class="px-4 py-2 rounded border">Volver al inicio</a>
+        <a routerLink="/orders" class="px-4 py-2 rounded bg-black text-white">Ver mis pedidos</a>
+      </div>
+    </div>

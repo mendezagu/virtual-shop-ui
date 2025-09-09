@@ -1,0 +1,192 @@
+<div class="flex items-center justify-center">
+  <mat-stepper
+    class="px-12"
+    orientation="vertical"
+    [linear]="isLinear"
+    #stepper
+  >
+    <!-- STEP 1 -->
+    <mat-step [stepControl]="firstFormGroup">
+      <form [formGroup]="firstFormGroup" (ngSubmit)="onSubmitFirstStep()">
+        <ng-template matStepLabel>Ingresa tus datos personales</ng-template>
+        <mat-form-field class="w-full" appearance="fill">
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="nombre" />
+          @if (this.firstFormGroup.get('nombre')?.hasError('required')) {
+          <mat-error>El nombre es obligatorio</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field class="w-full" appearance="fill">
+          <mat-label>Apellido</mat-label>
+          <input matInput formControlName="apellido" />
+          @if (this.firstFormGroup.get('apellido')?.hasError('required')) {
+          <mat-error>El apellido es obligatorio</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field class="w-full" appearance="fill">
+          <mat-label>Email</mat-label>
+          <input
+            matInput
+            type="email"
+            formControlName="email"
+            placeholder="ej. usuario@example.com"
+          />
+          @if (this.firstFormGroup.get('email')?.hasError('email')) {
+          <mat-error> El email es obligatorio </mat-error>
+          } @if (this.firstFormGroup.get('email')?.hasError('required')) {
+          <mat-error> Email no válido </mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field class="w-full" appearance="fill">
+          <mat-label>Teléfono</mat-label>
+          <input matInput formControlName="telefono" />
+          @if (this.firstFormGroup.get('telefono')?.hasError('required')) {
+          <mat-error>El teléfono es obligatorio</mat-error>
+          } @if (this.firstFormGroup.get('telefono')?.hasError('pattern')) {
+          <mat-error>Solo números permitidos</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field class="w-full" appearance="fill">
+          <mat-label>Contraseña</mat-label>
+          <input matInput type="password" formControlName="password" />
+          @if (this.firstFormGroup.get('password')?.hasError('required')) {
+          <mat-error>La contraseña es obligatoria</mat-error>
+          } @if (this.firstFormGroup.get('password')?.hasError('minlength')) {
+          <mat-error>Mínimo 8 caracteres</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field class="w-full" appearance="fill">
+          <mat-label>Confirmar contraseña</mat-label>
+          <input matInput type="password" formControlName="confirm_password" />
+          @if
+          (this.firstFormGroup.get('confirm_password')?.hasError('required')) {
+          <mat-error>La contraseña es obligatoria</mat-error>
+          } @if
+          (this.firstFormGroup.get('confirm_password')?.hasError('minlength')) {
+          <mat-error>Mínimo 8 caracteres</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field class="w-full" appearance="fill">
+          <mat-label>Rol</mat-label>
+          <input matInput type="number" formControlName="rol" />
+          @if (this.firstFormGroup.get('rol')?.hasError('required')) {
+          <mat-error>El rol es obligatorio</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="flex items-center justify-end">
+          <button
+            type="submit"
+            mat-raised-button
+            color="primary"
+            class="w-max mt-4 rounded-full"
+          >
+            Siguiente
+          </button>
+        </div>
+      </form>
+    </mat-step>
+
+    <!-- STEP 2 -->
+    <mat-step [stepControl]="storeForm">
+      <ng-template matStepLabel>Ingresa los datos de tu tienda</ng-template>
+
+      <form [formGroup]="storeForm" class="w-full space-y-4">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Nombre de la tienda</mat-label>
+          <input matInput formControlName="nombre_tienda" />
+          @if (this.storeForm.get('nombre_tienda')?.hasError('required')) {
+          <mat-error>El nombre de la tienda es obligatorio</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Teléfono de contacto</mat-label>
+          <input matInput formControlName="telefono_contacto" />
+          @if (this.storeForm.get('telefono_contacto')?.hasError('required')) {
+          <mat-error>El teléfono es obligatorio</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Link de la tienda</mat-label>
+          <input matInput formControlName="link_tienda" />
+          @if (this.storeForm.get('link_tienda')?.hasError('required')) {
+          <mat-error>El link es obligatorio</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Usuario</mat-label>
+          <input matInput formControlName="usuario_login" />
+          @if (this.storeForm.get('usuario_login')?.hasError('required')) {
+          <mat-error>El usuario es obligatorio</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password_hash" />
+          @if (this.storeForm.get('password_hash')?.hasError('required')) {
+          <mat-error>La contraseña es obligatoria</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Rubro (separado por comas)</mat-label>
+          <input matInput formControlName="rubro" />
+          <mat-hint
+            >Ejemplo: Cámaras de seguridad, Ferretería, Electricidad</mat-hint
+          >
+        </mat-form-field>
+      </form>
+
+      <div class="flex justify-between mt-4">
+        <button
+          type="submit"
+          mat-raised-button
+          color="accent"
+          class="w-max mt-4 rounded-full"
+        >
+          Atrás
+        </button>
+        <div class="flex items-center justify-end">
+          <button
+            type="button"
+            mat-raised-button
+            color="primary"
+            class="w-max mt-4 rounded-full"
+            (click)="onSubmitAll()"
+          >
+            Crear cuenta y tienda
+          </button>
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- STEP 3 
+    <mat-step>
+      <ng-template matStepLabel>Finalizado</ng-template>
+      <p>¡Ya terminaste!</p>
+      <div>
+        <button mat-button matStepperPrevious>Atrás</button>
+        <button mat-button (click)="stepper.reset()">Reiniciar</button>
+      </div>
+    </mat-step>
+
+    <mat-step>
+      <ng-template matStepLabel>Done</ng-template>
+      <p>You are now done.</p>
+      <div>
+        <button mat-button matStepperPrevious>Back</button>
+        <button mat-button (click)="stepper.reset()">Reset</button>
+      </div>
+    </mat-step> -->
+  </mat-stepper>
+</div>

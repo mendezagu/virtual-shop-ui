@@ -1,0 +1,123 @@
+<h2 mat-dialog-title>{{ data?.title || "Nuevo Producto" }}</h2>
+
+<mat-dialog-content>
+  <p>{{ data?.message || "Aquí puedes agregar un nuevo producto." }}</p>
+
+  <form
+    [formGroup]="productForm"
+    (ngSubmit)="crearProducto()"
+    class="flex flex-col gap-4"
+  >
+    <app-input
+      label="Nombre del producto"
+      formControlName="nombre_producto"
+      type="text"
+    ></app-input>
+
+    <!-- Categoría con SELECT -->
+    <mat-form-field appearance="fill">
+      <mat-label>Categoría</mat-label>
+      <mat-select formControlName="categoriaSelect" (selectionChange)="onCategorySelectChange($event.value)">
+        <mat-option *ngFor="let c of categories" [value]="c.name">
+          {{ c.name }} <span class="text-slate-400">({{ c.count }})</span>
+        </mat-option>
+        <mat-option value="__NEW__">+ Crear nueva categoría</mat-option>
+      </mat-select>
+      @if (productForm.get('categoria')?.touched && productForm.get('categoria')?.invalid) {
+        <mat-error>Selecciona una categoría o crea una nueva</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Input solo si elige crear nueva -->
+    <app-input
+      *ngIf="showNewCategory"
+      label="Nueva categoría"
+      formControlName="categoria"
+      type="text"
+      placeholder="Ej. Panadería artesanal"
+    ></app-input>
+
+    <!-- Si NO está creando nueva, igual enviamos la categoría elegida -->
+    <input type="hidden" formControlName="categoria" *ngIf="!showNewCategory" />
+
+    <app-input label="Grupo" formControlName="grupo" type="text"></app-input>
+
+    <app-textarea
+      label="Descripción"
+      formControlName="descripcion"
+    ></app-textarea>
+
+    <app-input label="Stock" formControlName="stock" type="number"></app-input>
+
+    <app-input
+      label="Precio"
+      formControlName="precio"
+      type="number"
+    ></app-input>
+
+    <mat-checkbox formControlName="presentacion_multiple">
+      Producto con variantes
+    </mat-checkbox>
+
+    <div class="flex flex-col">
+      <!-- Variantes -->
+      <div
+        *ngIf="productForm.get('presentacion_multiple')?.value"
+        formArrayName="variants"
+      >
+        <div
+          *ngFor="let varGroup of variants.controls; let i = index"
+          [formGroupName]="i"
+          class="flex flex-col gap-2 mb-2"
+        >
+          <app-input
+            label="Nombre Variante"
+            formControlName="nombre"
+            type="text"
+          ></app-input>
+          <app-input
+            label="Stock"
+            formControlName="stock"
+            type="number"
+          ></app-input>
+          <app-input
+            label="Precio"
+            formControlName="precio"
+            type="number"
+          ></app-input>
+          <a
+            class="!text-[#EB9B8A] flex items-center justify-center cursor-pointer"
+            (click)="quitarVariante(i)"
+          >
+            Eliminar
+          </a>
+        </div>
+
+        <button
+          mat-raised-button
+          color="primary"
+          class="rounded-full px-5 flex items-center gap-2"
+          type="button"
+          (click)="agregarVariante()"
+        >
+          Agregar Variante
+        </button>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <div class="flex items-center gap-4">
+    <a class="!text-[#EB9B8A] cursor-pointer" (click)="onCancel()">Cancelar</a>
+    <button
+      mat-raised-button
+      color="primary"
+      class="rounded-full px-5 flex items-center gap-2"
+      [disabled]="productForm.invalid"
+      (click)="crearProducto()"
+    >
+      Aceptar
+    </button>
+  </div>
+</mat-dialog-actions>

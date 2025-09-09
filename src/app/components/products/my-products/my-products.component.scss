@@ -1,0 +1,55 @@
+/* Accordion look moderno */
+.modern-accordion .mat-expansion-panel {
+  border: 1px solid #e5e7eb; /* slate-200 */
+  border-radius: 1rem;
+  overflow: hidden;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 2px rgba(2, 6, 23, 0.04);
+  background: #fff;
+}
+.modern-accordion .mat-expansion-panel:hover {
+  box-shadow: 0 4px 12px rgba(2, 6, 23, 0.06);
+}
+
+/* Header cómodo */
+.custom-expansion-header .mat-expansion-panel-header {
+  min-height: 4.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f1f5f9; /* slate-100 */
+}
+.mat-expansion-panel.mat-expanded .mat-expansion-panel-header {
+  border-bottom-color: #e5e7eb; /* slate-200 */
+}
+
+/* Chips suaves */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.chip-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+}
+.chip-soft {
+  background: #f8fafc; /* slate-50 */
+  color: #334155;      /* slate-700 */
+  border: 1px solid #e2e8f0; /* slate-200 */
+}
+.chip-outline {
+  background: #fff;
+  color: #6b7280;        /* gray-500 */
+  border: 1px dashed #e5e7eb;
+}
+
+/* Imagen del título (si querés ocultarla expandido, descomenta)
+.mat-expansion-panel.mat-expanded .mat-expansion-panel-header .panel-title-img {
+  display: none;
+} */

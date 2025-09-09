@@ -1,0 +1,98 @@
+<div class="mt-5 px-4 sm:px-8 w-full min-h-screen">
+  <!-- Encabezado -->
+  <div class="mb-5">
+    <div class="inline-flex items-center gap-2 rounded-full border border-pink-200 bg-pink-50 px-3 py-1 text-xs text-pink-700">
+      <span class="h-2 w-2 rounded-full bg-pink-500"></span>
+      Información
+    </div>
+    <h1 class="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight text-pink-500">
+      Información básica de tu tienda
+    </h1>
+    <p class="text-sm text-slate-500 mt-1">
+      Visualiza y edita los datos principales. Puedes ajustar el link y la descripción cuando quieras.
+    </p>
+  </div>
+
+  <!-- Card -->
+  <div class="relative bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden w-full max-w-5xl">
+    <!-- Top gradient ribbon -->
+    <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-300 via-pink-400 to-pink-300"></div>
+
+    <!-- Loading skeleton -->
+    <ng-container *ngIf="isLoading; else formTpl">
+      <div class="p-6 sm:p-10 space-y-4 animate-pulse">
+        <div class="h-5 w-1/3 bg-slate-200 rounded"></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="h-12 bg-slate-200 rounded"></div>
+          <div class="h-12 bg-slate-200 rounded"></div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="h-24 bg-slate-200 rounded"></div>
+          <div class="h-12 bg-slate-200 rounded"></div>
+        </div>
+        <div class="h-10 w-40 bg-slate-200 rounded ml-auto"></div>
+      </div>
+    </ng-container>
+
+    <!-- Form -->
+    <ng-template #formTpl>
+      <form [formGroup]="storeForm" (ngSubmit)="saveChanges()" class="p-6 sm:p-10">
+        <!-- Fila 1: Nombre y Rubro -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-4">
+          <div>
+            <app-input formControlName="nombre_tienda" label="Nombre de la tienda" type="text"></app-input>
+            <p class="mt-1 text-xs text-slate-500">El nombre visible para tus clientes.</p>
+            <div class="mt-1 text-xs text-rose-600" *ngIf="f['nombre_tienda']?.touched && f['nombre_tienda']?.invalid">
+              Debe tener al menos 2 caracteres.
+            </div>
+          </div>
+
+          <div>
+            <app-input formControlName="rubro" label="Rubro(s)" type="text"></app-input>
+            <p class="mt-1 text-xs text-slate-500">Separá múltiples rubros con coma. Ej: Ropa, Accesorios</p>
+          </div>
+        </div>
+
+        <!-- Fila 2: Descripción y Link -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-4">
+          <div>
+            <app-textarea formControlName="descripcion" label="Descripción" type="text"></app-textarea>
+            <p class="mt-1 text-xs text-slate-500">Breve descripción para SEO y presentación.</p>
+          </div>
+
+        <div>
+            <app-input formControlName="link_tienda" label="Link de la tienda" type="text"></app-input>
+            <p class="mt-1 text-xs text-slate-500">Se normaliza automáticamente (https://). Si lo dejás vacío, usamos el slug.</p>
+          </div>
+        </div>
+
+        <!-- Divider sutil -->
+        <div class="my-4 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
+
+        <!-- Barra de acciones -->
+        <div class="sticky bottom-0 -mx-6 sm:-mx-10 -mb-6 sm:-mb-10 bg-gradient-to-t from-white via-white to-white/40 px-6 sm:px-10 py-4">
+          <div class="flex items-center justify-end gap-2">
+            <button type="button"
+              class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 transition">
+              Descartar
+            </button>
+
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="storeForm.invalid || storeForm.pristine"
+              class="!rounded-xl !bg-emerald-500 hover:!bg-emerald-600 !text-white !px-5 !py-2.5 !shadow-sm transition">
+              Guardar cambios
+            </button>
+          </div>
+        </div>
+      </form>
+    </ng-template>
+  </div>
+
+  <!-- Hint footer -->
+  <div class="max-w-5xl mt-4 text-xs text-slate-500">
+    Tip: mantené el nombre corto y el link legible. Esto mejora cómo aparece tu tienda en las búsquedas.
+  </div>
+</div>

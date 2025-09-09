@@ -1,0 +1,173 @@
+<div class="min-h-[100dvh] bg-neutral-50">
+  <!-- Encabezado -->
+  <header class="px-4 sm:px-8 pt-6 pb-4 flex items-start justify-between">
+    <div>
+      <div
+        class="inline-flex items-center gap-2 rounded-full border border-pink-200 bg-pink-50 px-3 py-1 text-xs text-pink-700"
+      >
+        <span class="h-2 w-2 rounded-full bg-pink-500"></span>
+        Catálogo
+      </div>
+      <h1 class="mt-2 text-3xl font-semibold tracking-tight text-pink-500">
+        Productos de la tienda
+      </h1>
+      <p class="text-sm text-slate-500 mt-1">
+        Explorá los artículos disponibles.
+      </p>
+    </div>
+
+    <!-- botón carrito
+    <button
+      mat-raised-button
+      color="primary"
+      class="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 shadow-sm flex items-center gap-2"
+      (click)="openCart()"
+    >
+      <span class="material-icons">shopping_cart</span>
+      <span>Carrito</span>
+      <span
+        *ngIf="cartCount"
+        class="ml-1 inline-flex items-center justify-center h-6 min-w-6 px-2 rounded-full bg-white/90 text-emerald-600 text-xs font-bold"
+      >
+        {{ cartCount }}
+      </span>
+    </button> -->
+  </header>
+
+  <main class="px-4 sm:px-8 pb-10">
+    <section
+      class="relative bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden mx-auto max-w-6xl"
+    >
+      <div
+        class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-300 via-pink-400 to-pink-300"
+      ></div>
+
+      <div class="p-4 sm:p-6">
+        <!-- Error -->
+        <div *ngIf="hasError && !isLoading" class="text-center py-10">
+          <div
+            class="mx-auto w-14 h-14 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-500 mb-3"
+          >
+            <span class="material-icons">error_outline</span>
+          </div>
+          <h2 class="text-lg font-semibold text-slate-800">
+            No pudimos cargar los productos
+          </h2>
+          <p class="text-sm text-slate-500 mt-1">
+            Intentalo nuevamente más tarde.
+          </p>
+        </div>
+
+        <!-- Skeleton -->
+        <div
+          *ngIf="isLoading"
+          class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
+        >
+          <div
+            *ngFor="let s of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"
+            class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden animate-pulse"
+          >
+            <div class="h-32 bg-slate-200"></div>
+            <div class="p-3 space-y-2">
+              <div class="h-4 w-2/3 bg-slate-200 rounded"></div>
+              <div class="h-3 w-full bg-slate-200 rounded"></div>
+              <div class="h-3 w-4/5 bg-slate-200 rounded"></div>
+              <div class="h-5 w-24 bg-slate-200 rounded mt-2"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty -->
+        <div
+          *ngIf="!isLoading && !hasError && products.length === 0"
+          class="text-center py-12"
+        >
+          <div
+            class="mx-auto w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 mb-3"
+          >
+            <span class="material-icons">inventory_2</span>
+          </div>
+          <h3 class="text-lg font-semibold text-slate-800">
+            Aún no hay productos
+          </h3>
+          <p class="text-sm text-slate-500 mt-1">
+            Vuelve más tarde para ver novedades.
+          </p>
+        </div>
+
+        <!-- Grid de productos -->
+        <div
+          *ngIf="!isLoading && !hasError && products.length > 0"
+          class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
+        >
+          <article
+            *ngFor="let product of products"
+            [routerLink]="['/producto', product.id_producto]"
+            class="group rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition"
+          >
+            <div class="relative">
+              <img
+                [src]="
+                  (product.imagen_url && product.imagen_url[0]) ||
+                  'https://placehold.co/600x400?text=Producto'
+                "
+                alt="{{ product.nombre_producto }}"
+                class="w-full h-40 object-cover"
+                loading="lazy"
+              />
+            </div>
+
+            <div class="p-3 space-y-2">
+              <div>
+                <h3 class="text-sm font-semibold text-slate-900 line-clamp-1">
+                  {{ product.nombre_producto }}
+                </h3>
+                <!--<p class="text-xs text-slate-500 line-clamp-2">
+                  {{ product.descripcion || 'Sin descripción' }}
+                </p>-->
+              </div>
+
+              <div class="flex items-center justify-between">
+                <p
+                  class="text-base font-bold text-slate-900 whitespace-nowrap tabular-nums"
+                >
+                  {{ product.presentacion_multiple
+                        ? (product.variants?.[0]?.precio || product.precio)
+                        : product.precio | currency:'ARS':'symbol-narrow':'1.0-0' }}
+                </p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <!-- Cargar más -->
+        <div
+          *ngIf="!isLoading && !hasError && hasMore()"
+          class="flex justify-center pt-6"
+        >
+          <button
+            mat-raised-button
+            color="primary"
+            class="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 shadow-sm"
+            (click)="loadMore()"
+          >
+            Cargar más
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Drawer del carrito -->
+  <app-cart-drawer
+    [open]="cartOpen"
+    [items]="cartItems"
+    [total]="cartTotal"
+    (close)="cartOpen = false"
+    [slug]="slug" 
+    (updateQty)="updateQty($event)"
+    (remove)="removeItem($event)"
+    (clear)="clearCart()"
+  >
+  </app-cart-drawer>
+</div>

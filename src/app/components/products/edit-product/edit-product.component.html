@@ -1,0 +1,54 @@
+<form [formGroup]="productForm" (ngSubmit)="saveProduct()" class="product-form">
+  
+  <app-input
+    formControlName="nombre_producto"
+    label="Nombre del producto"
+    type="text"
+  ></app-input>
+
+  <app-input
+    formControlName="categoria"
+    label="Categoría"
+    type="text"
+  ></app-input>
+
+  <app-input
+    formControlName="grupo"
+    label="Grupo"
+    type="text"
+  ></app-input>
+
+  <app-textarea
+    formControlName="descripcion"
+    label="Descripción"
+  ></app-textarea>
+
+  <app-input
+    formControlName="stock"
+    label="Stock"
+    type="number"
+  ></app-input>
+
+  <app-input
+    formControlName="precio"
+    label="Precio"
+    type="number"
+  ></app-input>
+
+  <app-input
+    formControlName="imagen_url"
+    label="Imágenes (separadas por coma)"
+  ></app-input>
+
+  <mat-checkbox formControlName="presentacion_multiple">
+    Presentación múltiple
+  </mat-checkbox>
+
+  <mat-checkbox formControlName="disponible">
+    Disponible
+  </mat-checkbox>
+
+  <button mat-raised-button color="primary" type="submit" [disabled]="productForm.invalid">
+    Guardar
+  </button>
+</form>

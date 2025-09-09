@@ -1,0 +1,170 @@
+<div class="flex flex-col h-full min-w-[320px]">
+  <!-- Encabezado -->
+  <div class="px-4 pt-4">
+    <div class="inline-flex items-center gap-2 rounded-full border border-pink-200 bg-pink-50 px-3 py-1 text-xs text-pink-700">
+      <span class="h-2 w-2 rounded-full bg-pink-500"></span>
+      Producto
+    </div>
+    <h2 class="mt-2 text-xl font-semibold tracking-tight text-pink-500">Editar producto</h2>
+    <p class="text-xs text-slate-500 mt-1">Actualiza los datos y guarda los cambios.</p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="save()" class="flex flex-col flex-1">
+    <mat-dialog-content class="relative !p-0 flex-1">
+      <!-- Cinta superior -->
+      <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-300 via-pink-400 to-pink-300"></div>
+
+      <!-- Contenido -->
+      <div class="p-4 sm:p-6 space-y-4">
+        <!-- Datos básicos: 2 columnas en sm+ -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Nombre -->
+          <div class="w-full">
+            <app-input formControlName="nombre_producto" label="Nombre"></app-input>
+          </div>
+
+          <!-- Categoría (selector + nueva) -->
+          <div class="w-full">
+            <ng-container *ngIf="categories?.length; else onlyInput">
+              <mat-form-field appearance="fill" class="w-full">
+                <mat-label>Categoría</mat-label>
+                <mat-select formControlName="categoriaSelect">
+                  <mat-option *ngFor="let c of categories" [value]="c.name">
+                    {{ c.name }} <span class="text-slate-400">({{ c.count }})</span>
+                  </mat-option>
+                  <mat-option value="__NEW__">+ Nueva categoría…</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <div *ngIf="showNewCategory" class="mt-1">
+                <app-input formControlName="categoria" label="Nueva categoría"></app-input>
+              </div>
+            </ng-container>
+
+            <ng-template #onlyInput>
+              <!-- Fallback si no hay categorías disponibles -->
+              <app-input formControlName="categoria" label="Categoría"></app-input>
+            </ng-template>
+          </div>
+
+          <!-- Grupo -->
+          <div class="w-full">
+            <app-input formControlName="grupo" label="Grupo"></app-input>
+          </div>
+
+          <!-- Precio -->
+          <div class="w-full">
+            <app-input
+              class="whitespace-nowrap tabular-nums w-full"
+              type="number"
+              inputmode="decimal"
+              step="0.01"
+              formControlName="precio"
+              label="Precio">
+            </app-input>
+          </div>
+
+          <!-- Stock -->
+          <div class="w-full">
+            <app-input
+              class="whitespace-nowrap tabular-nums w-full"
+              type="number"
+              inputmode="numeric"
+              step="1"
+              formControlName="stock"
+              label="Stock">
+            </app-input>
+          </div>
+        </div>
+
+        <!-- Descripción -->
+        <div class="w-full">
+          <app-textarea
+            formControlName="descripcion"
+            label="Descripción"
+            placeholder="Escribe una descripción...">
+          </app-textarea>
+        </div>
+
+        <!-- Validaciones amigables -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[11px]">
+          <div class="text-rose-600" *ngIf="form.get('nombre_producto')?.touched && form.get('nombre_producto')?.invalid">
+            • El nombre es obligatorio (mínimo 2 caracteres).
+          </div>
+          <div class="text-rose-600" *ngIf="form.get('precio')?.touched && form.get('precio')?.invalid">
+            • El precio debe ser un número mayor o igual a 0.
+          </div>
+          <div class="text-rose-600" *ngIf="form.get('stock')?.touched && form.get('stock')?.invalid">
+            • El stock debe ser un número mayor o igual a 0.
+          </div>
+        </div>
+
+        <!-- Variantes -->
+        <ng-container *ngIf="variantsFormArray.controls.length > 0">
+          <div class="mt-2">
+            <h3 class="text-sm font-semibold text-pink-500">Variantes</h3>
+
+            <div formArrayName="variants" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+              <div
+                *ngFor="let variant of variantsFormArray.controls; let i = index"
+                [formGroupName]="i"
+                class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+              >
+                <div class="grid grid-cols-1 gap-3">
+                  <!-- Nombre variante -->
+                  <app-input formControlName="nombre" label="Nombre variante"></app-input>
+
+                  <!-- Stock / Precio variante -->
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <app-input
+                      class="whitespace-nowrap tabular-nums w-full"
+                      type="number"
+                      inputmode="numeric"
+                      step="1"
+                      formControlName="stock"
+                      label="Stock variante">
+                    </app-input>
+
+                    <app-input
+                      class="whitespace-nowrap tabular-nums w-full"
+                      type="number"
+                      inputmode="decimal"
+                      step="0.01"
+                      formControlName="precio"
+                      label="Precio variante">
+                    </app-input>
+                  </div>
+                </div>
+
+                <!-- Validaciones variante -->
+                <div class="mt-2 text-[11px] text-rose-600 space-y-1">
+                  <div *ngIf="variant.get('nombre')?.touched && variant.get('nombre')?.invalid">• La variante debe tener nombre.</div>
+                  <div *ngIf="variant.get('stock')?.touched && variant.get('stock')?.invalid">• Stock inválido (>= 0).</div>
+                  <div *ngIf="variant.get('precio')?.touched && variant.get('precio')?.invalid">• Precio inválido (>= 0).</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </mat-dialog-content>
+
+    <!-- Footer de acciones -->
+    <div class="px-4 sm:px-6 pb-4 pt-3 bg-gradient-to-t from-white via-white to-white/40 sticky bottom-0">
+      <div class="flex items-center justify-end gap-3">
+        <button type="button"
+                (click)="close()"
+                class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 transition">
+          Cancelar
+        </button>
+        <button mat-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="form.invalid || form.pristine"
+                class="!rounded-xl !bg-emerald-500 hover:!bg-emerald-600 !text-white !px-5 !py-2.5 !shadow-sm transition">
+          Guardar
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
