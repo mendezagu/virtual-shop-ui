@@ -61,4 +61,12 @@ export class LandingHomeComponent {
   redirectToMyProducts() {
     this.router.navigate(['/my-products']);
   }
+
+  redirectToMyCategories(){
+    this.router.navigate(['/mis-categorias']);
+  }
+
+  redirectToMyOrders(){
+    this.router.navigate(['/mis-pedidos'])
+  }
 }

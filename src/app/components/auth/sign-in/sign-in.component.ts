@@ -12,7 +12,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AuthService } from '../../../shared/services/private_services/auth.service';
 import { Router } from '@angular/router';
 import { BrandingSideComponent } from "../../../shared/components/branding-side/branding-side.component";
-import { InputComponent } from '../../../shared/components/input/input.component';
+import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
   selector: 'app-sign-in',
@@ -25,7 +25,7 @@ import { InputComponent } from '../../../shared/components/input/input.component
     MatButtonModule,
     MatCheckboxModule,
     BrandingSideComponent,
-    InputComponent
+    InputTextModule
 ],
   templateUrl: './sign-in.component.html',
   styleUrls: ['./sign-in.component.scss'],

@@ -29,8 +29,7 @@ export type PaymentStatus =
   providedIn: 'root'
 })
 export class PaymentsService {
-
- private base = 'http://localhost:3000/api/payments';
+  private base = 'http://localhost:3000/api/payments';
 
   constructor(private http: HttpClient, private session: SessionService) {}
 
@@ -38,17 +37,18 @@ export class PaymentsService {
     return new HttpHeaders({ 'X-Session-Id': this.session.get() });
   }
 
-async createPreference(items: MPItem[], externalRef?: string): Promise<CreatePreferenceResponse> {
-  // NO enviamos success_url/failure_url/pending_url
-  const body = { items, external_reference: externalRef };
+  /** 🔹 Crea preferencia en tu backend y redirige al checkout */
+  async createPreferenceAndRedirect(items: MPItem[], externalRef?: string, payerEmail?: string) {
+    const body = { items, external_reference: externalRef, payer_email: payerEmail };
 
-  return await firstValueFrom(
-    this.http.post<CreatePreferenceResponse>(`${this.base}/checkout-pro`, body, { headers: this.headers() })
-  );
-}
+    const pref = await firstValueFrom(
+      this.http.post<CreatePreferenceResponse>(`${this.base}/checkout-pro`, body, {
+        headers: this.headers()
+      })
+    );
 
-  redirectToCheckout(initPoint: string) {
-    window.location.href = initPoint;
+    // 🔥 Redirigir directo al checkout de Mercado Pago
+    window.location.href = pref.init_point;
   }
 
   /**
@@ -77,7 +77,6 @@ async createPreference(items: MPItem[], externalRef?: string): Promise<CreatePre
       ('pending' as PaymentStatus);
 
     if (!paymentId) {
-      // Sin ID, devolvemos lo que tengamos
       return { status: hintedStatus, external_reference };
     }
 
@@ -87,4 +86,21 @@ async createPreference(items: MPItem[], externalRef?: string): Promise<CreatePre
 
     return { status, paymentId, external_reference };
   }
+
+async payWithCard(body: {
+  token: string;
+  amount: number;
+  payer_email: string;
+  external_reference?: string;
+  installments?: number;
+}): Promise<any> {
+  const safeBody = {
+    ...body,
+    external_reference: body.external_reference ?? undefined, // 🔹 null -> undefined
+  };
+
+  return await firstValueFrom(
+    this.http.post(`${this.base}/card`, safeBody, { headers: this.headers() })
+  );
+}
 }

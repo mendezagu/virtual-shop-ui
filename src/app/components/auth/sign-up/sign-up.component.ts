@@ -4,10 +4,9 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { HttpClient } from '@angular/common/http';
 import { BrandingSideComponent } from "../../../shared/components/branding-side/branding-side.component";
-import { InputComponent } from '../../../shared/components/input/input.component';
 import { AuthService, RegisterData } from '../../../shared/services/private_services/auth.service';
+import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
   selector: 'app-sign-up',
@@ -19,7 +18,7 @@ import { AuthService, RegisterData } from '../../../shared/services/private_serv
     MatInputModule,
     MatButtonModule,
     BrandingSideComponent,
-    InputComponent
+    InputTextModule
 ],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.scss'
@@ -63,6 +62,7 @@ submit(): void {
     email,
     telefono: String(telefono), // aseguramos string
     password,
+    confirm_password,
     // confirm_password ya no se envía al backend
   };
 

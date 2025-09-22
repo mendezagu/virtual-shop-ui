@@ -45,6 +45,16 @@ export class ProductService {
     return this.http.post(url, producto);
   }
 
+   // 👇 Nuevo método
+  getCategories(storeSlug?: string): Observable<any> {
+    if (storeSlug) {
+      // categorías públicas por tienda
+      return this.http.get(`${this.baseUrl}/public/store/${storeSlug}/categories`);
+    }
+    // si no pasás slug, que devuelva todas las categorías del usuario (admin)
+    return this.http.get(`${this.baseUrl}/categories`);
+  }
+
   // Obtener productos de una tienda
  // (el resto de métodos puede seguir igual)
   getProductsByStore(
@@ -62,4 +72,8 @@ export class ProductService {
     const url = `${this.baseUrl}/${id_producto}`;
     return this.http.put(url, producto);
   }
+
+  updateCategory(id: string, name: string) {
+  return this.http.put(`/api/products/category/${id}`, { name });
+}
 }

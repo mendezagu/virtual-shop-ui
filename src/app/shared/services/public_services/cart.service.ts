@@ -22,6 +22,21 @@ export interface CartResponse {
   total: number;
 }
 
+export type CheckoutResponseMP = {
+  order: any;
+  orderCode: string;
+  preference_id: string;
+  init_point: string;
+};
+
+export type CheckoutResponseCash = {
+  order: any;
+  orderCode: string;
+  whatsappLink: string;
+};
+
+export type CheckoutResponse = CheckoutResponseMP | CheckoutResponseCash;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -77,4 +92,10 @@ export class CartService {
       .delete<CartResponse>(`${this.base}/${slug}/clear`, { headers: this.headers() })
       .pipe(tap(cart => this.cartSubject.next(cart)));
   }
+
+checkout(slug: string, dto: any): Observable<CheckoutResponse> {
+  return this.http.post<CheckoutResponse>(`http://localhost:3000/api/cart/public/${slug}/checkout`, dto, {
+    headers: this.headers(),
+  });
+}
 }

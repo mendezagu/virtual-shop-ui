@@ -43,7 +43,7 @@ export class StoreScheduleComponent {
     });
   }
 
-  /*save() {
+  save() {
     if (!this.storeData) return;
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
 
@@ -62,6 +62,6 @@ export class StoreScheduleComponent {
       next: () => { alert('Horarios actualizados'); this.form.markAsPristine(); this.saved.emit(); },
       error: () => alert('Error al guardar horarios'),
     });
-  }*/
+  }
 
 }

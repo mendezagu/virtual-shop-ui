@@ -1,16 +1,14 @@
 <div class="mt-5 px-4 sm:px-8 w-full">
+  <!-- Descripción -->
   <div class="mb-5">
-    <div class="inline-flex items-center gap-2 rounded-full border border-pink-200 bg-pink-50 px-3 py-1 text-xs text-pink-700">
-      <span class="h-2 w-2 rounded-full bg-pink-500"></span>
-      Contacto
-    </div>
-    <h2 class="mt-2 text-2xl font-semibold tracking-tight text-pink-500">Email y redes sociales</h2>
-    <p class="text-sm text-slate-500 mt-1">Opcionales pero recomendados para que te encuentren.</p>
+    <p class="text-sm text-slate-500 mt-1">
+      Agrega tu información de contacto para que los clientes se comuniquen con
+      vos
+    </p>
   </div>
 
-  <div class="relative bg-white border border-slate-200 rounded-2xl shadow-sm w-full max-w-5xl">
-    <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-300 via-pink-400 to-pink-300"></div>
-
+  <div>
+    <!-- Loading skeleton -->
     <ng-container *ngIf="isLoading; else formTpl">
       <div class="p-6 sm:p-10 space-y-4 animate-pulse">
         <div class="h-5 w-1/3 bg-slate-200 rounded"></div>
@@ -19,31 +17,130 @@
       </div>
     </ng-container>
 
+    <!-- Formulario -->
     <ng-template #formTpl>
-      <form [formGroup]="form" (ngSubmit)="save()" class="p-6 sm:p-10 space-y-4">
-        <app-input formControlName="telefono_contacto" label="Teléfono de contacto" type="text"></app-input>
-        <app-input formControlName="email_contacto" label="Email de contacto" type="email"></app-input>
+      <form [formGroup]="form" (ngSubmit)="save()" class="space-y-6">
+        <!-- Fila 1: Teléfono + Email -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <!-- Teléfono -->
+          <div class="flex flex-col w-full">
+            <label
+              for="telefono_contacto"
+              class="mb-1 text-sm font-medium text-slate-700"
+            >
+              Teléfono de contacto
+            </label>
+            
+            <!--
+            <p-inputMask 
+            mask="(999) 999-9999" 
+            formControlName="telefono_contacto"
+            placeholder="(999) 999-9999" 
+              styleClass="w-full"
+           
+              inputStyleClass="w-full"
+            />
 
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2">Redes sociales</label>
-          <div formArrayName="redes_sociales" class="space-y-2">
-            <div *ngFor="let ctrl of redesSociales.controls; let i=index" class="flex gap-2">
-              <input [formControlName]="i" class="border rounded-xl px-3 py-2 flex-1" placeholder="https://instagram.com/mitienda" />
-              <button type="button" (click)="removeRed(i)" class="rounded-xl border px-3 py-2 text-slate-600 hover:bg-slate-50">Quitar</button>
-            </div>
+            -->
+            <p-inputNumber
+              formControlName="telefono_contacto"
+              inputId="telefono_contacto"
+              pKeyFilter="int"
+              class="block w-full"
+              styleClass="w-full"
+              [inputStyle]="{ width: '100%' }"
+              inputStyleClass="w-full"
+            ></p-inputNumber>
           </div>
-          <button type="button" (click)="addRed()" class="mt-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-2 text-sm hover:bg-emerald-100">
-            + Agregar red
-          </button>
+
+          <!-- Email -->
+          <div class="flex flex-col w-full">
+            <label for="email" class="mb-1 text-sm font-medium text-slate-700">
+              Email de contacto
+            </label>
+            <input
+              pInputText
+              formControlName="email_contacto"
+              placeholder="Ej: miemail@gmail.com"
+              type="email"
+              class="w-full"
+            />
+          </div>
         </div>
 
-        <div class="my-4 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
+       <!-- Redes sociales -->
+<div>
+  <label class="block text-sm font-medium text-slate-700 mb-2">
+    Redes sociales
+  </label>
 
-        <div class="flex justify-end">
-          <button type="submit" [disabled]="form.invalid || form.pristine"
-                  class="rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 shadow-sm">
-            Guardar cambios
-          </button>
+  <div formArrayName="redes_sociales" class="space-y-3">
+    <div
+      *ngFor="let ctrl of redesSociales.controls; let i = index"
+      class="flex flex-col sm:flex-row gap-3 w-full"
+    >
+      <!-- Input -->
+      <input
+        pInputText
+        [formControlName]="i"
+        placeholder="https://instagram.com/mitienda"
+        class="flex-1 w-full"
+      />
+
+      <!-- Botón -->
+      <div class="flex justify-center sm:justify-start">
+        <p-button
+          [disabled]="redesSociales.length <= 2"
+          size="small"
+          label="Quitar"
+          [text]="true"
+          [raised]="true"
+          severity="secondary"
+          (click)="removeRed(i)"
+          class="w-auto sm:w-auto"
+        />
+      </div>
+    </div>
+  </div>
+
+  <p-button
+    type="button"
+    size="small"
+    label="+ Agregar red"
+    [text]="true"
+    [raised]="true"
+    severity="success"
+    (click)="addRed()"
+    class="mt-3 w-full sm:w-auto"
+  />
+</div>
+
+
+        <!-- Divider -->
+        <div
+          class="my-4 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"
+        ></div>
+
+        <!-- Botones -->
+        <div class="flex  items-center justify-end gap-3">
+          <p-button
+            type="button"
+            severity="secondary"
+            label="Cancelar"
+            [outlined]="true"
+            [rounded]="true"
+            size="small"
+     
+          />
+          <p-button
+            type="submit"
+            [disabled]="form.invalid || form.pristine"
+            label="Guardar cambios"
+            [rounded]="true"
+            severity="success"
+            size="small"
+      
+          />
         </div>
       </form>
     </ng-template>

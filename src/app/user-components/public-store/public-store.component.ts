@@ -22,10 +22,17 @@ export class PublicStoreComponent {
   ngOnInit(): void {
     this.slug = this.route.snapshot.paramMap.get('slug')!;
     this.publicStoreService.getStoreBySlug(this.slug).subscribe({
-      next: (data) => {
-        this.store = data;
-        this.isLoading = false;
-      },
+next: (data) => {
+  this.store = data;
+  this.isLoading = false;
+
+  // 🎨 Aplica variables de color a este componente (scope local)
+  const el = document.querySelector('app-public-store') as HTMLElement;
+  if (el) {
+    el.style.setProperty('--primary', this.store.primary_color || '#ff4081');
+    el.style.setProperty('--secondary', this.store.secondary_color || '#00bfa5');
+  }
+},
       error: () => {
         this.hasError = true;
         this.isLoading = false;

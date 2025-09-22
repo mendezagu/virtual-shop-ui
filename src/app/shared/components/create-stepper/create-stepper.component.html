@@ -1,161 +1,98 @@
 <div class="flex min-h-[100dvh] bg-neutral-50">
-  <!-- Sidebar / Stepper (desktop) -->
-  <aside class="hidden md:block w-80 shrink-0 border-r border-neutral-200 bg-white sticky top-0 h-screen p-5">
-    <header class="mb-6">
-      <h2 class="text-lg font-semibold tracking-tight text-neutral-800">Crear tienda</h2>
-      <p class="text-sm text-neutral-500">Completá los pasos para publicar</p>
-    </header>
+  <!-- Sidebar Stepper (solo visible en desktop) -->
+  <aside
+    class="hidden md:block w-80 shrink-0 border-r border-slate-200 bg-white sticky top-0 h-screen p-6 shadow-sm"
+  >
+    <div class="mb-6">
+      <h2 class="text-xl font-bold text-slate-800">Crear tienda</h2>
+      <p class="text-sm text-slate-500">Completá los pasos para publicar</p>
+    </div>
 
-    <ol class="relative mt-4">
-      <div class="absolute left-5 top-0 h-full w-px bg-gradient-to-b from-pink-200 via-neutral-200 to-transparent"></div>
-      <li *ngFor="let step of steps; let i = index" class="relative">
-        <button
-          class="group w-full text-left px-4 py-3 rounded-xl transition hover:bg-pink-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-300 mb-2"
-          (click)="selectStep(step)"
-          [attr.aria-current]="step.status === 'current' ? 'step' : null">
-          <div class="flex items-start gap-3">
-            <span class="relative z-10 inline-flex h-10 w-10 items-center justify-center rounded-full ring-1 transition"
-              [ngClass]="{
-                'bg-pink-500 text-white ring-pink-500 shadow-lg shadow-pink-200': step.status === 'current',
-                'bg-emerald-500 text-white ring-emerald-400': step.status === 'done',
-                'bg-white text-neutral-400 ring-neutral-200': step.status === 'upcoming'
-              }">
-              <svg *ngIf="step.status==='done'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5">
-                <path fill="currentColor" d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-              </svg>
-              <span *ngIf="step.status==='current'" class="text-sm font-semibold">{{ i + 1 }}</span>
-              <svg *ngIf="step.status==='upcoming'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 opacity-70">
-                <path fill="currentColor" d="M12 7a 1 1 0 0 1 1 1v3.59l2.3 2.3a1 1 0 1 1-1.4 1.42l-2.6-2.6A1 1 0 0 1 11 12V8a1 1 0 0 1 1-1z"/>
-              </svg>
-            </span>
-
-            <div class="min-w-0">
-              <div class="flex items-center gap-2">
-                <h3 class="truncate text-sm font-semibold"
-                    [ngClass]="selectedStep.id === step.id ? 'text-neutral-800' : 'text-neutral-600'">
-                  {{ step.title }}
-                </h3>
-                <span *ngIf="step.status==='done'"
-                      class="inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium
-                             border-emerald-200 text-emerald-700 bg-emerald-50">Listo</span>
-              </div>
-              <p class="truncate text-xs text-neutral-500">{{ step.subtitle }}</p>
-            </div>
-          </div>
-        </button>
-      </li>
-    </ol>
+    <p-stepper
+      orientation="vertical"
+      [(activeStep)]="activeStepIndex"
+      styleClass="modern-stepper"
+    >
+      <p-stepperPanel header="Información básica"></p-stepperPanel>
+      <p-stepperPanel header="Contacto"></p-stepperPanel>
+      <p-stepperPanel header="Ubicación y horarios"></p-stepperPanel>
+    </p-stepper>
   </aside>
 
-  <!-- Overlay Stepper (mobile) -->
-  <button
-    class="md:hidden fixed left-4 top-20 z-[1001] rounded-full border border-neutral-200 bg-white/90 backdrop-blur px-3 py-2 text-sm font-medium text-neutral-700 shadow-sm
-           hover:bg-white active:scale-[0.98] transition"
-    (click)="openMobileSteps()">
-    <span class="inline-flex items-center gap-2">
-      <svg class="h-4 w-4 text-pink-500" viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zM3 11h18v2H3zM3 16h12v2H3z"/></svg>
-      Pasos
-    </span>
-  </button>
-
-  <div class="md:hidden" [class.pointer-events-none]="!mobileStepsOpen">
-    <div class="fixed inset-0 bg-black/30 z-[1000] transition-opacity"
-         [class.opacity-0]="!mobileStepsOpen"
-         [class.opacity-100]="mobileStepsOpen"
-         (click)="closeMobileSteps()"></div>
-
-    <aside class="fixed inset-y-0 left-0 w-[82vw] max-w-[320px] bg-white z-[1001] shadow-xl border-r border-neutral-200
-                   transition-transform duration-200 ease-out"
-           [class.-translate-x-full]="!mobileStepsOpen"
-           [class.translate-x-0]="mobileStepsOpen">
-      <div class="p-5 border-b border-neutral-200 flex items-center justify-between">
-        <div>
-          <h3 class="text-sm font-semibold text-neutral-800">Pasos</h3>
-          <p class="text-xs text-neutral-500">Completá cada paso</p>
-        </div>
-        <button class="rounded-xl border px-3 py-1.5 text-sm text-neutral-600 hover:bg-neutral-50"
-                (click)="closeMobileSteps()">Cerrar</button>
+  <!-- Contenido dinámico -->
+  <main class="flex-1 relative">
+    <div class="max-w-3xl mx-auto">
+      <div class="mb-6">
+        <h1 class="text-2xl font-semibold text-slate-800">
+          {{ stepTitles[activeStepIndex] }}
+        </h1>
+        <p class="text-sm text-slate-500">
+          {{ stepSubtitles[activeStepIndex] }}
+        </p>
       </div>
 
-      <div class="p-4">
-        <ol class="relative">
-          <div class="absolute left-5 top-0 h-full w-px bg-gradient-to-b from-pink-200 via-neutral-200 to-transparent"></div>
-          <li *ngFor="let step of steps; let i = index" class="relative">
-            <button class="group w-full text-left px-4 py-3 rounded-xl transition hover:bg-pink-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-300 mb-2"
-                    (click)="selectStep(step)">
-              <div class="flex items-start gap-3">
-                <span class="relative z-10 inline-flex h-10 w-10 items-center justify-center rounded-full ring-1 transition"
-                  [ngClass]="{
-                    'bg-pink-500 text-white ring-pink-500 shadow-lg shadow-pink-200': step.status === 'current',
-                    'bg-emerald-500 text-white ring-emerald-400': step.status === 'done',
-                    'bg-white text-neutral-400 ring-neutral-200': step.status === 'upcoming'
-                  }">
-                  <svg *ngIf="step.status==='done'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5">
-                    <path fill="currentColor" d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                  </svg>
-                  <span *ngIf="step.status==='current'" class="text-sm font-semibold">{{ i + 1 }}</span>
-                  <svg *ngIf="step.status==='upcoming'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 opacity-70">
-                    <path fill="currentColor" d="M12 7a1 1 0 0 1 1 1v3.59l2.3 2.3a1 1 0 1 1-1.4 1.42l-2.6-2.6A1 1 0 0 1 11 12V8a1 1 0 0 1 1-1z"/>
-                  </svg>
-                </span>
+      <!-- Contenido renderizado -->
+      <div
+        class="rounded-2xl border border-slate-200 bg-white shadow-sm  relative"
+      >
+        <ng-container [ngSwitch]="activeStepIndex">
+          <app-basic-store-info
+            *ngSwitchCase="0"
+            (saved)="goNext()"
+          ></app-basic-store-info>
 
-                <div class="min-w-0">
-                  <h4 class="truncate text-sm font-semibold"
-                      [ngClass]="selectedStep.id === step.id ? 'text-neutral-800' : 'text-neutral-600'">
-                    {{ step.title }}
-                  </h4>
-                  <p class="truncate text-xs text-neutral-500">{{ step.subtitle }}</p>
-                </div>
-              </div>
-            </button>
-          </li>
-        </ol>
+          <app-store-contact
+            *ngSwitchCase="1"
+            (saved)="goNext()"
+            (back)="goPrev()"
+          ></app-store-contact>
+
+          <app-store-ubication-schedule
+            *ngSwitchCase="2"
+            (saved)="goNext()"
+            (back)="goPrev()"
+          ></app-store-ubication-schedule>
+        </ng-container>
       </div>
-    </aside>
-  </div>
+    </div>
 
-  <!-- Panel derecho (contenido) -->
-  <main class="flex-1 overflow-y-auto">
-    <div class="mx-auto w-full max-w-3xl p-4 md:p-6">
-      <div class="mb-6 flex items-center justify-between">
-        <div>
-          <div class="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs text-neutral-500">
-            Paso: <strong class="text-neutral-800 ml-1">{{ selectedStep.title }}</strong>
-          </div>
-          <h1 class="mt-3 text-2xl font-semibold tracking-tight text-neutral-800">
-            {{ selectedStep.subtitle }}
-          </h1>
-        </div>
+    <!-- FAB (solo en mobile) -->
+    <button
+      (click)="openMobileSteps()"
+      class="fixed bottom-6 right-6 md:hidden rounded-full bg-indigo-600 p-4 shadow-lg text-white hover:bg-indigo-700 focus:outline-none"
+      aria-label="Abrir pasos"
+    >
+      <i class="pi pi-bars text-lg"></i>
+    </button>
 
-        <button class="md:hidden rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
-                (click)="openMobileSteps()">
-          Ver pasos
+    <!-- Overlay para mobile -->
+    <div
+      *ngIf="mobileStepsOpen"
+      class="fixed inset-0 bg-black/40 z-40 md:hidden"
+      (click)="closeMobileSteps()"
+    ></div>
+
+    <!-- Stepper en mobile (slide-in) -->
+    <div
+      *ngIf="mobileStepsOpen"
+      class="fixed top-0 left-0 h-full w-72 bg-white shadow-lg z-50 p-6 transition-transform transform md:hidden"
+    >
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-lg font-bold text-slate-800">Pasos</h2>
+        <button (click)="closeMobileSteps()" aria-label="Cerrar">
+          <i class="pi pi-times text-slate-500 hover:text-slate-700"></i>
         </button>
       </div>
 
-      <section class="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-        <ng-container [ngSwitch]="selectedStep.content">
-          <!-- Paso 1: Crear tienda (avanza al guardar gracias a (saved)) -->
-          <div *ngSwitchCase="'form-basic'">
-            <app-createstore (saved)="goNext()"></app-createstore>
-          </div>
-
-          <!-- Paso 2: Contacto -->
-          <div *ngSwitchCase="'form-contact'">
-            <app-store-contact (saved)="goNext()"></app-store-contact>
-          </div>
-
-          <!-- Paso 3: Ubicación -->
-          <div *ngSwitchCase="'form-address'">
-            <app-store-ubication (saved)="goNext()"></app-store-ubication>
-          </div>
-
-          <!-- Paso 4: Horarios -->
-          <div *ngSwitchCase="'form-schedule'">
-            <app-store-schedule (saved)="goNext()"></app-store-schedule>
-          </div>
-        </ng-container>
-      </section>
+      <p-stepper
+        orientation="vertical"
+        [(activeStep)]="activeStepIndex"
+        styleClass="modern-stepper"
+      >
+        <p-stepperPanel header="Información básica"></p-stepperPanel>
+        <p-stepperPanel header="Contacto"></p-stepperPanel>
+        <p-stepperPanel header="Ubicación y horarios"></p-stepperPanel>
+      </p-stepper>
     </div>
   </main>
 </div>

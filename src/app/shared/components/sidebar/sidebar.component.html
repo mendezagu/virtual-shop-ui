@@ -1,59 +1,66 @@
-<!-- Encabezado del sidebar -->
-<div class="px-4 pt-4 pb-3">
-  <div class="rounded-2xl p-4 border border-slate-200 bg-gradient-to-br from-pink-50 to-white">
-    <div class="flex items-center gap-3">
-      <div class="h-10 w-10 rounded-xl bg-pink-500 text-white flex items-center justify-center shadow">
-        <mat-icon>storefront</mat-icon>
+<p-sidebar  [(visible)]="visible"
+  [modal]="true"
+ 
+  styleClass="w-18rem"
+  (onHide)="close()"  styleClass="w-18rem">
+  <div class="flex flex-col h-full">
+    <!-- Encabezado -->
+    <div class="px-4 pt-4 pb-3">
+      <div
+        class="rounded-2xl p-4 border border-slate-200 bg-gradient-to-br from-pink-50 to-white flex items-center gap-3"
+      >
+        <div class="h-10 w-10 rounded-xl bg-purple-950 text-white flex items-center justify-center shadow">
+          <i class="pi pi-shop"></i>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500">Bienvenido</p>
+          <h3 class="text-sm font-semibold text-slate-800">Panel del vendedor</h3>
+        </div>
       </div>
-      <div>
-        <p class="text-xs text-slate-500">Bienvenido</p>
-        <h3 class="text-sm font-semibold text-slate-800">Panel del vendedor</h3>
+    </div>
+
+    <!-- Navegación -->
+    <ul class="list-none p-0 m-0 flex-1">
+      <li>
+        <a pRipple (click)="redirectToHome(); close()" class="flex items-center p-3 rounded-lg cursor-pointer text-slate-700 hover:bg-pink-50">
+          <i class="pi pi-home text-purple-500 mr-2"></i>
+          <span class="font-medium">Home</span>
+        </a>
+      </li>
+      <li>
+        <a pRipple (click)="redirectToStepper(); close()" class="flex items-center p-3 rounded-lg cursor-pointer text-slate-700 hover:bg-pink-50">
+          <i class="pi pi-shop text-purple-500 mr-2"></i>
+          <span class="font-medium">Mi tienda</span>
+        </a>
+      </li>
+      <li>
+        <a pRipple (click)="redirectToMyProducts(); close()" class="flex items-center p-3 rounded-lg cursor-pointer text-slate-700 hover:bg-pink-50">
+          <i class="pi pi-shopping-bag text-purple-500 mr-2"></i>
+          <span class="font-medium">Mis productos</span>
+        </a>
+      </li>
+      <li>
+        <a pRipple (click)="redirectToMyCategories(); close()" class="flex items-center p-3 rounded-lg cursor-pointer text-slate-700 hover:bg-pink-50">
+          <i class="pi pi-tags text-purple-500 mr-2"></i>
+          <span class="font-medium">Categorías</span>
+        </a>
+      </li>
+      <li>
+        <a pRipple (click)="logout(); close()" class="flex items-center p-3 rounded-lg cursor-pointer text-slate-700 hover:bg-pink-50">
+          <i class="pi pi-sign-out text-purple-500 mr-2"></i>
+          <span class="font-medium">Cerrar sesión</span>
+        </a>
+      </li>
+    </ul>
+
+    <!-- Footer -->
+    <div class="px-4 pb-4">
+      <div class="rounded-xl border border-slate-200 bg-white p-3 text-xs text-slate-500 flex items-center justify-between">
+        <span>Estado</span>
+        <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5">
+          <span class="h-2 w-2 rounded-full bg-emerald-500"></span> Activo
+        </span>
       </div>
     </div>
   </div>
-</div>
-
-<!-- Navegación -->
-<mat-nav-list class="px-2 pb-3">
-  <a
-    mat-list-item
-    class="group rounded-xl my-1 px-3 py-2 hover:bg-pink-50 transition"
-    (click)="redirectToHome()"
-    aria-label="Ir a Home"
-  >
-    <mat-icon class="text-pink-500 group-hover:scale-110 transition">home</mat-icon>
-    <span class="text-slate-700 font-medium ml-3">Home</span>
-  </a>
-
-  <a
-    mat-list-item
-    class="group rounded-xl my-1 px-3 py-2 hover:bg-pink-50 transition"
-    (click)="redirectToStepper()"
-    aria-label="Ir a Mi tienda"
-  >
-    <mat-icon class="text-pink-500 group-hover:scale-110 transition">store</mat-icon>
-    <span class="text-slate-700 font-medium ml-3">Mi tienda</span>
-  </a>
-
-  <a
-    mat-list-item
-    class="group rounded-xl my-1 px-3 py-2 hover:bg-pink-50 transition"
-    (click)="logout()"
-    aria-label="Cerrar sesión"
-  >
-    <mat-icon class="text-pink-500 group-hover:scale-110 transition">logout</mat-icon>
-    <span class="text-slate-700 font-medium ml-3">Cerrar sesión</span>
-  </a>
-</mat-nav-list>
-
-<!-- Footer del sidebar -->
-<div class="px-4 pb-4">
-  <div class="rounded-xl border border-slate-200 bg-white p-3 text-xs text-slate-500">
-    <div class="flex items-center justify-between">
-      <span>Estado</span>
-      <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5">
-        <span class="h-2 w-2 rounded-full bg-emerald-500"></span> Activo
-      </span>
-    </div>
-  </div>
-</div>
+</p-sidebar>

@@ -1,0 +1,79 @@
+:host ::ng-deep .p-dropdown {
+  width: 100% !important;
+}
+
+.upload-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1.5rem;
+  background-color: #fff;
+  text-align: center;
+}
+
+.upload-header {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn-select {
+  background: #f3e8ff;
+  color: #9333ea;
+  border: 1px solid #e9d5ff;
+}
+
+.btn-gallery {
+  background: #fff7ed;
+  color: #ea580c;
+  border: 1px solid #fed7aa;
+}
+
+.upload-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #6b7280;
+}
+
+.upload-icon {
+  font-size: 3rem;
+  color: #3b82f6;
+  margin-bottom: 0.8rem;
+}
+
+.upload-info {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.upload-files {
+  margin-top: 1rem;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.file-icon {
+  color: #3b82f6;
+  margin-right: 0.5rem;
+}
+
+.file-name {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.btn-remove {
+  background: transparent !important;
+  border: none !important;
+  color: #ef4444 !important;
+}

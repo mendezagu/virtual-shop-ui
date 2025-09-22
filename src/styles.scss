@@ -6,6 +6,9 @@
 @tailwind components;
 @tailwind utilities;
 
+
+@import "../node_modules/quill/dist/quill.core.css";
+@import "../node_modules/quill/dist/quill.snow.css";
 :host {
   display: block;
   width: 250px;       /* ancho del sidebar */
@@ -20,6 +23,22 @@
 //toolbar
 ::ng-deep mat-toolbar.custom-toolbar {
   background-color: #8CDE81 !important;
+}
+
+
+:root {
+  --primary: #ff4081;   /* defaults */
+  --secondary: #00bfa5;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+}
+
+.btn-secondary {
+  background-color: var(--secondary);
+  color: white;
 }
 
 

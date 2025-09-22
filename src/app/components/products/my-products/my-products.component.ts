@@ -188,4 +188,15 @@ export class MyProductsComponent implements OnInit {
     this.currentPage = event.pageIndex;
     this.loadProducts(this.currentPage, this.pageSize, this.searchCtrl.value || '');
   }
+
+  uploadImage(product: any, index: number) {
+  // Aquí podés abrir un file picker o tu modal de subida
+  console.log("Subir imagen para", product.nombre_producto, "slot", index);
+}
+
+removeImage(product: any, index: number) {
+  if (product.imagen_url) {
+    product.imagen_url.splice(index, 1);
+  }
+}
 }

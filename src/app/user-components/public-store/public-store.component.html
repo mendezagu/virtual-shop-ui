@@ -1,5 +1,4 @@
 <div class="min-h-[100dvh] bg-neutral-50">
-  <!-- Encabezado -->
   <!-- ===== Loading / Error mínimos ===== -->
   <div *ngIf="isLoading" class="p-6 text-slate-500">Cargando tienda…</div>
   <div *ngIf="!isLoading && hasError" class="p-6 text-rose-600">
@@ -30,7 +29,7 @@
           {{ store?.nombre_tienda || slug || "Tienda" }}
         </h1>
 
-        <!-- Ejemplo de rubros si quieres mostrarlos -->
+        <!-- Rubros -->
         <div *ngIf="rubros().length" class="mt-6 text-sm text-slate-600">
           <span class="font-medium text-slate-800">Rubros:&nbsp;</span>
           <span class="inline-flex flex-wrap gap-1 align-middle">
@@ -43,7 +42,7 @@
           </span>
         </div>
 
-        <!-- Descripción en el header -->
+        <!-- Descripción -->
         <p
           *ngIf="store?.descripcion"
           class="text-white/90 text-sm mt-1 line-clamp-2"
@@ -51,7 +50,7 @@
           {{ store.descripcion }}
         </p>
 
-        <!-- Línea de info (opcional) -->
+        <!-- Línea de info -->
         <p class="text-white/90 text-sm mt-1 flex flex-wrap gap-x-2 gap-y-0.5">
           <span *ngIf="store?.tiempo_entrega">{{ store.tiempo_entrega }}</span>
           <span
@@ -86,12 +85,13 @@
             />
             <button
               type="button"
-              class="absolute right-1.5 top-1.5 h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-rose-600 grid place-items-center shadow"
+              class="absolute right-1.5 top-1.5 h-7 w-7 sm:h-8 sm:w-8 rounded-full grid place-items-center shadow"
               aria-label="Buscar"
+              [ngStyle]="{ backgroundColor: 'var(--secondary)' }"
             >
-              <mat-icon class="!text-white !text-[18px] sm:!text-[20px]"
-                >search</mat-icon
-              >
+              <mat-icon class="!text-white !text-[18px] sm:!text-[20px]">
+                search
+              </mat-icon>
             </button>
           </div>
         </div>
@@ -102,28 +102,33 @@
     <main
       class="max-w-6xl mx-auto px-4 sm:px-8 pb-10 grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6"
     >
-      <!-- Contenido principal (aquí podrías inyectar el listado/carruseles de productos si corresponde) -->
+      <!-- Contenido principal -->
       <section class="lg:col-span-8">
         <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-4">
-          <h3
-            class="text-sm font-semibold text-slate-800 flex items-center gap-2"
-          >
-            <mat-icon class="!text-rose-500 !text-[18px]">category</mat-icon>
+          <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+            <mat-icon
+              class="!text-[18px]"
+              [ngStyle]="{ color: 'var(--primary)' }"
+              >category</mat-icon
+            >
             Categorías
           </h3>
 
           <div class="mt-4">
             <ng-container *ngIf="categories?.length; else noCat">
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div
+                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+              >
                 <a
                   *ngFor="let c of categories"
-                    [routerLink]="['/store', slug, 'categoria', c.slug]"
+                  [routerLink]="['/store', slug, 'categoria', c.slug]"
                   class="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow-md transition flex items-center justify-between"
                 >
                   <!-- texto -->
                   <div class="min-w-0 pr-3">
                     <div
-                      class="text-sm font-semibold text-slate-900 group-hover:text-rose-600"
+                      class="text-sm font-semibold text-slate-900"
+                      [ngStyle]="{ color: 'var(--primary)' }"
                     >
                       {{ c.name }}
                     </div>
@@ -144,7 +149,11 @@
                     />
                     <ng-template #bubble>
                       <div
-                        class="absolute right-0 top-1/2 -translate-y-1/2 h-16 w-16 rounded-xl bg-gradient-to-br from-rose-100 to-rose-200"
+                        class="absolute right-0 top-1/2 -translate-y-1/2 h-16 w-16 rounded-xl"
+                        [ngStyle]="{
+                          background:
+                            'linear-gradient(to bottom right, var(--primary), var(--secondary))'
+                        }"
                       ></div>
                     </ng-template>
                   </div>
@@ -157,28 +166,24 @@
             </ng-template>
           </div>
         </div>
-
-        <!-- Aquí tu propio contenido principal 
-        <div
-          class="rounded-2xl border border-slate-200 bg-white shadow-sm p-4 text-slate-500"
-        >
-          Contenido principal de la tienda…
-        </div> -->
       </section>
 
       <!-- Sidebar -->
       <aside class="lg:col-span-4 space-y-4">
         <!-- Contacto -->
         <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-4">
-          <h3
-            class="text-sm font-semibold text-slate-800 flex items-center gap-2"
-          >
-            <mat-icon class="!text-rose-500 !text-[18px]">call</mat-icon>
+          <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+            <mat-icon
+              class="!text-[18px]"
+              [ngStyle]="{ color: 'var(--primary)' }"
+              >call</mat-icon
+            >
             Contacto
           </h3>
           <div class="mt-2 text-sm text-slate-600 space-y-1.5">
-            <div *ngIf="store?.telefono">
-              <span class="font-medium">Teléfono:</span> {{ store.telefono }}
+            <div *ngIf="store?.telefono_contacto">
+              <span class="font-medium">Teléfono:</span>
+              {{ store.telefono_contacto }}
             </div>
             <div *ngIf="store?.email">
               <span class="font-medium">Email:</span> {{ store.email }}
@@ -186,7 +191,8 @@
             <div *ngIf="store?.web">
               <span class="font-medium">Web:</span>
               <a
-                class="text-rose-600 hover:underline"
+                class="hover:underline"
+                [ngStyle]="{ color: 'var(--secondary)' }"
                 [href]="store.web"
                 target="_blank"
                 rel="noopener"
@@ -196,12 +202,13 @@
             <div *ngIf="store?.instagram">
               <span class="font-medium">Instagram:</span>
               <a
-                class="text-rose-600 hover:underline"
+                class="hover:underline"
+                [ngStyle]="{ color: 'var(--secondary)' }"
                 [href]="store.instagram"
                 target="_blank"
                 rel="noopener"
               >
-                <span></span>{{ getInstagramHandle(store.instagram) }}
+                {{ getInstagramHandle(store.instagram) }}
               </a>
             </div>
           </div>
@@ -209,15 +216,18 @@
 
         <!-- Ubicación -->
         <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-4">
-          <h3
-            class="text-sm font-semibold text-slate-800 flex items-center gap-2"
-          >
-            <mat-icon class="!text-rose-500 !text-[18px]">location_on</mat-icon>
+          <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+            <mat-icon
+              class="!text-[18px]"
+              [ngStyle]="{ color: 'var(--primary)' }"
+              >location_on</mat-icon
+            >
             Ubicación
           </h3>
           <div class="mt-2 text-sm text-slate-600 space-y-1.5">
             <div *ngIf="store?.direccion">
-              <span class="font-medium">Dirección:</span> {{ store.direccion }}
+              <span class="font-medium">Dirección:</span>
+              {{ store.direccion }}
             </div>
             <div *ngIf="store?.ciudad || store?.provincia">
               <span class="font-medium">Ciudad:</span> {{ store.ciudad }}
@@ -225,7 +235,8 @@
             </div>
             <a
               *ngIf="store?.direccion"
-              class="inline-flex items-center gap-1 text-rose-600 hover:underline mt-1"
+              class="inline-flex items-center gap-1 hover:underline mt-1"
+              [ngStyle]="{ color: 'var(--secondary)' }"
               [href]="
                 'https://www.google.com/maps/search/?api=1&query=' +
                 store.direccion
@@ -241,10 +252,12 @@
 
         <!-- Horarios -->
         <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-4">
-          <h3
-            class="text-sm font-semibold text-slate-800 flex items-center gap-2"
-          >
-            <mat-icon class="!text-rose-500 !text-[18px]">schedule</mat-icon>
+          <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+            <mat-icon
+              class="!text-[18px]"
+              [ngStyle]="{ color: 'var(--primary)' }"
+              >schedule</mat-icon
+            >
             Horarios
           </h3>
           <div class="mt-2 text-sm text-slate-600">
@@ -258,11 +271,11 @@
               </li>
             </ul>
             <ng-template #horarioTexto>
-              <p *ngIf="store?.horario" class="whitespace-pre-line">
-                {{ store.horario }}
+              <p *ngIf="store?.horario_cierre" class="whitespace-pre-line">
+                {{ store.horario_apertura }} - {{ store.horario_cierre }}
               </p>
               <p
-                *ngIf="!store?.horarios && !store?.horario"
+                *ngIf="!store?.horarios && !store?.horario_apertura"
                 class="text-slate-400"
               >
                 No informado.

@@ -26,7 +26,7 @@ export class PublicStoreService {
 
   // Obtener producto individual por ID
   getProductById(id: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/products/public/${id}`);
+    return this.http.get(`${this.apiUrl}/products/${id}`);
   }
 
   // Categorías de la tienda

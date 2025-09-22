@@ -19,26 +19,27 @@
         </div>
 
         <div class="flex flex-col mb-3">
-          <app-input
-            formControlName="email"
-            [control]="form.get('email')"
+          <label for="username">Eamil</label>
+
+          <input
+            pInputText
+            id="username"
             type="email"
-            placeholder="Ej: email@example.com"
-            label="Email"
-          ></app-input>
-         
+            placeholder="juan.perez@gmail.com"
+            aria-describedby="username-help"
+            formControlName="email"
+          />
         </div>
 
         <div class="flex flex-col mb-3">
-          <app-input
+             <label for="username">Contraseña</label>
+          <input
+            pInputText
             formControlName="password"
-            [control]="form.get('password')"
             type="password"
             placeholder="Contraseña"
             label="Contraseña"
-          ></app-input>
-
-          
+          />
         </div>
 
         <div class="flex items-center justify-between">

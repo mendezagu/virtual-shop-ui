@@ -1,73 +1,68 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CreatestoreComponent } from '../../../components/stores/createstore/createstore.component';// 👈 nuestro form de crear
-import { StoreContactComponent } from "../../../components/stores/store-contact/store-contact.component";
-import { StoreUbicationComponent } from "../../../components/stores/store-ubication/store-ubication.component";
-import { StoreScheduleComponent } from "../../../components/stores/store-schedule/store-schedule.component";
+import { StepperModule } from 'primeng/stepper';
+import { ButtonModule } from 'primeng/button';
+import { RippleModule } from 'primeng/ripple';
 
-type StepStatus = 'done' | 'current' | 'upcoming';
-interface Step {
-  id: 'basic' | 'contact' | 'address' | 'schedule';
-  title: string;
-  subtitle: string;
-  content: 'form-basic' | 'form-contact' | 'form-address' | 'form-schedule';
-  status: StepStatus;
-}
+import { MyStoreComponent } from '../../../components/stores/store-basic-info/store-basic-info.component';
+import { StoreContactComponent } from '../../../components/stores/store-contact/store-contact.component';
+import { StoreUbicationScheduleComponent } from '../../../components/stores/store-ubication-schedule/store-ubication-schedule.component';
+import { StoreScheduleComponent } from '../../../components/stores/store-schedule/store-schedule.component';
+
 @Component({
   selector: 'app-create-stepper',
   standalone: true,
-  imports: [ CommonModule,
-    CreatestoreComponent,
+  imports: [
+    CommonModule,
+    StepperModule,
+    ButtonModule,
+    RippleModule,
+    MyStoreComponent,
     StoreContactComponent,
-    StoreUbicationComponent,
-    StoreScheduleComponent,],
+    StoreUbicationScheduleComponent,
+    StoreScheduleComponent,
+  ],
   templateUrl: './create-stepper.component.html',
-  styleUrl: './create-stepper.component.scss'
+  styleUrls: ['./create-stepper.component.scss'],
 })
 export class CreateStepperComponent {
-mobileStepsOpen = false;
+  // estado de mobile overlay
+  mobileStepsOpen = false;
+  activeStepIndex = 0;
 
-  steps: Step[] = [
-    { id: 'basic',    title: 'Información básica', subtitle: 'Datos iniciales',     content: 'form-basic',    status: 'current' },
-    { id: 'contact',  title: 'Contacto',           subtitle: 'Email y redes',       content: 'form-contact',  status: 'upcoming' },
-    { id: 'address',  title: 'Ubicación',          subtitle: 'Dirección y mapa',    content: 'form-address',  status: 'upcoming' },
-    { id: 'schedule', title: 'Horarios',           subtitle: 'Apertura y cierre',   content: 'form-schedule', status: 'upcoming' },
+  stepTitles = [
+    'Información básica',
+    'Contacto',
+    'Ubicación y horarios',
+    
   ];
 
-  get selectedStep(): Step {
-    return this.steps.find(s => s.status === 'current')!;
-  }
+  stepSubtitles = [
+    'Datos iniciales de la tienda',
+    'Teléfono, email y redes sociales',
+    'Dirección y zona de entrega',
+    'Horarios de apertura y cierre',
+  ];
 
-  selectStep(step: Step) {
-    this.steps = this.steps.map(s => ({
-      ...s,
-      status: s.id === step.id
-        ? 'current'
-        : this.isBefore(s.id, step.id) ? 'done' : 'upcoming'
-    }));
+  openMobileSteps() {
+    this.mobileStepsOpen = true;
+  }
+  closeMobileSteps() {
     this.mobileStepsOpen = false;
+  }
+  @HostListener('document:keydown.escape') onEsc() {
+    this.closeMobileSteps();
   }
 
   goNext() {
-    const idx = this.steps.findIndex(s => s.status === 'current');
-    if (idx === -1 || idx === this.steps.length - 1) return;
-    this.steps = this.steps.map((s, i) =>
-      i < idx + 1 ? { ...s, status: 'done' } :
-      i === idx + 1 ? { ...s, status: 'current' } :
-      { ...s, status: 'upcoming' }
-    );
+    if (this.activeStepIndex < 3) {
+      this.activeStepIndex++;
+    }
   }
 
-  private isBefore(aId: Step['id'], bId: Step['id']) {
-    const a = this.steps.findIndex(s => s.id === aId);
-    const b = this.steps.findIndex(s => s.id === bId);
-    return a < b;
+  goPrev() {
+    if (this.activeStepIndex > 0) {
+      this.activeStepIndex--;
+    }
   }
-
-  openMobileSteps()  { this.mobileStepsOpen = true; }
-  closeMobileSteps() { this.mobileStepsOpen = false; }
-
-  // Cerrar con ESC
-  @HostListener('document:keydown.escape') onEsc() { this.closeMobileSteps(); }
 }
-

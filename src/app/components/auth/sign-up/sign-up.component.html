@@ -17,62 +17,57 @@
             >
           </span>
         </div>
+        <div class="flex flex-col">
+          <label for="username">Nombre</label>
+          <input
+            pInputText
+            formControlName="nombre"
+            type="text"
+            placeholder="Ej: Juan"
+          />
 
-        <app-input
-          formControlName="nombre"
-          [control]="signUpForm.get('nombre')"
-          type="text"
-          placeholder="Ej: Juan"
-          label="Nombre"
-        >
-        </app-input>
-       
+          <label for="username">Apellido</label>
+          <input
+            pInputText
+            formControlName="apellido"
+            type="text"
+            placeholder="Ej: Pérez"
+          />
 
-        <app-input
-          formControlName="apellido"
-          [control]="signUpForm.get('apellido')"
-          type="text"
-          placeholder="Ej: Pérez"
-          label="Apellido"
-        >
-        </app-input>
-     
+          <label for="username">Email</label>
+          <input
+            pInputText
+            formControlName="email"
+            type="email"
+            placeholder="Ej: email@example.com"
+            label="Email"
+          />
 
-        <app-input
-          formControlName="email"
-          [control]="signUpForm.get('email')"
-          type="email"
-          placeholder="Ej: email@example.com"
-          label="Email"
-        ></app-input>
-     
+          <label for="username">Telefono</label>
+          <input
+            pInputText
+            formControlName="telefono"
+            type="number"
+            placeholder="Ej: 123456789"
+          />
 
-        <app-input
-          formControlName="telefono"
-          [control]="signUpForm.get('telefono')"
-          type="number"
-          placeholder="Ej: 123456789"
-          label="Teléfono"
-        ></app-input>
-    
+          <label for="username">Contraseña</label>
+          <input
+            pInputText
+            formControlName="password"
+            type="password"
+            placeholder="Contraseña"
+          />
 
-        <app-input
-          formControlName="password"
-          [control]="signUpForm.get('password')"
-          type="password"
-          placeholder="Contraseña"
-          label="Contraseña"
-        ></app-input>
-   
+          <label for="username">Repetir contaseña</label>
+          <input
+            pInputText
+            formControlName="confirm_password"
+            type="password"
+            placeholder="Repetir contraseña"
+          />
+        </div>
 
-        <app-input
-          formControlName="confirm_password"
-          [control]="signUpForm.get('confirm_password')"
-          type="password"
-          placeholder="Confirmar contraseña"
-          label="Confirmar contraseña"
-        ></app-input>
-        
         <button
           type="submit"
           mat-raised-button

@@ -1,0 +1,15 @@
+<div class="min-h-screen bg-neutral-50">
+  <ng-container *ngIf="isLoading">
+    <div class="flex items-center justify-center h-screen">
+      <p class="text-neutral-500">Cargando...</p>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!isLoading">
+    <!-- Si el usuario no tiene tienda -->
+    <app-create-stepper *ngIf="!hasStore"></app-create-stepper>
+
+    <!-- Si ya tiene tienda -->
+    <app-stepper *ngIf="hasStore"></app-stepper>
+  </ng-container>
+</div>

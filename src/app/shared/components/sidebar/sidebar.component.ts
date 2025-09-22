@@ -1,29 +1,57 @@
-import { Component } from '@angular/core';
-import {MatSidenavModule} from '@angular/material/sidenav';
-import { MatListModule } from '@angular/material/list';
+import { Component, EventEmitter, Inject, Input, Output, PLATFORM_ID } from '@angular/core';
+
 import { AuthService } from '../../services/private_services/auth.service';
 import { Router } from '@angular/router';
 import { StoreService } from '../../services/private_services/store.service';
-import { MatIcon } from "@angular/material/icon";
-import { CommonModule } from '@angular/common';
 
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+
+import { SidebarModule } from 'primeng/sidebar';
+import { ButtonModule } from 'primeng/button';
+import { RippleModule } from 'primeng/ripple';
+import { AvatarModule } from 'primeng/avatar';
+import { StyleClassModule } from 'primeng/styleclass';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [MatSidenavModule, MatListModule, MatIcon, CommonModule],
+  imports: [
+    CommonModule,
+    SidebarModule,
+    ButtonModule,
+    RippleModule,
+    AvatarModule,
+    StyleClassModule,
+  ],
   templateUrl: './sidebar.component.html',
-  styleUrl: './sidebar.component.scss'
+  styleUrl: './sidebar.component.scss',
 })
 export class SidebarComponent {
-    role: string | null = null;
+   @Input() visible = false; // 👈 el padre controla visibilidad
+
+  // 🚀 Emite evento cuando se cierra
+  @Output() visibleChange = new EventEmitter<boolean>();
+
+  toggle() {
+    this.visible = !this.visible;
+  }
+
+close() {
+    this.visible = false;
+    this.visibleChange.emit(this.visible);
+  }
+
+  sidebarVisible: boolean = false;
+  role: string | null = null;
   constructor(
     private authService: AuthService,
     private router: Router,
-    private storeService: StoreService
+    private storeService: StoreService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
+    if (isPlatformBrowser(this.platformId)) {
     this.role = this.authService.getUserRole();
-    console.log(this.role, 'ROLE');
+  }
   }
 
   logout() {
@@ -36,10 +64,10 @@ export class SidebarComponent {
   }
 
   redirectToStepper() {
-    this.router.navigate(['/stepper']);
+    this.router.navigate(['/my-store']);
   }
 
-redirectToMyStore() {
+  redirectToMyStore() {
     this.storeService.getMyStores().subscribe({
       next: (stores) => {
         if (!stores || stores.length === 0) {
@@ -54,8 +82,14 @@ redirectToMyStore() {
         console.error('Error al obtener tiendas', err);
         // Manejo básico: lo mando a crear tienda por defecto
         this.router.navigate(['/create-store']);
-      }
+      },
     });
   }
+  redirectToMyProducts() {
+    this.router.navigate(['/my-products']);
+  }
 
+  redirectToMyCategories() {
+    this.router.navigate(['/mis-categorias']);
+  }
 }

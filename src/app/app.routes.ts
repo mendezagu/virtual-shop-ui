@@ -19,6 +19,9 @@ import { SuccessfulPaymentComponent } from './components/checkout-process/succes
 import { FailedPaymentComponent } from './components/checkout-process/failed-payment/failed-payment.component';
 import { PendingPaymentComponent } from './components/checkout-process/pending-payment/pending-payment.component';
 import { CategoryProductsComponent } from './user-components/category-products/category-products.component';
+import { MyCategoriesComponent } from './my-categories/my-categories.component';
+import { OrdersAdminComponent } from './components/orders-admin/orders-admin.component';
+import { StorePageComponent } from './components/stores/store-page/store-page.component';
 
 export const routes: Routes = [
   // Rutas de autenticación
@@ -30,11 +33,13 @@ export const routes: Routes = [
   // Panel administrativo
   { path: 'landing-home', component: LandingHomeComponent, canActivate: [authGuard] },
   { path: 'create-store', component: CreatestoreComponent, canActivate: [authGuard] },
-  { path: 'my-store', component: MyStoreComponent, canActivate: [authGuard] },
+  { path: 'my-store', component: StorePageComponent, canActivate: [authGuard] },
   { path: 'create-product', component: CreateProductComponent, canActivate: [authGuard] },
   { path: 'my-products', component: MyProductsComponent, canActivate: [authGuard] },
   { path: 'edit-product/:id', component: EditProductComponent, canActivate: [authGuard] },
-   { path: 'stepper', component: StepperComponent, canActivate: [authGuard] },
+  { path: 'stepper', component: StepperComponent, canActivate: [authGuard] },
+  { path: 'mis-categorias', component: MyCategoriesComponent, canActivate: [authGuard] },
+  { path: 'mis-pedidos', component: OrdersAdminComponent, canActivate: [authGuard]},
 
   // ================= RUTAS PÚBLICAS =================
   { path: 'store/:slug', component: PublicStoreComponent },

@@ -1,6 +1,10 @@
-:host, html, body {
+:host {
+  display: block;
   height: 100%;
 }
-mat-sidenav-container {
+
+html,
+body {
   height: 100%;
+  margin: 0;
 }

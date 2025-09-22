@@ -1,11 +1,15 @@
 <div class="mt-5 px-4 sm:px-8 w-full">
   <!-- Encabezado -->
   <div class="mb-5">
-    <div class="inline-flex items-center gap-2 rounded-full border border-pink-200 bg-pink-50 px-3 py-1 text-xs text-pink-700">
+    <div
+      class="inline-flex items-center gap-2 rounded-full border border-pink-200 bg-pink-50 px-3 py-1 text-xs text-pink-700"
+    >
       <span class="h-2 w-2 rounded-full bg-pink-500"></span>
       Crear tienda
     </div>
-    <h1 class="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight text-pink-500">
+    <h1
+      class="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight text-pink-500"
+    >
       Información básica
     </h1>
     <p class="text-sm text-slate-500 mt-1">
@@ -14,18 +18,28 @@
   </div>
 
   <!-- Card -->
-  <div class="relative bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden w-full max-w-3xl">
+  <div
+    class="relative bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden w-full max-w-3xl"
+  >
     <!-- Cinta superior -->
-    <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-300 via-pink-400 to-pink-300"></div>
+    <div
+      class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-300 via-pink-400 to-pink-300"
+    ></div>
 
-    <form [formGroup]="storeForm" (ngSubmit)="createStore()" class="p-6 sm:p-10 space-y-5">
+    <form
+      [formGroup]="storeForm"
+      (ngSubmit)="createStore()"
+      class="p-6 sm:p-10 space-y-5"
+    >
       <!-- Fila 1 -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Nombre de la tienda</mat-label>
           <input matInput formControlName="nombre_tienda" />
           <mat-hint>Visible para tus clientes</mat-hint>
-          <mat-error *ngIf="f['nombre_tienda']?.touched && f['nombre_tienda']?.invalid">
+          <mat-error
+            *ngIf="f['nombre_tienda']?.touched && f['nombre_tienda']?.invalid"
+          >
             El nombre es obligatorio (mínimo 2 caracteres).
           </mat-error>
         </mat-form-field>
@@ -33,7 +47,11 @@
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Teléfono de contacto</mat-label>
           <input matInput formControlName="telefono_contacto" />
-          <mat-error *ngIf="f['telefono_contacto']?.touched && f['telefono_contacto']?.invalid">
+          <mat-error
+            *ngIf="
+              f['telefono_contacto']?.touched && f['telefono_contacto']?.invalid
+            "
+          >
             El teléfono es obligatorio.
           </mat-error>
         </mat-form-field>
@@ -44,7 +62,9 @@
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Usuario</mat-label>
           <input matInput formControlName="usuario_login" />
-          <mat-error *ngIf="f['usuario_login']?.touched && f['usuario_login']?.invalid">
+          <mat-error
+            *ngIf="f['usuario_login']?.touched && f['usuario_login']?.invalid"
+          >
             El usuario es obligatorio.
           </mat-error>
         </mat-form-field>
@@ -77,25 +97,34 @@
       <mat-form-field appearance="outline" class="w-full">
         <mat-label>Redes sociales (URLs separadas por comas)</mat-label>
         <input matInput formControlName="redes_sociales" />
-        <mat-hint>Ej: https://instagram.com/mi_tienda, https://facebook.com/mi_tienda</mat-hint>
+        <mat-hint
+          >Ej: https://instagram.com/mi_tienda,
+          https://facebook.com/mi_tienda</mat-hint
+        >
       </mat-form-field>
 
       <!-- Footer acciones -->
-      <div class="sticky bottom-0 -mx-6 sm:-mx-10 -mb-6 sm:-mb-10 bg-gradient-to-t from-white via-white to-white/40 px-6 sm:px-10 pt-4 pb-6">
+      <div
+        class="sticky bottom-0 -mx-6 sm:-mx-10 -mb-6 sm:-mb-10 bg-gradient-to-t from-white via-white to-white/40 px-6 sm:px-10 pt-4 pb-6"
+      >
         <div class="flex items-center justify-end gap-2">
-          <button type="button"
-                  class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 transition"
-                  [disabled]="isLoading"
-                  (click)="storeForm.reset()">
+          <button
+            type="button"
+            class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 transition"
+            [disabled]="isLoading"
+            (click)="storeForm.reset()"
+          >
             Limpiar
           </button>
 
-          <button mat-raised-button
-                  color="primary"
-                  type="submit"
-                  [disabled]="storeForm.invalid || isLoading"
-                  class="!rounded-xl !bg-emerald-500 hover:!bg-emerald-600 !text-white !px-5 !py-2.5 !shadow-sm transition">
-            {{ isLoading ? 'Creando...' : 'Crear tienda' }}
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="storeForm.invalid || isLoading"
+            class="!rounded-xl !bg-emerald-500 hover:!bg-emerald-600 !text-white !px-5 !py-2.5 !shadow-sm transition"
+          >
+            {{ isLoading ? "Creando..." : "Crear tienda" }}
           </button>
         </div>
       </div>

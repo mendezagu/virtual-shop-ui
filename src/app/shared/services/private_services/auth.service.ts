@@ -7,7 +7,7 @@ import jwtDecode from 'jwt-decode';
 
 interface LoginResponse {
   access_token: string;
-  user?: { id: string; email: string; name?: string };
+  user?: { id: string; email: string; nombre?: string; storeId?: string };
 }
 
 export interface RegisterData {
@@ -16,7 +16,7 @@ export interface RegisterData {
   email: string;
   telefono: string;
   password: string;
-  //confirm_password: string;
+  confirm_password: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -29,17 +29,31 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: object
+    @Inject(PLATFORM_ID) private platformId: object,
   ) {}
 
-  // Método para registrar usuario
-register(data: RegisterData): Observable<any> {
-  //const { confirm_password, ...payload } = data; // 👈 eliminamos confirm_password
-  return this.http.post(`${this.apiUrl}/register`, data);
-}
+  // 👉 Registro
+  register(data: RegisterData): Observable<any> {
+    return this.http.post(`${this.apiUrl}/register`, data);
+  }
 
+  // 👉 Login (pide al backend y guarda token en localStorage)
+  login(email: string, password: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password }).pipe(
+      tap((res) => {
+        const token = res.access_token;
+        if (token && isPlatformBrowser(this.platformId)) {
+          localStorage.setItem(this.TOKEN_KEY, token);
+          localStorage.setItem('user', JSON.stringify(res.user));
+          this.loggedInSubject.next(true);
+        }
+      }),
+    );
+  }
+
+  // 👉 Decodificar payload del JWT
   getUserData(): JwtPayload | null {
-    const token = localStorage.getItem('auth_token');
+    const token = this.getToken();
     if (!token) return null;
     try {
       return jwtDecode<JwtPayload>(token);
@@ -49,23 +63,11 @@ register(data: RegisterData): Observable<any> {
     }
   }
 
-  login(email: string, password: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password }).pipe(
-      tap((res) => {
-        console.log('Respuesta del backend:', res); // 👈 para ver qué devuelve
-        const token = (res as any).access_token || (res as any).token;
-        if (token && isPlatformBrowser(this.platformId)) {
-          localStorage.setItem(this.TOKEN_KEY, token);
-          localStorage.setItem('user', JSON.stringify(res.user));
-          this.loggedInSubject.next(true);
-        }
-      })
-    );
-  }
-
+  // 👉 Logout
   logout(): void {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.removeItem(this.TOKEN_KEY);
+      localStorage.removeItem('user');
       this.loggedInSubject.next(false);
     }
   }
@@ -92,8 +94,10 @@ register(data: RegisterData): Observable<any> {
     return false;
   }
 
-  getUserRole(): string | null {
-  const user = localStorage.getItem('user');
-  return user ? JSON.parse(user).role : null;
-}
+getUserRole(): string | null {
+    if (isPlatformBrowser(this.platformId)) {
+      return localStorage.getItem('role');
+    }
+    return null; // en servidor devolvemos null
+  }
 }

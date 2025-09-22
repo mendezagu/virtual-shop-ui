@@ -11,6 +11,7 @@ import {
   CartResponse,
   CartService,
 } from '../../shared/services/public_services/cart.service';
+import { log } from 'node:console';
 
 @Component({
   selector: 'app-product-detail-dialog',
@@ -40,28 +41,22 @@ export class ProductDetailComponent {
     public cartService: CartService
   ) {}
 
-  ngOnInit() {
-    //this.slug = this.route.snapshot.paramMap.get('slug')!;
-    this.loadProduct(this.slug);
+ngOnInit() {
+  const id = this.route.snapshot.paramMap.get('id')!; // ✅ viene de /producto/:id
+  this.loadProduct(id);
+}
 
-   const id = this.route.snapshot.paramMap.get('id')!;
+loadProduct(id: string) {
   this.publicStoreService.getProductById(id).subscribe({
     next: (res) => {
       this.product = res;
-      this.slug = res.store.link_tienda;  // ✅ SLUG directo del producto
+      console.log(res, 'RESPONNNNSE')
+      this.slug = res.store.link_tienda; // ✅ ahora tienes el slug real del backend
     },
     error: (err) => console.error('Error cargando producto:', err)
   });
-  }
+}
 
-  loadProduct(id: string) {
-    this.publicStoreService.getProductById(id).subscribe({
-      next: (res) => {
-        this.product = res;
-        this.slug = res.store.link_tienda;
-      },
-    });
-  }
 
   toggleVariant(id: string, checked: boolean) {
     if (checked) {
@@ -92,43 +87,46 @@ export class ProductDetailComponent {
     return (this.qty['single'] || 1) * (this.product.precio || 0);
   }
 
-  addToCart() {
-    if (!this.product) return;
+ addToCart() {
+  if (!this.product) return;
 
-    const slug = this.route.snapshot.paramMap.get('slug')!;
-
+  if (this.product.presentacion_multiple) {
     // con variantes
-    if (this.product.presentacion_multiple) {
-      [...this.selectedVariants].forEach((id) => {
-        const cantidad = this.qty[id] || 1;
-        this.cartService
-          .add(this.slug, {
-            productId: this.product.id_producto,
-            variantId: id,
-            cantidad,
-          })
-          .subscribe({
-            next: (c) => {
-              this.cart = c;
-              this.cartOpen = true; // 👈 abre el drawer
-            },
-            error: (err) => console.error('Error agregando variante:', err),
-          });
-      });
-    } else {
-      // sin variantes
-      const cantidad = this.qty['single'] || 1;
+    [...this.selectedVariants].forEach((id) => {
+      const cantidad = this.qty[id] || 1;
       this.cartService
-        .add(this.slug, { productId: this.product.id_producto, cantidad })
+        .add(this.slug, {
+          productId: this.product.id_producto,
+          variantId: id,
+          cantidad,
+          //observaciones: this.observaciones || null, // 👈 se envía la nota
+        })
         .subscribe({
           next: (c) => {
             this.cart = c;
-            this.cartOpen = true; // 👈 abre el drawer
+            this.cartOpen = true;
           },
-          error: (err) => console.error('Error agregando producto:', err),
+          error: (err) => console.error('Error agregando variante:', err),
         });
-    }
+    });
+  } else {
+    // sin variantes
+    const cantidad = this.qty['single'] || 1;
+    this.cartService
+      .add(this.slug, {
+        productId: this.product.id_producto,
+        cantidad,
+        //observaciones: this.observaciones || null, // 👈 se envía la nota
+      })
+      .subscribe({
+        next: (c) => {
+          this.cart = c;
+          this.cartOpen = true;
+        },
+        error: (err) => console.error('Error agregando producto:', err),
+      });
   }
+}
 
   // 👇 helpers que usará el template
   onUpdateQty(ev: { itemId: string; cantidad: number }) {

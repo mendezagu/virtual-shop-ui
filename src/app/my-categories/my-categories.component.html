@@ -1,0 +1,230 @@
+<div class="mt-6">
+  <!-- Encabezado -->
+  <div class="px-4 sm:px-12 mb-4">
+    <div
+      class="inline-flex items-center gap-2 rounded-full border border-pink-200 bg-pink-50 px-3 py-1 text-xs text-pink-700"
+    >
+      <span class="h-2 w-2 rounded-full bg-pink-500"></span>
+      Inventario
+    </div>
+    <h1 class="mt-2 text-3xl font-semibold tracking-tight text-pink-500">
+      Mis categorías
+    </h1>
+    <p class="text-sm text-slate-500 mt-1">
+      Visualiza, crea y administra las categorías de tu tienda.
+    </p>
+  </div>
+
+  <!-- Barra de acciones -->
+  <div class="px-4 sm:px-12 mb-4">
+    <div
+      class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4"
+    >
+      <!-- Buscador pill -->
+      <div
+        class="flex items-center w-full sm:w-80 rounded-full border border-slate-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-pink-300"
+      >
+        <mat-icon class="text-slate-400 mr-2">search</mat-icon>
+        <input
+          type="text"
+          placeholder="Buscar categoría"
+          class="flex-1 outline-none border-none bg-transparent text-slate-700 placeholder:text-slate-400"
+        />
+      </div>
+
+      <div class="flex-1"></div>
+
+      <!-- Formulario crear categoría -->
+      <form
+        [formGroup]="newCategoryForm"
+        (ngSubmit)="createCategory()"
+        class="flex items-center gap-2"
+      >
+        <input
+          type="text"
+          formControlName="name"
+          placeholder="Nueva categoría"
+          class="rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-pink-300"
+        />
+        <button
+          type="submit"
+          mat-icon-button
+          color="primary"
+          [disabled]="newCategoryForm.invalid"
+        >
+          <mat-icon>add</mat-icon>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="px-4 sm:px-12">
+    <!-- Skeleton -->
+    <ng-container *ngIf="isLoading; else contentTpl">
+      <div
+        class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 animate-pulse"
+      >
+        <div class="h-5 w-1/3 bg-slate-200 rounded mb-4"></div>
+        <div class="h-16 bg-slate-200 rounded mb-2"></div>
+        <div class="h-16 bg-slate-200 rounded mb-2"></div>
+        <div class="h-16 bg-slate-200 rounded"></div>
+      </div>
+    </ng-container>
+
+    <!-- Lista / Empty -->
+    <ng-template #contentTpl>
+      <ng-container *ngIf="categories?.length; else emptyTpl">
+        <mat-accordion class="modern-accordion" multi>
+          <mat-expansion-panel
+            *ngFor="let c of categories"
+            (opened)="c.isOpen = true; loadProducts(c)"
+            (closed)="c.isOpen = false"
+          >
+            <mat-expansion-panel-header>
+              <div class="flex items-center w-full">
+                <!-- Icono carpeta -->
+                <div
+                  class="w-12 h-12 bg-white mr-3 flex items-center justify-center"
+                >
+                  <mat-icon class="text-pink-400">folder</mat-icon>
+                </div>
+
+                <!-- Nombre de la categoría -->
+                <div class="flex-1 min-w-0">
+                  <span class="font-medium text-slate-800 truncate">
+                    {{ c.name }}
+                  </span>
+                </div>
+
+                <!-- ✅ Desktop: contador y botón eliminar -->
+                <div class="hidden sm:flex items-center gap-3 ml-4">
+                  <span class="chip chip-soft">
+                    <span class="chip-dot bg-emerald-500"></span>
+                    {{ c.count }} producto(s)
+                  </span>
+
+                  <button
+                    mat-icon-button
+                    color="warn"
+                    (click)="deleteCategory(c)"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+
+                <!-- ✅ Mobile: menú more_vert -->
+                <button
+                  mat-icon-button
+                  [matMenuTriggerFor]="menu"
+                  class="block sm:hidden ml-auto"
+                >
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                  <button mat-menu-item (click)="deleteCategory(c)">
+                    <mat-icon color="warn">delete</mat-icon>
+                    <span>Eliminar categoría</span>
+                  </button>
+                </mat-menu>
+              </div>
+            </mat-expansion-panel-header>
+
+            <!-- Productos dentro de la categoría -->
+            <div *ngIf="c.loading" class="text-slate-400 p-4">
+              Cargando productos…
+            </div>
+            <div
+              *ngIf="!c.loading && (!c.products || !c.products.length)"
+              class="text-slate-500 p-4"
+            >
+              No hay productos en esta categoría.
+            </div>
+
+            <div
+              *ngIf="c.products?.length"
+              class="relative overflow-hidden px-1"
+            >
+              <div
+                class="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4"
+              >
+                <div
+                  *ngFor="let p of c.products"
+                  class="snap-start shrink-0 w-64 rounded-xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition"
+                >
+                  <div
+                    class="w-full h-40 rounded-t-xl overflow-hidden bg-slate-50"
+                  >
+                    <img
+                      class="w-full h-full object-cover"
+                      [src]="
+                        (p.imagen_url && p.imagen_url[0]) ||
+                        'https://placehold.co/400x300?text=Producto'
+                      "
+                      alt="{{ p.nombre_producto }}"
+                    />
+                  </div>
+                  <div class="p-3">
+                    <div class="font-medium text-slate-800 truncate">
+                      {{ p.nombre_producto }}
+                    </div>
+                    <div class="text-xs text-slate-500 truncate">
+                      {{ p.descripcion }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ✅ Editor de nombre -->
+            <div class="border-t border-slate-200 mt-4 pt-4">
+              <form
+                [formGroup]="categoryForms[c.id]"
+                (ngSubmit)="updateCategory(c)"
+                class="flex items-center gap-2 flex-wrap"
+              >
+                <app-input
+                  type="text"
+                  formControlName="name"
+                  class="flex-1"
+                ></app-input>
+
+                <button
+                  type="submit"
+                  mat-flat-button
+                  color="primary"
+                  class="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 shadow-sm flex items-center gap-2"
+                  [disabled]="
+                    categoryForms[c.id].pristine || categoryForms[c.id].invalid
+                  "
+                >
+                  <mat-icon class="mr-1 text-sm">check</mat-icon>
+                  Guardar
+                </button>
+              </form>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </ng-container>
+
+      <!-- Empty state -->
+      <ng-template #emptyTpl>
+        <div
+          class="bg-white border border-slate-200 rounded-2xl shadow-sm p-10 text-center"
+        >
+          <div
+            class="mx-auto w-14 h-14 rounded-2xl bg-pink-50 flex items-center justify-center text-pink-500 mb-3"
+          >
+            <mat-icon>category</mat-icon>
+          </div>
+          <h3 class="text-lg font-semibold text-slate-800">
+            Aún no tienes categorías
+          </h3>
+          <p class="text-sm text-slate-500 mt-1">
+            Crea tu primera categoría para organizar tus productos.
+          </p>
+        </div>
+      </ng-template>
+    </ng-template>
+  </div>
+</div>

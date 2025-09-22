@@ -1,87 +1,30 @@
-<mat-sidenav-container class="h-[100dvh] bg-slate-50">
-  <!-- Sidebar -->
-  @if (loggedIn$ | async) {
-    <mat-sidenav
-      #sidenav
-      [mode]="sidenavMode"
-      [opened]="sidenavOpened"
-      fixedInViewport
-      [fixedTopGap]="64"
-      class="!w-72 !border-r !border-slate-200 bg-white/80 backdrop-blur-xl"
-    >
-      <app-sidebar></app-sidebar>
-    </mat-sidenav>
-  }
+<!-- Toolbar -->
+<div
+  class="sticky top-0 z-50 h-16 px-4 bg-white border-b border-slate-200 shadow-sm flex items-center justify-between"
+>
+  <div class="flex items-center gap-3">
+    <!-- Botón hamburguesa -->
+    <p-button
+      (onClick)="toggleSidebar()"
+      icon="pi pi-bars"
+      styleClass="p-button-text "
+    ></p-button>
 
-  <!-- Contenido principal -->
-  <mat-sidenav-content>
-    @if (loggedIn$ | async) {
-      <mat-toolbar
-        class="!sticky !top-0 !z-[1001] !h-16 !px-4 bg-white/90 backdrop-blur 
-               supports-[backdrop-filter]:backdrop-blur-md border-b border-slate-200 shadow-sm"
-      >
-        <div class="flex w-full items-center justify-between">
-          <div class="flex items-center gap-3">
-            <!-- Botón visible en móviles/tablets -->
-            <button mat-icon-button (click)="toggleSidebar()" class="md:hidden">
-              <mat-icon class="text-slate-600">menu</mat-icon>
-            </button>
+    <img class="w-10 h-10" src="assets/logo-app.png" alt="Pedi App" />
+    <span class="hidden md:inline text-slate-700 font-semibold">Panel</span>
+  </div>
 
-            <img class="w-10 h-10" src="assets/logo-app.png" alt="Pedi App" />
-            <span class="hidden md:inline text-slate-700 font-semibold tracking-tight">Panel</span>
-          </div>
+  <!-- Acciones -->
+  <div class="flex items-center gap-3">
+    <button pButton icon="pi pi-bell" class="p-button-text"></button>
+    <button pButton icon="pi pi-user" class="p-button-text"></button>
+  </div>
+</div>
 
-          <!-- Botón de carrito en toolbar -->
-          <button mat-icon-button aria-label="Carrito" (click)="openCartDrawer()" *ngIf="cartCount > 0">
-            <mat-icon class="text-slate-600">shopping_cart</mat-icon>
-            <span class="absolute -top-1 -right-1 bg-emerald-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-              {{ cartCount }}
-            </span>
-          </button>
+<!-- Sidebar controlado desde AppComponent -->
+<app-sidebar [(visible)]="sidebarVisible"></app-sidebar>
 
-          <div class="flex items-center gap-2">
-            <button mat-icon-button aria-label="Notificaciones">
-              <mat-icon class="text-slate-600">notifications</mat-icon>
-            </button>
-            <button mat-icon-button aria-label="Cuenta">
-              <mat-icon class="text-slate-600">account_circle</mat-icon>
-            </button>
-          </div>
-        </div>
-      </mat-toolbar>
-    }
-
-    <!-- Botón flotante del carrito -->
-    <div *ngIf="cartCount > 0" cdkDrag class="fixed bottom-20 left-4 z-[2000]">
-      <div class="relative">
-        <button mat-fab color="primary" (click)="openCartDrawer()">
-          <mat-icon>shopping_cart</mat-icon>
-        </button>
-        <button
-          class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs"
-          (click)="cartCount = 0"
-        >
-          ×
-        </button>
-      </div>
-    </div>
-
-    <!-- Drawer del carrito -->
-<app-cart-drawer
-  *ngIf="cart$ | async as cart"
-  [open]="cartOpen"
-  [items]="cart.items"
-  [total]="cart.total"
-  (close)="cartOpen = false"
-  [slug]="slug ?? ''"
-  (updateQty)="slug && cartService.update(slug, $event.itemId, $event.cantidad).subscribe()"
-  (remove)="slug && cartService.remove(slug, $event).subscribe()"
-  (clear)="slug && cartService.clear(slug).subscribe()">
-</app-cart-drawer>
-
-    <!-- Router con padding -->
-    <div class="p-4 md:p-6">
-      <router-outlet></router-outlet>
-    </div>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+<!-- Contenido -->
+<div class="p-4 md:p-6">
+  <router-outlet></router-outlet>
+</div>

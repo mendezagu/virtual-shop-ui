@@ -1,0 +1,19 @@
+/* Efecto slide-in para el stepper mobile */
+:host ::ng-deep .modern-stepper {
+  width: 100%;
+}
+
+.mobile-stepper-enter {
+  transform: translateX(-100%);
+}
+.mobile-stepper-enter-active {
+  transform: translateX(0);
+  transition: transform 0.3s ease-in-out;
+}
+.mobile-stepper-leave {
+  transform: translateX(0);
+}
+.mobile-stepper-leave-active {
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out;
+}

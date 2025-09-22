@@ -1,0 +1,25 @@
+:host {
+  --primary: #ff4081;   // fallback si no viene nada
+  --secondary: #00bfa5;
+  display: block;
+}
+
+.store-title {
+  color: var(--primary);
+}
+
+.store-icon {
+  color: var(--primary);
+}
+
+.btn-store-primary {
+  background-color: var(--primary);
+  color: white;
+  border-radius: 9999px;
+}
+
+.btn-store-secondary {
+  background-color: var(--secondary);
+  color: white;
+  border-radius: 9999px;
+}
