@@ -5,11 +5,18 @@ export interface ProductVariant {
   precio: number;
 }
 
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  imageUrl?: string | null;
+}
+
 export interface Producto {
   id_producto: string;
   id_tienda: string;
   nombre_producto: string;
-  categoria: string;
+  category?: Category | null;
   grupo: string | number;
   descripcion: string;
   stock: number;
@@ -18,5 +25,12 @@ export interface Producto {
   presentacion_multiple: boolean;
   disponible: boolean;
   fecha_creacion: string;
-  variants?: ProductVariant[]; // 👈 Ahora incluye las variantes
+  variants?: ProductVariant[];
+  sku?: string;
+  codigo_barras ?: string;
+  unidad_medida ?: string[];
+  condicion?: string[];
+  vencimiento ?: string;
+  color ?: string[];
+
 }

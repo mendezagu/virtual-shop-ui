@@ -1,4 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -13,6 +21,7 @@ import { StoreService } from '../../services/private_services/store.service';
 import { PublicStoreService } from '../../services/public_services/publicstore.service';
 
 import { Store } from '../../../shared/models/store.model';
+import { Producto } from '../../../shared/models/product.model';
 
 // PrimeNG
 import { DialogModule } from 'primeng/dialog';
@@ -65,9 +74,20 @@ type CategorySummary = {
   ],
   providers: [MessageService, PrimeNGConfig],
 })
-export class ProductDialogComponent implements OnInit {
-  //mesage
+export class ProductDialogComponent implements OnInit, OnChanges {
+  // Inputs para reutilizar en crear/editar
+  @Input() product?: Producto;
+  @Input() storeId?: string;
+
+  @Input() visible: boolean = false;
+  @Output() visibleChange = new EventEmitter<boolean>();
+
+  // UI
+  //visible = false;
   messages: Message[] = [];
+  showNewCategory = false;
+
+  // Formulario
   productForm!: FormGroup;
 
   myStores: Store[] = [];
@@ -75,15 +95,14 @@ export class ProductDialogComponent implements OnInit {
   selectedStoreSlug = '';
 
   categories: CategorySummary[] = [];
-  showNewCategory = false;
 
   // 📂 Upload
-  files: (File | null)[] = [null, null, null]; // hasta 3 fotos
+  files: (File | null)[] = [null, null, null];
   preview: (string | null)[] = [null, null, null];
   totalSize = 0;
   totalSizePercent = 0;
 
-  // Opciones de enums
+  // Opciones enums
   unidadOptions = [
     { label: 'Unidad', value: 'UNIDAD' },
     { label: 'Kilogramo', value: 'KILOGRAMO' },
@@ -99,13 +118,6 @@ export class ProductDialogComponent implements OnInit {
     { label: 'Reacondicionado', value: 'REACONDICIONADO' },
   ];
 
-  // PrimeNG Dialog
-  visible = false;
-
-  showDialog() {
-    this.visible = true;
-  }
-
   constructor(
     private fb: FormBuilder,
     private productService: ProductService,
@@ -116,34 +128,20 @@ export class ProductDialogComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.initForm();
+
     this.messages = [
       {
         severity: 'info',
         detail:
-          'Agrega los detalles y características de tu productos, cuanto mas detalles brindes a tus clientes mejor sera su experiencia en tu tienda',
+          'Agrega o edita los detalles de tu producto. Mientras más detalles brindes, mejor será la experiencia de tus clientes.',
       },
     ];
-    this.productForm = this.fb.group({
-      nombre_producto: ['', Validators.required],
-      categoriaSelect: ['', Validators.required],
-      categoria: [''], // solo si es nueva
-      descripcion: ['', Validators.required],
-      stock: [0, [Validators.required, Validators.min(0)]],
-      precio: [0, [Validators.required, Validators.min(0)]],
-      presentacion_multiple: [false],
-      variants: this.fb.array([]),
 
-      // Nuevos campos
-      sku: [''],
-      codigo_barras: [''],
-      unidad_medida: ['', Validators.required],
-      color: [''],
-      condicion: ['NUEVO', Validators.required],
-      vencimiento: [''],
-      video_youtube: [''],
-    });
+    if (this.product) {
+      this.patchForm(this.product);
+    }
 
-    // Traer tiendas
     this.storeService.getMyStores().subscribe((stores) => {
       this.myStores = stores;
       if (stores.length > 0) {
@@ -153,7 +151,6 @@ export class ProductDialogComponent implements OnInit {
       }
     });
 
-    // Manejo de variantes
     this.productForm
       .get('presentacion_multiple')
       ?.valueChanges.subscribe((val) => {
@@ -169,24 +166,72 @@ export class ProductDialogComponent implements OnInit {
       });
   }
 
-  // Cargar categorías
-  private loadCategories() {
-    if (!this.selectedStoreSlug) return;
-    this.publicStoreService.getCategories(this.selectedStoreSlug).subscribe({
-      next: (res) => {
-        this.categories = (res.data || []).map((c: any) => ({
-          id: c.id,
-          name: c.name || c.nombre || 'Sin nombre',
-          slug: c.slug || c.id || c.name,
-          count: c.count || 0,
-          imageUrl: c.imageUrl || null,
-        }));
-      },
-      error: (_) => {
-        this.categories = [];
-      },
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['product'] && changes['product'].currentValue) {
+      this.patchForm(changes['product'].currentValue);
+    }
+  }
+
+  private initForm() {
+    this.productForm = this.fb.group({
+      nombre_producto: ['', Validators.required],
+      categoriaSelect: ['', Validators.required],
+      categoria: [''],
+      descripcion: ['', Validators.required],
+      stock: [0, [Validators.required, Validators.min(0)]],
+      precio: [0, [Validators.required, Validators.min(0)]],
+      presentacion_multiple: [false],
+      variants: this.fb.array([]),
+      sku: [''],
+      codigo_barras: [''],
+      unidad_medida: ['', Validators.required],
+      color: [''],
+      condicion: ['NUEVO', Validators.required],
+      vencimiento: [''],
+      video_youtube: [''],
     });
   }
+
+private patchForm(product: Producto) {
+  let categoryId = (product as any).categoryId || '';
+
+  // fallback: si no tiene categoryId pero sí un nombre viejo
+  if (!categoryId && product.category?.name) {
+    const match = this.categories.find(c => c.name === product.category?.name);
+    if (match) categoryId = match.id;
+  }
+
+  this.productForm.patchValue({
+    nombre_producto: product.nombre_producto,
+    categoriaSelect: categoryId,
+    categoria: product.category?.name || '',
+    descripcion: product.descripcion,
+    stock: product.stock,
+    precio: product.precio,
+    presentacion_multiple: product.presentacion_multiple,
+    sku: (product as any).sku || '',
+    codigo_barras: (product as any).codigo_barras || '',
+    unidad_medida: (product as any).unidad_medida || '',
+    color: (product as any).color || '',
+    condicion: (product as any).condicion || 'NUEVO',
+    vencimiento: product.vencimiento
+  ? new Date(product.vencimiento).toISOString().substring(0, 10): '',
+    video_youtube: (product as any).video_youtube || '',
+  });
+
+  if (product.variants?.length) {
+    this.variants.clear(); // 🔑 para no duplicar
+    product.variants.forEach((v) =>
+      this.variants.push(
+        this.fb.group({
+          nombre: [v.nombre, Validators.required],
+          stock: [v.stock, [Validators.required, Validators.min(0)]],
+          precio: [v.precio, [Validators.required, Validators.min(0)]],
+        })
+      )
+    );
+  }
+}
 
   // Variantes
   get variants() {
@@ -206,7 +251,25 @@ export class ProductDialogComponent implements OnInit {
     this.variants.removeAt(index);
   }
 
-  // Cambiar categoría
+  // Categorías
+ private loadCategories() {
+  if (!this.selectedStoreSlug) return;
+  this.publicStoreService.getCategories(this.selectedStoreSlug).subscribe({
+    next: (res) => {
+      this.categories = (res.data || []).map((c: any) => ({
+        id: c.id, // 👈 usamos slug como id
+        name: c.name || c.nombre || 'Sin nombre',
+        slug: c.slug,
+        count: c.count || 0,
+        imageUrl: c.imageUrl || null,
+      }));
+    },
+    error: (_) => {
+      this.categories = [];
+    },
+  });
+}
+
   onCategorySelectChange(value: string) {
     if (value === '__NEW__') {
       this.showNewCategory = true;
@@ -223,23 +286,25 @@ export class ProductDialogComponent implements OnInit {
     this.productForm.get('categoriaSelect')?.updateValueAndValidity();
   }
 
-  crearProducto() {
+  // CREAR o EDITAR
+  submit() {
     if (this.productForm.invalid) return;
 
     const { categoriaSelect, categoria, ...payload } =
       this.productForm.getRawValue();
 
-    // procesar categoría
     if (this.showNewCategory) {
       payload.categoria = categoria?.trim();
+       delete payload.categoryId;
     } else {
       payload.categoryId = categoriaSelect;
     }
 
-    // limpiar vencimiento vacío
-    if (!payload.vencimiento) delete payload.vencimiento;
-
-    // variantes vs stock/precio
+if (payload.vencimiento) {
+  payload.vencimiento = new Date(payload.vencimiento).toISOString();
+} else {
+  delete payload.vencimiento;
+}
     if (payload.presentacion_multiple) {
       delete payload.stock;
       delete payload.precio;
@@ -247,41 +312,71 @@ export class ProductDialogComponent implements OnInit {
       delete payload.variants;
     }
 
-    // adjuntar archivos si existen
-    if (this.files.length > 0) {
+    /*if (this.files.length > 0) {
       payload.files = this.files;
-    }
+    }*/
 
-    this.productService.createProduct(this.selectedStoreId, payload).subscribe({
-      next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Producto creado correctamente',
+    if (this.product) {
+      // EDITAR
+      this.productService
+        .updateProduct(this.product.id_producto, payload)
+        .subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Éxito',
+              detail: 'Producto actualizado correctamente',
+            });
+            this.visible = false;
+             this.visibleChange.emit(this.visible);
+          },
+          error: (err) => {
+            console.error(err);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'No se pudo actualizar el producto',
+            });
+          },
         });
-        this.visible = false;
-      },
-      error: (err) => {
-        console.error(err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo crear el producto',
-        });
-      },
-    });
+    } else {
+      // CREAR
+      this.productService.createProduct(this.selectedStoreId, payload).subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Producto creado correctamente',
+          });
+          this.visible = false;
+          this.visibleChange.emit(this.visible);
+        },
+        error: (err) => {
+          console.error(err);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudo crear el producto',
+          });
+        },
+      });
+    }
   }
+
+  handleHide() {
+  this.visible = false;
+  this.visibleChange.emit(this.visible);
+}
 
   onCancel() {
     this.visible = false;
+    this.visibleChange.emit(this.visible);
   }
-
-  // Manejar selección de archivo
+  // Manejo de archivos
   onFileSelect(event: any): void {
     if (event.files && event.files.length > 0) {
       for (let file of event.files) {
         this.files.push(file);
-
         const reader = new FileReader();
         reader.onload = () => {
           this.preview.push(reader.result as string);
@@ -291,7 +386,6 @@ export class ProductDialogComponent implements OnInit {
     }
   }
 
-  // Eliminar archivo
   removeFile(index: number) {
     this.files[index] = null;
     this.preview[index] = null;

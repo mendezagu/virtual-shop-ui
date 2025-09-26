@@ -24,7 +24,7 @@
       <div
         class="flex items-center w-full sm:w-80 rounded-full border border-slate-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-pink-300"
       >
-        <mat-icon class="text-slate-400 mr-2">search</mat-icon>
+        <i class="pi pi-search text-slate-400 mr-2"></i>
         <input
           type="text"
           placeholder="Buscar categoría"
@@ -34,27 +34,36 @@
 
       <div class="flex-1"></div>
 
-      <!-- Formulario crear categoría -->
-      <form
-        [formGroup]="newCategoryForm"
-        (ngSubmit)="createCategory()"
-        class="flex items-center gap-2"
-      >
-        <input
-          type="text"
-          formControlName="name"
-          placeholder="Nueva categoría"
-          class="rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-pink-300"
-        />
-        <button
-          type="submit"
-          mat-icon-button
-          color="primary"
-          [disabled]="newCategoryForm.invalid"
-        >
-          <mat-icon>add</mat-icon>
-        </button>
-      </form>
+    <!-- Formulario crear categoría -->
+<div class="flex flex-col gap-2 w-full">
+ <form
+  [formGroup]="newCategoryForm"
+  (ngSubmit)="createCategory()"
+  class="flex justify-end items-end gap-2"
+>
+  <!-- Label arriba del input -->
+  <div class="flex flex-col">
+    <label for="name" class="font-medium mb-1 text-gray-600">Añadir nueva categoría</label>
+    <input
+      id="name"
+      type="text"
+      pInputText
+      formControlName="name"
+      placeholder="Ej: Bebidas"
+      class="w-48"
+    />
+  </div>
+
+  <p-button
+    type="submit"
+    label="Añadir categoría"
+    [outlined]="true"
+    severity="success"
+    [disabled]="newCategoryForm.invalid"
+  ></p-button>
+</form>
+
+</div>
     </div>
   </div>
 
@@ -75,65 +84,48 @@
     <!-- Lista / Empty -->
     <ng-template #contentTpl>
       <ng-container *ngIf="categories?.length; else emptyTpl">
-        <mat-accordion class="modern-accordion" multi>
-          <mat-expansion-panel
+        <p-accordion
+          class="w-full"
+          expandIcon="pi pi-plus"
+          collapseIcon="pi pi-minus"
+        >
+          <p-accordionTab
             *ngFor="let c of categories"
-            (opened)="c.isOpen = true; loadProducts(c)"
-            (closed)="c.isOpen = false"
+            (onOpen)="c.isOpen = true; loadProducts(c)"
+            (onClose)="c.isOpen = false"
           >
-            <mat-expansion-panel-header>
-              <div class="flex items-center w-full">
-                <!-- Icono carpeta -->
-                <div
-                  class="w-12 h-12 bg-white mr-3 flex items-center justify-center"
+            <!-- Header -->
+            <ng-template pTemplate="header">
+              <span class="flex items-center gap-3 w-full">
+                <p-avatar
+                  icon="pi pi-folder"
+                  shape="circle"
+                  styleClass="bg-pink-100 text-pink-500"
+                ></p-avatar>
+                <span
+                  class="font-medium text-slate-800 block max-w-[120px] truncate sm:max-w-none"
                 >
-                  <mat-icon class="text-pink-400">folder</mat-icon>
-                </div>
-
-                <!-- Nombre de la categoría -->
-                <div class="flex-1 min-w-0">
-                  <span class="font-medium text-slate-800 truncate">
-                    {{ c.name }}
-                  </span>
-                </div>
-
-                <!-- ✅ Desktop: contador y botón eliminar -->
-                <div class="hidden sm:flex items-center gap-3 ml-4">
-                  <span class="chip chip-soft">
-                    <span class="chip-dot bg-emerald-500"></span>
-                    {{ c.count }} producto(s)
-                  </span>
-
-                  <button
-                    mat-icon-button
-                    color="warn"
-                    (click)="deleteCategory(c)"
-                  >
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </div>
-
-                <!-- ✅ Mobile: menú more_vert -->
+                  {{ c.name }}
+                </span>
+                <p-badge
+                  [value]="c.count"
+                  severity="success"
+                  class="ml-auto mr-2"
+                ></p-badge>
                 <button
-                  mat-icon-button
-                  [matMenuTriggerFor]="menu"
-                  class="block sm:hidden ml-auto"
-                >
-                  <mat-icon>more_vert</mat-icon>
-                </button>
-                <mat-menu #menu="matMenu">
-                  <button mat-menu-item (click)="deleteCategory(c)">
-                    <mat-icon color="warn">delete</mat-icon>
-                    <span>Eliminar categoría</span>
-                  </button>
-                </mat-menu>
-              </div>
-            </mat-expansion-panel-header>
+                  pButton
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-text p-button-danger"
+                  (click)="deleteCategory(c); $event.stopPropagation()"
+                ></button>
+              </span>
+            </ng-template>
 
-            <!-- Productos dentro de la categoría -->
+            <!-- Body -->
             <div *ngIf="c.loading" class="text-slate-400 p-4">
               Cargando productos…
             </div>
+
             <div
               *ngIf="!c.loading && (!c.products || !c.products.length)"
               class="text-slate-500 p-4"
@@ -176,35 +168,33 @@
               </div>
             </div>
 
-            <!-- ✅ Editor de nombre -->
+            <!-- Editor de nombre -->
             <div class="border-t border-slate-200 mt-4 pt-4">
               <form
                 [formGroup]="categoryForms[c.id]"
                 (ngSubmit)="updateCategory(c)"
                 class="flex items-center gap-2 flex-wrap"
               >
-                <app-input
+                <input
                   type="text"
+                  pInputText
                   formControlName="name"
                   class="flex-1"
-                ></app-input>
-
+                />
                 <button
                   type="submit"
-                  mat-flat-button
-                  color="primary"
-                  class="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 shadow-sm flex items-center gap-2"
+                  pButton
+                  label="Guardar"
+                  icon="pi pi-check"
+                  class="p-button-rounded p-button-success"
                   [disabled]="
                     categoryForms[c.id].pristine || categoryForms[c.id].invalid
                   "
-                >
-                  <mat-icon class="mr-1 text-sm">check</mat-icon>
-                  Guardar
-                </button>
+                ></button>
               </form>
             </div>
-          </mat-expansion-panel>
-        </mat-accordion>
+          </p-accordionTab>
+        </p-accordion>
       </ng-container>
 
       <!-- Empty state -->
@@ -215,7 +205,7 @@
           <div
             class="mx-auto w-14 h-14 rounded-2xl bg-pink-50 flex items-center justify-center text-pink-500 mb-3"
           >
-            <mat-icon>category</mat-icon>
+            <i class="pi pi-tags text-2xl"></i>
           </div>
           <h3 class="text-lg font-semibold text-slate-800">
             Aún no tienes categorías
@@ -228,3 +218,5 @@
     </ng-template>
   </div>
 </div>
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>

@@ -105,7 +105,9 @@
       <!-- Contenido principal -->
       <section class="lg:col-span-8">
         <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-4">
-          <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+          <h3
+            class="text-sm font-semibold text-slate-800 flex items-center gap-2"
+          >
             <mat-icon
               class="!text-[18px]"
               [ngStyle]="{ color: 'var(--primary)' }"
@@ -114,57 +116,62 @@
             Categorías
           </h3>
 
-          <div class="mt-4">
-            <ng-container *ngIf="categories?.length; else noCat">
-              <div
-                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-              >
-                <a
-                  *ngFor="let c of categories"
-                  [routerLink]="['/store', slug, 'categoria', c.slug]"
-                  class="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow-md transition flex items-center justify-between"
-                >
-                  <!-- texto -->
-                  <div class="min-w-0 pr-3">
-                    <div
-                      class="text-sm font-semibold text-slate-900"
-                      [ngStyle]="{ color: 'var(--primary)' }"
-                    >
-                      {{ c.name }}
-                    </div>
-                    <div class="text-xs text-slate-500 mt-0.5">
-                      {{ c.count }}
-                      {{ c.count === 1 ? "producto" : "productos" }}
-                    </div>
+         <div class="mt-4">
+  <ng-container *ngIf="categories?.length; else noCat">
+    <p-dataView [value]="categories" layout="grid" [rows]="6">
+      <ng-template pTemplate="grid" let-items>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 w-full">
+          <div *ngFor="let c of items" class="col">
+            <a
+              [routerLink]="['/store', slug, 'categoria', c.slug]"
+              class="block rounded-2xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow-md transition group"
+            >
+              <!-- Imagen / fallback -->
+              <div class="w-full flex justify-center mb-3">
+                <ng-container *ngIf="c.imageUrl; else fallbackBubble">
+                  <img
+                    [src]="c.imageUrl"
+                    [alt]="c.name"
+                    class="h-20 w-20 object-contain rounded-xl"
+                  />
+                </ng-container>
+                <ng-template #fallbackBubble>
+                  <div
+                    class="h-20 w-20 rounded-xl flex items-center justify-center text-white text-xl font-bold"
+                    [ngStyle]="{
+                      background:
+                        'linear-gradient(to bottom right, var(--primary), var(--secondary))'
+                    }"
+                  >
+                    {{ c.name[0] }}
                   </div>
-
-                  <!-- imagen / fallback -->
-                  <div class="relative h-16 w-24 shrink-0">
-                    <img
-                      *ngIf="getCategoryImage(c); else bubble"
-                      [src]="getCategoryImage(c)!"
-                      [alt]="c.name"
-                      class="absolute right-0 top-1/2 -translate-y-1/2 h-16 w-auto object-contain"
-                      loading="lazy"
-                    />
-                    <ng-template #bubble>
-                      <div
-                        class="absolute right-0 top-1/2 -translate-y-1/2 h-16 w-16 rounded-xl"
-                        [ngStyle]="{
-                          background:
-                            'linear-gradient(to bottom right, var(--primary), var(--secondary))'
-                        }"
-                      ></div>
-                    </ng-template>
-                  </div>
-                </a>
+                </ng-template>
               </div>
-            </ng-container>
 
-            <ng-template #noCat>
-              <p class="text-slate-400">Sin categorías aún.</p>
-            </ng-template>
+              <!-- Texto -->
+              <div class="text-center">
+                <div
+                  class="font-semibold text-sm text-slate-800 group-hover:text-[var(--primary)] transition"
+                >
+                  {{ c.name }}
+                </div>
+                <div class="text-xs text-slate-500 mt-1">
+                  {{ c.count }}
+                  {{ c.count === 1 ? "producto" : "productos" }}
+                </div>
+              </div>
+            </a>
           </div>
+        </div>
+      </ng-template>
+    </p-dataView>
+  </ng-container>
+
+  <ng-template #noCat>
+    <p class="text-slate-400">Sin categorías aún.</p>
+  </ng-template>
+</div>
+
         </div>
       </section>
 
@@ -172,7 +179,9 @@
       <aside class="lg:col-span-4 space-y-4">
         <!-- Contacto -->
         <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-4">
-          <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+          <h3
+            class="text-sm font-semibold text-slate-800 flex items-center gap-2"
+          >
             <mat-icon
               class="!text-[18px]"
               [ngStyle]="{ color: 'var(--primary)' }"
@@ -216,7 +225,9 @@
 
         <!-- Ubicación -->
         <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-4">
-          <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+          <h3
+            class="text-sm font-semibold text-slate-800 flex items-center gap-2"
+          >
             <mat-icon
               class="!text-[18px]"
               [ngStyle]="{ color: 'var(--primary)' }"
@@ -252,7 +263,9 @@
 
         <!-- Horarios -->
         <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-4">
-          <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+          <h3
+            class="text-sm font-semibold text-slate-800 flex items-center gap-2"
+          >
             <mat-icon
               class="!text-[18px]"
               [ngStyle]="{ color: 'var(--primary)' }"

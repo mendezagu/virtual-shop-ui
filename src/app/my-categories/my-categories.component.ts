@@ -20,6 +20,15 @@ import { MatSelect, MatSelectTrigger } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatOptionModule } from '@angular/material/core';
 import { MatMenuModule } from '@angular/material/menu';
+//PRIMENG 
+import { AccordionModule } from 'primeng/accordion';
+import { AvatarModule } from 'primeng/avatar';
+import { BadgeModule } from 'primeng/badge';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 export interface CategorySummary {
   id: string; // 👈 nuevo
@@ -39,11 +48,19 @@ export interface CategorySummary {
     MatExpansionModule,
     MatIconModule,
     ReactiveFormsModule,
-    InputComponent,
     MatMenuModule,
     MatFormFieldModule,
     MatOptionModule,
+//primeng
+    AccordionModule,
+    AvatarModule,
+    BadgeModule,
+    ButtonModule,
+    InputTextModule,
+    ToastModule,
+    ConfirmDialogModule
   ],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './my-categories.component.html',
   styleUrls: ['./my-categories.component.scss'],
 })
@@ -64,7 +81,9 @@ export class MyCategoriesComponent implements OnInit {
     private publicStoreService: PublicStoreService,
     private fb: FormBuilder,
     private productService: ProductService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService,
   ) {}
 
   ngOnInit(): void {
@@ -89,25 +108,38 @@ export class MyCategoriesComponent implements OnInit {
       },
     });
   }
-  loadCategories() {
-    if (!this.storeSlug) return;
 
-    this.productService.getCategories(this.storeSlug).subscribe({
-      next: (res) => {
-        this.categories = res.data;
-        this.categories.forEach((c) => {
-          this.categoryForms[c.id] = this.fb.group({
-            name: [c.name, [Validators.required, Validators.minLength(2)]],
-          });
+loadCategories(page: number = 1, limit: number = 10) {
+  if (!this.storeSlug) return;
+
+  this.categoryService.getCategories(this.storeSlug, page, limit).subscribe({
+    next: (res) => {
+      console.log('categorías recibidas', res);
+
+      this.categories = Array.isArray(res.data) ? res.data : [];
+
+      // Generar formularios de edición para cada categoría
+      this.categories.forEach((c) => {
+        this.categoryForms[c.id] = this.fb.group({
+          name: [c.name, [Validators.required, Validators.minLength(2)]],
         });
-        this.isLoading = false;
-      },
-      error: () => {
-        this.isLoading = false;
-        this.hasError = true;
-      },
-    });
-  }
+      });
+
+      // ⚡ Podés usar esta metadata para armar paginador
+      const { total, totalPages } = res.meta;
+      console.log(`Página ${page} de ${totalPages}, total categorías: ${total}`);
+
+      this.isLoading = false;
+    },
+    error: (err) => {
+      console.error('Error cargando categorías:', err);
+      this.isLoading = false;
+      this.hasError = true;
+      this.categories = [];
+    },
+  });
+}
+
 
   loadProducts(category: CategorySummary) {
     if (!this.storeSlug) return;
@@ -128,37 +160,94 @@ export class MyCategoriesComponent implements OnInit {
       });
   }
 
-  createCategory() {
-    if (this.newCategoryForm.invalid) return;
-    const name = this.newCategoryForm.value.name;
+createCategory() {
+  if (this.newCategoryForm.invalid) return;
+  const name = this.newCategoryForm.value.name;
 
-    this.categoryService.createCategory(this.storeId, name).subscribe({
-      next: (cat) => {
-        this.categories.push({ ...cat, count: 0, products: [] });
-        this.newCategoryForm.reset();
-      },
-    });
-  }
+  this.confirmationService.confirm({
+    message: `¿Quieres crear la categoría "${name}"?`,
+    header: 'Confirmar creación',
+    icon: 'pi pi-check-circle',
+    acceptLabel: 'Sí, crear',
+    rejectLabel: 'Cancelar',
+    acceptButtonStyleClass: 'p-button-success p-button-sm',
+    rejectButtonStyleClass: 'p-button-text p-button-sm',
+    accept: () => {
+      this.categoryService.createCategory(this.storeId, name).subscribe({
+        next: (cat) => {
+          this.categories.push({ ...cat, count: 0, products: [] });
+          this.newCategoryForm.reset();
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Categoría creada',
+            detail: `"${cat.name}" fue creada exitosamente.`,
+          });
+        },
+        error: () => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudo crear la categoría.',
+          });
+        },
+      });
+    }
+  });
+}
 
-  updateCategory(c: CategorySummary) {
-    const form = this.categoryForms[c.id];
-    if (!form?.valid) return;
+updateCategory(c: CategorySummary) {
+  const form = this.categoryForms[c.id];
+  if (!form?.valid) return;
 
-    this.categoryService.updateCategory(c.id, form.value.name).subscribe({
-      next: () => (c.name = form.value.name),
-    });
-  }
+  this.categoryService.updateCategory(c.id, form.value.name).subscribe({
+    next: () => {
+      c.name = form.value.name;
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Categoría actualizada',
+        detail: `"${c.name}" se actualizó correctamente.`,
+      });
+    },
+    error: () => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo actualizar la categoría.',
+      });
+    }
+  });
+}
 
-  deleteCategory(c: CategorySummary) {
-    if (!confirm(`¿Seguro que quieres eliminar la categoría "${c.name}"?`))
-      return;
-
-    this.categoryService.deleteCategory(c.id).subscribe({
-      next: () => {
-        this.categories = this.categories.filter((cat) => cat.id !== c.id);
-      },
-    });
-  }
+deleteCategory(c: CategorySummary) {
+  this.confirmationService.confirm({
+    message: `¿Seguro que quieres eliminar la categoría "${c.name}"?`,
+    header: 'Confirmar eliminación',
+    icon: 'pi pi-exclamation-triangle',
+    acceptLabel: 'Sí, eliminar',
+    rejectLabel: 'Cancelar',
+    acceptButtonStyleClass: 'p-button-danger p-button-sm',
+    rejectButtonStyleClass: 'p-button-text p-button-sm',
+    accept: () => {
+      this.categoryService.deleteCategory(c.id).subscribe({
+        next: () => {
+          this.categories = this.categories.filter((cat) => cat.id !== c.id);
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Categoría eliminada',
+            detail: `"${c.name}" fue eliminada.`,
+          });
+        },
+        error: () => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudo eliminar la categoría.',
+          });
+        },
+      });
+    }
+  });
+}
 
   onCategoryMenuAction(action: string, c: CategorySummary) {
     if (action === 'delete') {

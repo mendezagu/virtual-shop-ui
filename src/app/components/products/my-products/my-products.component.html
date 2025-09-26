@@ -21,29 +21,26 @@
       class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4"
     >
       <!-- Buscador pill -->
-      <div
-        class="flex items-center w-full sm:w-80 rounded-full border border-slate-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-pink-300"
-      >
-        <mat-icon class="text-slate-400 mr-2">search</mat-icon>
+      <div class="flex items-center">
+        <i class="pi pi-search text-slate-400 mr-2"></i>
         <input
           type="text"
+          pInputText
           [formControl]="searchCtrl"
           placeholder="Buscar producto"
-          class="flex-1 outline-none border-none bg-transparent text-slate-700 placeholder:text-slate-400"
+          class="flex-1 bg-transparent text-slate-700 placeholder:text-slate-400"
         />
       </div>
 
       <div class="flex-1"></div>
 
       <button
-        mat-raised-button
-        color="primary"
+        pButton
+        label="Agregar producto"
+        icon="pi pi-plus"
         class="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 shadow-sm flex items-center gap-2"
         (click)="openCreateDialog()"
-      >
-        <mat-icon>add</mat-icon>
-        Agregar producto
-      </button>
+      ></button>
     </div>
   </div>
 
@@ -64,33 +61,30 @@
     <!-- Lista / Empty -->
     <ng-template #contentTpl>
       <ng-container *ngIf="productos?.length; else emptyTpl">
-        <mat-accordion class="modern-accordion" multi>
-          @for (product of productos; track product.id_producto) {
-          <mat-expansion-panel class="custom-expansion-header">
-            <mat-expansion-panel-header>
-              <mat-panel-title>
+        <p-accordion [multiple]="true" class="modern-accordion">
+          <p-accordionTab
+            *ngFor="let product of productos; trackBy: trackByProduct"
+          >
+            <ng-template pTemplate="header">
+              <div class="flex items-center w-full">
                 <div
                   class="w-12 h-12 rounded-xl overflow-hidden ring-1 ring-slate-200 bg-white mr-3"
                 >
                   <img
                     class="w-full h-full object-cover"
-                    src=" ../../../../assets/logo-app.png"
+                    src="../../../../assets/logo-app.png"
                     alt="Producto"
                   />
                 </div>
-                <div class="min-w-0">
+                <div class="min-w-0 flex-1">
                   <div class="font-medium text-slate-800 truncate">
                     {{ product.nombre_producto }}
                   </div>
                   <div class="text-xs text-slate-500 truncate">
-                    {{ product.categoria || "Sin categoría" }}
+                    {{ product.category?.name || "Sin categoría" }}
                   </div>
                 </div>
-              </mat-panel-title>
-
-              <!-- Chips derecha -->
-              <mat-panel-description class="!justify-end">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 ml-auto">
                   <span class="chip chip-soft">
                     <span class="chip-dot bg-emerald-500"></span>
                     Stock: {{ getTotalStock(product) }}
@@ -117,11 +111,10 @@
                     Variantes: {{ product.variants!.length }}
                   </span>
                 </div>
-              </mat-panel-description>
-            </mat-expansion-panel-header>
+              </div>
+            </ng-template>
 
             <!-- Panel content -->
-
             <div class="pt-4">
               <!-- Imágenes del producto -->
               <div class="mt-6">
@@ -129,7 +122,6 @@
                   Imágenes del producto
                 </h4>
 
-                <!-- Carrusel en mobile / grid en desktop -->
                 <div
                   class="flex gap-4 overflow-x-auto sm:grid sm:grid-cols-3 sm:gap-4"
                 >
@@ -146,12 +138,12 @@
                         class="w-full aspect-square object-cover rounded-lg border mb-2"
                       />
                       <button
+                        pButton
                         type="button"
-                        class="text-red-500 text-xs hover:underline"
+                        icon="pi pi-times"
+                        class="p-button-text p-button-danger text-xs"
                         (click)="removeImage(product, idx)"
-                      >
-                        Quitar
-                      </button>
+                      ></button>
                     </ng-container>
 
                     <ng-template #uploadTpl>
@@ -159,68 +151,134 @@
                         class="w-full aspect-square flex items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 hover:border-pink-400 hover:bg-pink-50 transition cursor-pointer"
                         (click)="uploadImage(product, idx)"
                       >
-                        <mat-icon class="text-slate-400">add_a_photo</mat-icon>
+                        <i class="pi pi-camera text-slate-400"></i>
                       </div>
                       <p class="mt-2 text-xs text-slate-400">Foto {{ i }}</p>
                     </ng-template>
                   </div>
                 </div>
               </div>
-              <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+              <!-- Info producto -->
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
                 <!-- Columna 1 -->
                 <div class="space-y-4">
-                  <app-input
-                    label="Nombre"
-                    type="text"
-                    [disabled]="disabledFields"
-                    [(value)]="product.nombre_producto"
-                  >
-                  </app-input>
+                  <div class="flex flex-col">
+                    <label for="nombre">Nombre</label>
+                    <input
+                      pInputText
+                      type="text"
+                      [disabled]="disabledFields"
+                      [(value)]="product.nombre_producto"
+                    />
+                  </div>
 
-                  <app-input
-                    label="Precio"
-                    type="number"
-                    [disabled]="disabledFields"
-                    [(value)]="product.precio"
-                  >
-                  </app-input>
+                  <div class="flex flex-col">
+                    <label for="precio">Precio</label>
+                    <input
+                      pInputText
+                      type="number"
+                      [disabled]="disabledFields"
+                      [(value)]="product.precio"
+                    />
+                  </div>
+
+                    <div class="flex flex-col">
+                    <label for="codigo">SKU/Código</label>
+                    <input
+                      pInputText
+                      type="text"
+                      [disabled]="disabledFields"
+                      [(value)]="product.sku"
+                    />
+                  </div>
                 </div>
 
                 <!-- Columna 2 -->
                 <div class="space-y-4">
-                  <app-input
-                    label="Categoría"
-                    type="text"
-                    [disabled]="disabledFields"
-                    [(value)]="product.categoria"
-                  >
-                  </app-input>
+                  <div class="flex flex-col">
+                    <label for="categoria">Categoría</label>
+                    <input
+                      pInputText
+                      type="text"
+                      [disabled]="true"
+                      [value]="product.category?.name || 'Sin categoría'"
+                    />
+                  </div>
 
-                  <app-input
-                    label="Grupo"
-                    type="text"
-                    [disabled]="disabledFields"
-                    [(value)]="product.grupo"
-                  >
-                  </app-input>
+                  <div class="flex flex-col">
+                    <label for="grupo">Grupo</label>
+                    <input
+                      pInputText
+                      type="text"
+                      [disabled]="disabledFields"
+                      [(value)]="product.grupo"
+                    />
+                  </div>
+
+                  <div class="flex flex-col">
+                    <label for="codigo_barras">Código de barras</label>
+                    <input
+                      pInputText
+                      type="text"
+                      [disabled]="disabledFields"
+                      [(value)]="product.codigo_barras"
+                    />
+                  </div>
+
+                  <div class="flex flex-col">
+                    <label for="condicion">Condición</label>
+                    <input
+                      pInputText
+                      type="text"
+                      [disabled]="disabledFields"
+                      [value]="product.condicion"
+                    />
+                  </div>
                 </div>
 
                 <!-- Columna 3 -->
                 <div class="space-y-4">
-                  <app-input
-                    label="Stock total"
-                    type="number"
-                    [disabled]="true"
-                    [value]="getTotalStock(product)"
-                  >
-                  </app-input>
+                  <div class="flex flex-col">
+                    <label for="stock">Stock total</label>
+                    <input
+                      pInputText
+                      type="number"
+                      [disabled]="true"
+                      [value]="getTotalStock(product)"
+                    />
+                  </div>
 
-                  <app-textarea
-                    label="Descripción"
-                    placeholder="Escribe una descripción..."
-                    [disabled]="disabledFields"
-                  >
-                  </app-textarea>
+                  <div class="flex flex-col">
+                    <label for="unidad_medida">Unidad de medida</label>
+                    <input
+                      pInputText
+                      type="text"
+                      [disabled]="disabledFields"
+                      [value]="product.unidad_medida"
+                    />
+                  </div>
+
+                  <div class="flex flex-col">
+                    <label for="vencimiento">Vencimiento</label>
+                    <input
+                      pInputText
+                      type="date"
+                      [disabled]="disabledFields"
+                      [value]="product.vencimiento ? (product.vencimiento | date:'yyyy-MM-dd') : ''"
+                    />
+                  </div>
+
+                  <div class="flex flex-col">
+                    <label for="descripcion">Descripción</label>
+                    <textarea
+                      pInputTextarea
+                      label="Descripción"
+                      placeholder="Escribe una descripción..."
+                      [value]="product.descripcion"
+                      [disabled]="disabledFields"
+                    ></textarea>
+                  </div>
                 </div>
               </div>
 
@@ -236,8 +294,8 @@
                 <div
                   class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
                 >
-                  @for (v of product.variants; track v.id_variant || $index) {
                   <div
+                    *ngFor="let v of product.variants; trackBy: trackByVariant"
                     class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
                   >
                     <div class="grid grid-cols-1 gap-3">
@@ -261,24 +319,21 @@
                       ></app-input>
                     </div>
                   </div>
-                  }
                 </div>
               </div>
 
               <!-- Acciones -->
               <div class="mt-6 flex items-center justify-end gap-2">
                 <button
-                  mat-stroked-button
-                  class="rounded-xl border border-slate-200 text-slate-700 px-4 py-2 hover:bg-slate-50"
-                  (click)="openEditDialog(product, currentStoreSlug)"
-                >
-                  Editar producto
-                </button>
+                  pButton
+                  label="Editar producto"
+                  class="p-button-outlined"
+                  (click)="openEditDialog(product)"
+                ></button>
               </div>
             </div>
-          </mat-expansion-panel>
-          }
-        </mat-accordion>
+          </p-accordionTab>
+        </p-accordion>
       </ng-container>
 
       <!-- Empty state -->
@@ -289,7 +344,7 @@
           <div
             class="mx-auto w-14 h-14 rounded-2xl bg-pink-50 flex items-center justify-center text-pink-500 mb-3"
           >
-            <mat-icon>inventory_2</mat-icon>
+            <i class="pi pi-box text-2xl"></i>
           </div>
           <h3 class="text-lg font-semibold text-slate-800">
             Aún no hay productos
@@ -298,13 +353,12 @@
             Crea tu primer producto para empezar a vender.
           </p>
           <button
-            mat-raised-button
-            color="primary"
+            pButton
+            label="Agregar producto"
+            icon="pi pi-plus"
             class="mt-4 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 shadow-sm"
             (click)="openCreateDialog()"
-          >
-            Agregar producto
-          </button>
+          ></button>
         </div>
       </ng-template>
     </ng-template>
@@ -312,12 +366,26 @@
 
   <!-- Paginador -->
   <div class="flex justify-center mt-6">
-    <mat-paginator
-      [length]="totalItems"
-      [pageSize]="pageSize"
-      [pageSizeOptions]="[5, 10, 20]"
-      (page)="onPageChange($event)"
-    >
-    </mat-paginator>
+    <p-paginator
+      [rows]="pageSize"
+      [totalRecords]="totalItems"
+      [rowsPerPageOptions]="[5, 10, 20]"
+      (onPageChange)="onPageChange($event)"
+    ></p-paginator>
   </div>
 </div>
+
+<!-- Editar producto -->
+<app-product-dialog
+  [product]="selectedProduct"
+  [storeId]="currentStoreSlug"
+  [visible]="editVisible"
+  (visibleChange)="editVisible = $event"
+></app-product-dialog>
+
+<!-- Crear producto -->
+<app-product-dialog
+  [storeId]="currentStoreSlug"
+  [visible]="createVisible"
+  (visibleChange)="createVisible = $event"
+></app-product-dialog>

@@ -4,10 +4,13 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatIcon } from "@angular/material/icon";
 
+//primeng
+import { DataViewModule } from 'primeng/dataview';
+
 @Component({
   selector: 'app-public-store',
   standalone: true,
-  imports: [RouterModule, CommonModule, MatIcon],
+  imports: [RouterModule, CommonModule, MatIcon, DataViewModule],
   templateUrl: './public-store.component.html',
   styleUrl: './public-store.component.scss'
 })

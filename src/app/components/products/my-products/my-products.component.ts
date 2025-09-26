@@ -18,6 +18,14 @@ import { TextareaComponent } from '../../../shared/components/textarea/textarea.
 import { CommonModule } from '@angular/common';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
+// PrimeNG
+import { AccordionModule } from 'primeng/accordion';
+import { ButtonModule } from 'primeng/button';
+import { PaginatorModule } from 'primeng/paginator';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { InputTextModule } from 'primeng/inputtext';
+
 @Component({
   selector: 'app-my-products',
   standalone: true,
@@ -31,13 +39,20 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
     MatInputModule,
     MatPaginatorModule,
     InputComponent,
-    TextareaComponent,
+    //primeng
+    DialogModule,
+    ProductDialogComponent,
+    AccordionModule,
+    ButtonModule,
+    InputTextModule,
+    PaginatorModule,
+    InputTextareaModule
   ],
   templateUrl: './my-products.component.html',
   styleUrls: ['./my-products.component.scss'],
 })
 export class MyProductsComponent implements OnInit {
-  @ViewChild(MatAccordion) accordion!: MatAccordion;
+  @ViewChild('accordion') accordion: any;
 
   disabledFields = true;
   isLoading = true;
@@ -53,16 +68,18 @@ export class MyProductsComponent implements OnInit {
 
   searchCtrl = new FormControl<string>('', { nonNullable: true });
 
+  selectedProduct?: Producto;
+  editVisible = false;
+  createVisible = false;
+
   constructor(
     private productService: ProductService,
     private storeService: StoreService,
-    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
-    this.loadProducts(this.currentPage, this.pageSize);
+     this.loadProducts(this.currentPage, this.pageSize);
 
-    // 🔎 Búsqueda con debounce
     this.searchCtrl.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe((term) => {
@@ -71,60 +88,13 @@ export class MyProductsComponent implements OnInit {
       });
   }
 
-  openCreateDialog() {
-    const dialogRef = this.dialog.open(ProductDialogComponent, {
-      width: '420px',
-      data: { title: 'Agregar producto', message: 'Completa los datos del nuevo producto.' },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        // crea y refresca
-        this.storeService.getMyStores().subscribe({
-          next: (stores) => {
-            const idTienda = stores?.[0]?.id_tienda;
-            if (!idTienda) return;
-            this.productService.createProduct(idTienda, result).subscribe({
-              next: () =>
-                this.loadProducts(
-                  this.currentPage,
-                  this.pageSize,
-                  this.searchCtrl.value || ''
-                ),
-            });
-          },
-        });
-      }
-    });
+    openCreateDialog() {
+    this.createVisible = true;
   }
 
-  /** 👇 Ahora acepta slug opcional, pero si lo tenemos guardado lo pasamos */
-  openEditDialog(product: Producto, storeSlug?: string) {
-    const deducedSlug =
-      storeSlug ||
-      this.currentStoreSlug ||
-      // si el producto viene de un findOne con store:
-      (product as any)?.store?.link_tienda ||
-      undefined;
-
-    const dialogRef = this.dialog.open(EditProductDialogComponent, {
-      width: '520px',
-      data: deducedSlug ? { product, storeSlug: deducedSlug } : { product },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.productService.updateProduct(product.id_producto, result).subscribe({
-          next: () =>
-            this.loadProducts(
-              this.currentPage,
-              this.pageSize,
-              this.searchCtrl.value || ''
-            ),
-          error: (err) => console.error('Error al actualizar', err),
-        });
-      }
-    });
+  openEditDialog(product: Producto) {
+    this.selectedProduct = product;
+    this.editVisible = true;
   }
 
   getTotalStock(product: Producto): number {
@@ -156,7 +126,6 @@ export class MyProductsComponent implements OnInit {
         const store = stores?.[0];
         const idTienda = store?.id_tienda;
 
-        // 👇 guardamos el slug público para el diálogo
         this.currentStoreSlug = store?.link_tienda;
 
         if (!idTienda) {
@@ -183,20 +152,27 @@ export class MyProductsComponent implements OnInit {
     });
   }
 
-  onPageChange(event: PageEvent) {
-    this.pageSize = event.pageSize;
-    this.currentPage = event.pageIndex;
+  onPageChange(event: any) {
+    this.pageSize = event.rows;
+    this.currentPage = event.page;
     this.loadProducts(this.currentPage, this.pageSize, this.searchCtrl.value || '');
   }
 
   uploadImage(product: any, index: number) {
-  // Aquí podés abrir un file picker o tu modal de subida
-  console.log("Subir imagen para", product.nombre_producto, "slot", index);
+    console.log('Subir imagen para', product.nombre_producto, 'slot', index);
+  }
+
+  removeImage(product: any, index: number) {
+    if (product.imagen_url) {
+      product.imagen_url.splice(index, 1);
+    }
+  }
+
+  trackByProduct(index: number, product: Producto): string {
+  return product.id_producto;
 }
 
-removeImage(product: any, index: number) {
-  if (product.imagen_url) {
-    product.imagen_url.splice(index, 1);
-  }
+trackByVariant(index: number, variant: ProductVariant): string {
+  return variant.id_variant || variant.nombre;
 }
 }

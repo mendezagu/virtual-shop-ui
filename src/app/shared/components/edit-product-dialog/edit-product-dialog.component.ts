@@ -60,7 +60,7 @@ export class EditProductDialogComponent implements OnInit {
     this.form = this.fb.group({
       nombre_producto: [this.data.product.nombre_producto, Validators.required],
       // `categoria` es el valor que se envía al backend
-      categoria: [this.data.product.categoria ?? '', Validators.required],
+      categoria: [this.data.product.category?.name ?? '', Validators.required],
       // `categoriaSelect` sólo maneja el UI del mat-select (NO se envía al backend)
       categoriaSelect: [''],
       grupo: [this.data.product.grupo, Validators.required],

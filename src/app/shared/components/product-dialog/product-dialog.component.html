@@ -1,27 +1,27 @@
-<div class="card flex justify-center">
-  <p-button (onClick)="showDialog()" label="Nuevo Producto"></p-button>
 
-  <p-dialog
-    header="Nuevo Producto"
-    [(visible)]="visible"
-    [modal]="true"
-    [style]="{ width: '95%', maxWidth: '700px' }"
-    [breakpoints]="{ '960px': '90vw', '640px': '95vw' }"
-    class="mb-4"
+  
+<p-dialog
+  [header]="product ? 'Editar producto' : 'Nuevo producto'"
+  [(visible)]="visible"
+  (onHide)="handleHide()"
+  [modal]="true"
+  [style]="{ width: '95%', maxWidth: '700px' }"
+  [breakpoints]="{ '960px': '90vw', '640px': '95vw' }"
+  class="mb-4"
+>
+  <div class="card">
+    <p-messages
+      [(value)]="messages"
+      [enableService]="false"
+      [closable]="false"
+    />
+  </div>
+
+  <form
+    [formGroup]="productForm"
+    (ngSubmit)="submit()"
+    class="flex flex-col gap-6"
   >
-    <div class="card">
-      <p-messages
-        [(value)]="messages"
-        [enableService]="false"
-        [closable]="false"
-      />
-    </div>
-
-    <form
-      [formGroup]="productForm"
-      (ngSubmit)="crearProducto()"
-      class="flex flex-col gap-6"
-    >
       <p-tabView>
         <!-- TAB 1: Detalles -->
         <p-tabPanel>
@@ -164,6 +164,29 @@
               ></p-dropdown>
             </div>
           </div>
+          <!-- vencimiento y Condición -->
+           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div class="flex flex-col gap-2">
+              <label for="vencimiento">Vencimiento</label>
+              <input
+                pInputText
+                formControlName="vencimiento"
+                type="date"
+                class="w-full"
+              />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label for="condicion">Condición</label>
+              <p-dropdown
+                formControlName="condicion"
+                [options]="condicionOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Selecciona condición"
+                class="w-full"
+              ></p-dropdown>
+            </div>
+           </div>
 
           <!-- Descripción -->
           <div class="flex flex-col gap-2 mt-4">
@@ -310,24 +333,24 @@
         </p-tabPanel>
       </p-tabView>
 
-      <!-- Botones -->
-      <div class="flex flex-row justify-end gap-3 mt-6 w-full">
-        <p-button
-          label="Cancelar"
-          severity="secondary"
-          (onClick)="onCancel()"
-          type="button"
-          class="flex-1 sm:flex-none"
-        ></p-button>
-        <p-button
-          label="Aceptar"
-          type="submit"
-          [disabled]="productForm.invalid"
-          class="flex-1 sm:flex-none"
-        ></p-button>
-      </div>
+     <!-- Botones -->
+    <div class="flex flex-row justify-end gap-3 mt-6 w-full">
+      <p-button
+        label="Cancelar"
+        severity="secondary"
+        (onClick)="onCancel()"
+        type="button"
+        class="flex-1 sm:flex-none"
+      ></p-button>
+      <p-button
+        [label]="product ? 'Guardar cambios' : 'Crear'"
+        type="submit"
+        [disabled]="productForm.invalid"
+        class="flex-1 sm:flex-none"
+      ></p-button>
+    </div>
     </form>
   </p-dialog>
-</div>
+
 
 <p-toast></p-toast>

@@ -77,7 +77,7 @@ export class EditProductComponent implements OnInit {
         this.product = res.data[0];
         this.productForm.patchValue({
           nombre_producto: this.product.nombre_producto,
-          categoria: this.product.categoria,
+          categoria: this.product.category?.name || '',
           grupo: this.product.grupo,
           descripcion: this.product.descripcion,
           stock: this.product.stock,
