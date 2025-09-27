@@ -1,5 +1,3 @@
-
-  
 <p-dialog
   [header]="product ? 'Editar producto' : 'Nuevo producto'"
   [(visible)]="visible"
@@ -22,318 +20,331 @@
     (ngSubmit)="submit()"
     class="flex flex-col gap-6"
   >
-      <p-tabView>
-        <!-- TAB 1: Detalles -->
-        <p-tabPanel>
-          <ng-template pTemplate="header">
-            <i class="pi pi-book"></i>
-            <span class="ml-2">Detalles</span>
-          </ng-template>
+    <p-tabView>
+      <!-- TAB 1: Detalles -->
+      <p-tabPanel>
+        <ng-template pTemplate="header">
+          <i class="pi pi-book"></i>
+          <span class="ml-2">Detalles</span>
+        </ng-template>
 
-          <!-- Nombre y Stock -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="flex flex-col gap-2">
-              <label for="nombre_producto">Nombre del producto</label>
-              <p-iconField iconPosition="left" class="w-full">
-                <p-inputIcon styleClass="pi pi-box" />
-                <input
-                  pInputText
-                  placeholder="Ej: Remera oversize"
-                  formControlName="nombre_producto"
-                  type="text"
-                  class="w-full"
-                />
-              </p-iconField>
-              <small
-                class="p-error"
-                *ngIf="
-                  productForm.get('nombre_producto')?.invalid &&
-                  (productForm.get('nombre_producto')?.dirty ||
-                    productForm.get('nombre_producto')?.touched)
-                "
-              >
-                El nombre es obligatorio
-              </small>
-            </div>
-
-            <div class="flex flex-col gap-2">
-              <label for="stock">Stock</label>
-              <input
-                pInputText
-                formControlName="stock"
-                type="number"
-                class="w-full"
-              />
-              <small
-                class="p-error"
-                *ngIf="
-                  productForm.get('stock')?.invalid &&
-                  (productForm.get('stock')?.dirty ||
-                    productForm.get('stock')?.touched)
-                "
-              >
-                El stock es obligatorio
-              </small>
-            </div>
-          </div>
-
-          <!-- SKU y Código de barras -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <div class="flex flex-col gap-2">
-              <label for="sku">Sku / Código</label>
-              <input
-                pInputText
-                formControlName="sku"
-                type="text"
-                class="w-full"
-              />
-            </div>
-            <div class="flex flex-col gap-2">
-              <label for="codigo_barras">Código de barras</label>
-              <input
-                pInputText
-                formControlName="codigo_barras"
-                type="text"
-                class="w-full"
-              />
-            </div>
-          </div>
-
-          <!-- Categoría y Unidad -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <div class="flex flex-col gap-2">
-              <label for="categoriaSelect">Categoría</label>
-              <p-dropdown
-                formControlName="categoriaSelect"
-                [options]="categories"
-                optionLabel="name"
-                optionValue="id"
-                placeholder="Selecciona una categoría"
-                class="w-full"
-                (onChange)="onCategorySelectChange($event.value)"
-              >
-                <ng-template let-category pTemplate="item">
-                  <div class="flex items-center gap-2">
-                    <img
-                      *ngIf="category.imageUrl"
-                      [src]="category.imageUrl"
-                      alt="img"
-                      class="w-6 h-6 rounded-full"
-                    />
-                    <span>{{ category.name }}</span>
-                    <span class="text-xs text-slate-400">
-                      ({{ category.count }})
-                    </span>
-                  </div>
-                </ng-template>
-                <ng-template pTemplate="footer">
-                  <div class="p-2 border-t text-center">
-                    <button
-                      pButton
-                      type="button"
-                      class="p-button-text p-button-sm w-full"
-                      (click)="onCategorySelectChange('__NEW__')"
-                    >
-                      + Crear nueva categoría
-                    </button>
-                  </div>
-                </ng-template>
-              </p-dropdown>
-
-              <div *ngIf="showNewCategory" class="mt-2">
-                <label for="categoria">Nueva categoría</label>
-                <input
-                  pInputText
-                  formControlName="categoria"
-                  type="text"
-                  placeholder="Ej. Panadería artesanal"
-                  class="w-full"
-                />
-              </div>
-            </div>
-
-            <div class="flex flex-col gap-2">
-              <label for="unidad_medida">Unidad de medida</label>
-              <p-dropdown
-                formControlName="unidad_medida"
-                [options]="unidadOptions"
-                optionLabel="label"
-                optionValue="value"
-                placeholder="Selecciona unidad"
-                class="w-full"
-              ></p-dropdown>
-            </div>
-          </div>
-          <!-- vencimiento y Condición -->
-           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <div class="flex flex-col gap-2">
-              <label for="vencimiento">Vencimiento</label>
-              <input
-                pInputText
-                formControlName="vencimiento"
-                type="date"
-                class="w-full"
-              />
-            </div>
-            <div class="flex flex-col gap-2">
-              <label for="condicion">Condición</label>
-              <p-dropdown
-                formControlName="condicion"
-                [options]="condicionOptions"
-                optionLabel="label"
-                optionValue="value"
-                placeholder="Selecciona condición"
-                class="w-full"
-              ></p-dropdown>
-            </div>
-           </div>
-
-          <!-- Descripción -->
-          <div class="flex flex-col gap-2 mt-4">
-            <label for="descripcion">Descripción</label>
-            <textarea
-              rows="5"
-              pInputTextarea
-              formControlName="descripcion"
-              class="w-full"
-            ></textarea>
-          </div>
-        </p-tabPanel>
-
-        <!-- TAB 2: Precio -->
-        <p-tabPanel>
-          <ng-template pTemplate="header">
-            <i class="pi pi-dollar"></i>
-            <span class="ml-2">Precio</span>
-          </ng-template>
+        <!-- Nombre y Stock -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="flex flex-col gap-2">
-            <label for="precio">Precio</label>
+            <label for="nombre_producto">Nombre del producto</label>
+            <p-iconField iconPosition="left" class="w-full">
+              <p-inputIcon styleClass="pi pi-box" />
+              <input
+                pInputText
+                placeholder="Ej: Remera oversize"
+                formControlName="nombre_producto"
+                type="text"
+                class="w-full"
+              />
+            </p-iconField>
+            <small
+              class="p-error"
+              *ngIf="
+                productForm.get('nombre_producto')?.invalid &&
+                (productForm.get('nombre_producto')?.dirty ||
+                  productForm.get('nombre_producto')?.touched)
+              "
+            >
+              El nombre es obligatorio
+            </small>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label for="stock">Stock</label>
             <input
               pInputText
-              id="precio"
-              formControlName="precio"
+              formControlName="stock"
               type="number"
               class="w-full"
             />
-          </div>
-        </p-tabPanel>
-
-        <!-- TAB 3: Variantes -->
-        <p-tabPanel>
-          <ng-template pTemplate="header">
-            <i class="pi pi-list-check"></i>
-            <span class="ml-2">Variantes</span>
-          </ng-template>
-          <div class="flex flex-col gap-3">
-            <p-checkbox
-              formControlName="presentacion_multiple"
-              binary="true"
-              label="Producto con variantes"
-            ></p-checkbox>
-
-            <div
-              *ngIf="productForm.get('presentacion_multiple')?.value"
-              formArrayName="variants"
-              class="flex flex-col gap-4"
+            <small
+              class="p-error"
+              *ngIf="
+                productForm.get('stock')?.invalid &&
+                (productForm.get('stock')?.dirty ||
+                  productForm.get('stock')?.touched)
+              "
             >
-              <div
-                *ngFor="let varGroup of variants.controls; let i = index"
-                [formGroupName]="i"
-                class="border p-4 rounded-lg grid gap-4 md:grid-cols-3"
-              >
-                <app-input
-                  label="Nombre Variante"
-                  formControlName="nombre"
-                  type="text"
-                ></app-input>
-                <app-input
-                  label="Stock"
-                  formControlName="stock"
-                  type="number"
-                ></app-input>
-                <app-input
-                  label="Precio"
-                  formControlName="precio"
-                  type="number"
-                ></app-input>
-                <p-button
-                  label="Eliminar"
-                  severity="danger"
-                  (onClick)="quitarVariante(i)"
-                  type="button"
-                  class="col-span-3 md:col-span-1"
-                ></p-button>
-              </div>
-              <p-button
-                label="Agregar Variante"
-                icon="pi pi-plus"
-                (onClick)="agregarVariante()"
-                type="button"
-              ></p-button>
+              El stock es obligatorio
+            </small>
+          </div>
+        </div>
+
+        <!-- SKU y Código de barras -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div class="flex flex-col gap-2">
+            <label for="sku">Sku / Código</label>
+            <input
+              pInputText
+              formControlName="sku"
+              type="text"
+              class="w-full"
+            />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label for="codigo_barras">Código de barras</label>
+            <input
+              pInputText
+              formControlName="codigo_barras"
+              type="text"
+              class="w-full"
+            />
+          </div>
+        </div>
+
+        <!-- Categoría y Unidad -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div class="flex flex-col gap-2">
+            <label for="categoriaSelect">Categoría</label>
+            <p-dropdown
+              formControlName="categoriaSelect"
+              [options]="categories"
+              optionLabel="name"
+              optionValue="id"
+              placeholder="Selecciona una categoría"
+              class="w-full"
+              (onChange)="onCategorySelectChange($event.value)"
+            >
+              <ng-template let-category pTemplate="item">
+                <div class="flex items-center gap-2">
+                  <img
+                    *ngIf="category.imageUrl"
+                    [src]="category.imageUrl"
+                    alt="img"
+                    class="w-6 h-6 rounded-full"
+                  />
+                  <span>{{ category.name }}</span>
+                  <span class="text-xs text-slate-400">
+                    ({{ category.count }})
+                  </span>
+                </div>
+              </ng-template>
+              <ng-template pTemplate="footer">
+                <div class="p-2 border-t text-center">
+                  <button
+                    pButton
+                    type="button"
+                    class="p-button-text p-button-sm w-full"
+                    (click)="onCategorySelectChange('__NEW__')"
+                  >
+                    + Crear nueva categoría
+                  </button>
+                </div>
+              </ng-template>
+            </p-dropdown>
+
+            <div *ngIf="showNewCategory" class="mt-2">
+              <label for="categoria">Nueva categoría</label>
+              <input
+                pInputText
+                formControlName="categoria"
+                type="text"
+                placeholder="Ej. Panadería artesanal"
+                class="w-full"
+              />
             </div>
           </div>
-        </p-tabPanel>
 
-        <!-- TAB 4: Imágenes -->
-        <p-tabPanel>
-          <ng-template pTemplate="header">
-            <i class="pi pi-camera"></i>
-            <span class="ml-2">Imágenes</span>
-          </ng-template>
-          <div class="upload-card">
-            <p-fileUpload
-              name="imagenes[]"
-              accept="image/*"
-              maxFileSize="5000000"
-              [multiple]="true"
-              [customUpload]="true"
-              (onSelect)="onFileSelect($event)"
+          <div class="flex flex-col gap-2">
+            <label for="unidad_medida">Unidad de medida</label>
+            <p-dropdown
+              formControlName="unidad_medida"
+              [options]="unidadOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Selecciona unidad"
               class="w-full"
-            >
-              <ng-template pTemplate="empty">
-                <div class="upload-empty text-center p-6">
-                  <i class="pi pi-cloud-upload text-5xl text-gray-400"></i>
-                  <h4 class="mt-2 font-semibold">Sube tu imagen</h4>
-                  <p class="text-sm text-gray-500">
-                    Arrastra y suelta o haz click en
-                    <b>"Seleccionar"</b>
-                  </p>
-                  <div class="text-xs text-gray-400 mt-1">
-                    JPG, PNG, WebP • Máximo 5MB
-                  </div>
-                </div>
-              </ng-template>
+            ></p-dropdown>
+          </div>
+        </div>
+        <!-- vencimiento y Condición -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div class="flex flex-col gap-2">
+            <label for="vencimiento">Vencimiento</label>
+            <input
+              pInputText
+              formControlName="vencimiento"
+              type="date"
+              class="w-full"
+            />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label for="condicion">Condición</label>
+            <p-dropdown
+              formControlName="condicion"
+              [options]="condicionOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Selecciona condición"
+              class="w-full"
+            ></p-dropdown>
+          </div>
+        </div>
 
-              <ng-template
-                pTemplate="content"
-                let-files
-                let-removeFileCallback="removeFileCallback"
+        <!-- Descripción -->
+        <div class="flex flex-col gap-2 mt-4">
+          <label for="descripcion">Descripción</label>
+          <textarea
+            rows="5"
+            pInputTextarea
+            formControlName="descripcion"
+            class="w-full"
+          ></textarea>
+        </div>
+      </p-tabPanel>
+
+      <!-- TAB 2: Precio -->
+      <p-tabPanel>
+        <ng-template pTemplate="header">
+          <i class="pi pi-dollar"></i>
+          <span class="ml-2">Precio</span>
+        </ng-template>
+        <div class="flex flex-col gap-2">
+          <label for="precio">Precio</label>
+          <input
+            pInputText
+            id="precio"
+            formControlName="precio"
+            type="number"
+            class="w-full"
+          />
+        </div>
+      </p-tabPanel>
+
+      <!-- TAB 3: Variantes -->
+      <p-tabPanel>
+        <ng-template pTemplate="header">
+          <i class="pi pi-list-check"></i>
+          <span class="ml-2">Variantes</span>
+        </ng-template>
+        <div class="flex flex-col gap-3">
+          <p-checkbox
+            formControlName="presentacion_multiple"
+            binary="true"
+            label="Producto con variantes"
+          ></p-checkbox>
+
+          <div
+            *ngIf="productForm.get('presentacion_multiple')?.value"
+            formArrayName="variants"
+            class="flex flex-col gap-4"
+          >
+            <div
+              *ngFor="let varGroup of variants.controls; let i = index"
+              [formGroupName]="i"
+              class="border p-4 rounded-lg grid gap-4 md:grid-cols-3"
+            >
+              <div class="flex flex-col gap-2">
+                <label>Nombre Variante</label>
+                <input
+                  pInputText
+                  formControlName="nombre"
+                  type="text"
+                  class="w-full"
+                />
+              </div>
+              <div class="flex flex-col gap-2">
+                <label>Stock</label>
+                <input
+                  pInputText
+                  formControlName="stock"
+                  type="number"
+                  class="w-full"
+                />
+              </div>
+              <div class="flex flex-col gap-2">
+                <label>Precio</label>
+                <input
+                  pInputText
+                  formControlName="precio"
+                  type="number"
+                  class="w-full"
+                />
+              </div>
+              <p-button
+                label="Eliminar"
+                severity="danger"
+                (onClick)="quitarVariante(i)"
+                type="button"
+                class="col-span-3 md:col-span-1"
+              ></p-button>
+            </div>
+
+            <p-button
+              label="Agregar Variante"
+              icon="pi pi-plus"
+              (onClick)="agregarVariante()"
+              type="button"
+            ></p-button>
+          </div>
+        </div>
+      </p-tabPanel>
+
+      <!-- TAB 4: Imágenes -->
+      <p-tabPanel>
+        <ng-template pTemplate="header">
+          <i class="pi pi-camera"></i>
+          <span class="ml-2">Imágenes</span>
+        </ng-template>
+        <div class="upload-card">
+          <p-fileUpload
+            name="imagenes[]"
+            accept="image/*"
+            maxFileSize="5000000"
+            [multiple]="true"
+            [customUpload]="true"
+            (onSelect)="onFileSelect($event)"
+            class="w-full"
+          >
+            <ng-template pTemplate="empty">
+              <div class="upload-empty text-center p-6">
+                <i class="pi pi-cloud-upload text-5xl text-gray-400"></i>
+                <h4 class="mt-2 font-semibold">Sube tu imagen</h4>
+                <p class="text-sm text-gray-500">
+                  Arrastra y suelta o haz click en
+                  <b>"Seleccionar"</b>
+                </p>
+                <div class="text-xs text-gray-400 mt-1">
+                  JPG, PNG, WebP • Máximo 5MB
+                </div>
+              </div>
+            </ng-template>
+
+            <ng-template
+              pTemplate="content"
+              let-files
+              let-removeFileCallback="removeFileCallback"
+            >
+              <div
+                class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 mt-4"
+                *ngIf="files?.length > 0"
               >
                 <div
-                  class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 mt-4"
-                  *ngIf="files?.length > 0"
+                  class="border rounded-lg p-3 flex items-center justify-between"
+                  *ngFor="let file of files; let i = index"
                 >
-                  <div
-                    class="border rounded-lg p-3 flex items-center justify-between"
-                    *ngFor="let file of files; let i = index"
-                  >
-                    <span class="truncate">{{ file.name }}</span>
-                    <button
-                      type="button"
-                      pButton
-                      icon="pi pi-times"
-                      class="p-button-rounded p-button-text p-button-danger"
-                      (click)="removeFileCallback(i)"
-                    ></button>
-                  </div>
+                  <span class="truncate">{{ file.name }}</span>
+                  <button
+                    type="button"
+                    pButton
+                    icon="pi pi-times"
+                    class="p-button-rounded p-button-text p-button-danger"
+                    (click)="removeFileCallback(i)"
+                  ></button>
                 </div>
-              </ng-template>
-            </p-fileUpload>
-          </div>
-        </p-tabPanel>
-      </p-tabView>
+              </div>
+            </ng-template>
+          </p-fileUpload>
+        </div>
+      </p-tabPanel>
+    </p-tabView>
 
-     <!-- Botones -->
+    <!-- Botones -->
     <div class="flex flex-row justify-end gap-3 mt-6 w-full">
       <p-button
         label="Cancelar"
@@ -349,8 +360,7 @@
         class="flex-1 sm:flex-none"
       ></p-button>
     </div>
-    </form>
-  </p-dialog>
-
+  </form>
+</p-dialog>
 
 <p-toast></p-toast>

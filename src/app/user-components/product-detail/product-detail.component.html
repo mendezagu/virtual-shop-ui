@@ -1,44 +1,43 @@
-<div class="relative max-w-3xl mx-auto h-[100dvh] overflow-y-auto p-6">
+<div class="relative max-w-3xl mx-auto max-h-[100dvh] overflow-y-auto p-6">
   <!-- Imagen -->
   <div class="flex justify-center mb-4">
     <img
-      [src]="(product?.imagen_url?.[0]) || 'https://placehold.co/400x400?text=Producto'"
-      alt="{{ product?.nombre_producto }}"
-      class="h-60 object-contain rounded-lg"
+      [src]="product?.imagen_url?.[0] || 'https://placehold.co/400x400?text=Producto'"
+      [alt]="product?.nombre_producto"
+      class="h-52 object-contain rounded-lg"
     />
   </div>
 
   <!-- Nombre -->
-   <div class="flex flex-col items-start justify-start">
-     <span class="text-xl font-bold text-slate-900 text-center mb-1">
-    {{ product?.nombre_producto }}
-  </span>
-  <span class="text-sm text-slate-500 text-center mb-4">
-    {{ product?.descripcion }}
-  </span>
-   </div>
- 
+  <div class="flex flex-col items-start justify-start">
+    <span class="text-xl font-bold text-slate-900 text-center mb-1">
+      {{ product?.nombre_producto }}
+    </span>
+    <span class="text-sm text-slate-500 text-center mb-4">
+      {{ product?.descripcion }}
+    </span>
+  </div>
 
   <!-- Variantes -->
   <div *ngIf="product?.presentacion_multiple && product?.variants?.length">
     <h3 class="text-lg font-semibold text-slate-800 mb-2">Presentaciones</h3>
+
     <div
       *ngFor="let v of product.variants"
       class="flex items-center justify-between border rounded-lg px-3 py-2 mb-2"
     >
       <!-- Checkbox -->
-      <label class="flex items-center gap-2 cursor-pointer">
-        <div class="flex items-center justify-between">
-               <mat-checkbox
-          [checked]="selectedVariants.has(v.id_variant)"
-          (change)="toggleVariant(v.id_variant, $event.checked)"
-        >
+      <div class="flex items-center">
+        <p-checkbox
+          [binary]="true"
+          [ngModel]="selectedVariants.has(v.id_variant)"
+          (onChange)="toggleVariant(v.id_variant, $event.checked)"
+          inputId="variant-{{ v.id_variant }}"
+        ></p-checkbox>
+        <label for="variant-{{ v.id_variant }}" class="ml-2 text-sm">
           {{ v.nombre }}
-        </mat-checkbox>
-        </div>
-   
-        
-      </label>
+        </label>
+      </div>
 
       <!-- Cantidad + precio -->
       <div
@@ -46,26 +45,24 @@
         *ngIf="selectedVariants.has(v.id_variant)"
       >
         <div class="flex items-center border rounded-full">
-          <button
-            type="button"
-            class="px-2 py-1 text-slate-500 hover:text-slate-700"
-            (click)="decrement(v.id_variant)"
-          >
-            –
-          </button>
+          <p-button
+            [raised]="true"
+            icon="pi pi-minus"
+            (onClick)="decrement(v.id_variant)"
+            styleClass="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
+          />
           <input
             type="number"
             min="0"
             [(ngModel)]="qty[v.id_variant]"
             class="w-10 text-center border-0 text-sm focus:ring-0"
           />
-          <button
-            type="button"
-            class="px-2 py-1 text-slate-500 hover:text-slate-700"
-            (click)="increment(v.id_variant)"
-          >
-            +
-          </button>
+          <p-button
+            icon="pi pi-plus"
+            [raised]="true"
+            (onClick)="increment(v.id_variant)"
+            styleClass="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
+          />
         </div>
         <span class="text-sm font-semibold text-emerald-600 whitespace-nowrap">
           {{ v.precio | currency : "ARS" : "symbol-narrow" : "1.0-0" }}
@@ -75,92 +72,76 @@
   </div>
 
   <!-- Si NO tiene variantes -->
-<div *ngIf="!product?.presentacion_multiple" class="space-y-4">
+  <div *ngIf="!product?.presentacion_multiple" class="space-y-4">
+    <!-- Cantidad -->
+    <div class="border rounded-lg p-3 flex items-center justify-between">
+      <span class="text-sm font-semibold text-slate-800">Unidades</span>
+      <div class="flex items-center border rounded-full">
+        <p-button
+          [raised]="true"
+          icon="pi pi-minus"
+          (onClick)="decrement('single')"
+          styleClass="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
+        />
+        <input
+          type="number"
+          min="1"
+          [(ngModel)]="qty['single']"
+          class="w-10 text-center border-0 text-sm focus:ring-0"
+        />
+        <p-button
+          icon="pi pi-plus"
+          [raised]="true"
+          (onClick)="increment('single')"
+          styleClass="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
+        />
+      </div>
+    </div>
 
-  <!-- Cantidad -->
-  <div class="border rounded-lg p-3 flex items-center justify-between">
-    <span class="text-sm font-semibold text-slate-800">Unidades</span>
-    <div class="flex items-center border rounded-full">
-      <button
-        type="button"
-        class="px-2 py-1 text-slate-500 hover:text-slate-700"
-        (click)="decrement('single')"
-      >
-        –
-      </button>
-      <input
-        type="number"
-        min="1"
-        [(ngModel)]="qty['single']"
-        class="w-10 text-center border-0 text-sm focus:ring-0"
-      />
-      <button
-        type="button"
-        class="px-2 py-1 text-slate-500 hover:text-slate-700"
-        (click)="increment('single')"
-      >
-        +
-      </button>
+    <!-- Aclaraciones -->
+    <div>
+      <label class="block text-sm font-semibold text-slate-700 mb-1">
+        ¿Querés aclarar algo?
+      </label>
+      <textarea
+        pInputTextarea
+        [(ngModel)]="observaciones"
+        maxlength="250"
+        rows="2"
+        placeholder="Notas al producto"
+        class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-pink-300"
+      ></textarea>
+      <p class="text-xs text-slate-400 text-right">
+        {{ observaciones.length }}/250
+      </p>
     </div>
   </div>
 
-  <!-- Aclaraciones -->
-  <div>
-    <label class="block text-sm font-semibold text-slate-700 mb-1">
-      ¿Querés aclarar algo?
-    </label>
-    <textarea
-      [(ngModel)]="observaciones"
-      maxlength="250"
-      rows="2"
-      placeholder="Notas al producto"
-      class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-pink-300"
-    ></textarea>
-    <p class="text-xs text-slate-400 text-right">
-      {{ observaciones.length }}/250
-    </p>
-  </div>
-</div>
-
-  <!-- Observaciones
-  <div class="mt-5">
-    <label class="block text-sm font-semibold text-slate-700 mb-1"
-      >Observaciones</label
-    >
-    <textarea
-      [(ngModel)]="observaciones"
-      maxlength="150"
-      rows="2"
-      placeholder="Escribe una observación (máx 150 caracteres)"
-      class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-pink-300"
-    ></textarea>
-    <p class="text-xs text-slate-400 text-right">
-      {{ observaciones.length }}/150
-    </p>
-  </div> -->
-
   <!-- Footer -->
   <div class="mt-6 sticky bottom-0 bg-white pt-4">
-    <button
-      mat-raised-button
-      color="primary"
-      class="w-full rounded-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 text-base font-semibold flex items-center justify-between px-5"
-      (click)="addToCart()"
+    <p-button
+      (onClick)="addToCart()"
+      styleClass="w-full rounded-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 text-base font-semibold flex items-center justify-between px-5"
     >
-      <span>Agregar</span>
-      <span>{{ total | currency : "ARS" : "symbol-narrow" : "1.0-0" }}</span>
-    </button>
+      <ng-template pTemplate="content">
+        <span>Agregar</span>
+        <span>
+          {{ total | currency : "ARS" : "symbol-narrow" : "1.0-0" }}
+        </span>
+      </ng-template>
+    </p-button>
   </div>
 
   <!-- Drawer del carrito -->
-<app-cart-drawer
-  [open]="cartOpen"
-  [items]="cart?.items ?? []"
-  [total]="cart?.total ?? 0"
-  (close)="cartOpen = false"
-  [slug]="slug"
-  (updateQty)="onUpdateQty($event)"
-(remove)="onRemove($event)"
-(clear)="onClear()">
-</app-cart-drawer>
+  <app-cart-drawer
+    [open]="cartOpen"
+    [items]="cart?.items ?? []"
+    [total]="cart?.total ?? 0"
+    (close)="cartOpen = false"
+    [slug]="slug"
+    (updateQty)="onUpdateQty($event)"
+    (remove)="onRemove($event)"
+    (clear)="onClear()"
+  >
+  </app-cart-drawer>
 </div>

@@ -11,7 +11,9 @@ import {
   CartResponse,
   CartService,
 } from '../../shared/services/public_services/cart.service';
-import { log } from 'node:console';
+import { ButtonModule } from 'primeng/button';
+import { CheckboxModule } from 'primeng/checkbox';
+import { InputTextareaModule } from 'primeng/inputtextarea';
 
 @Component({
   selector: 'app-product-detail-dialog',
@@ -20,9 +22,11 @@ import { log } from 'node:console';
     CommonModule,
     FormsModule,
     MatButtonModule,
-    MatCheckbox,
     CartDrawerComponent,
-  ],
+    ButtonModule,
+    CheckboxModule,
+    InputTextareaModule,
+],
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.scss',
 })

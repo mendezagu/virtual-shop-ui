@@ -151,19 +151,22 @@ export class ProductDialogComponent implements OnInit, OnChanges {
       }
     });
 
-    this.productForm
-      .get('presentacion_multiple')
-      ?.valueChanges.subscribe((val) => {
-        if (val) {
-          this.productForm.get('stock')?.disable();
-          this.productForm.get('precio')?.disable();
-          if (this.variants.length === 0) this.agregarVariante();
-        } else {
-          this.productForm.get('stock')?.enable();
-          this.productForm.get('precio')?.enable();
-          this.variants.clear();
-        }
-      });
+    this.productForm.get('presentacion_multiple')?.valueChanges.subscribe((val) => {
+  if (val) {
+    this.productForm.get('stock')?.disable();
+    this.productForm.get('precio')?.disable();
+
+    // 👉 solo al activar, agrego una variante si está vacío
+    if (this.variants.length === 0) {
+      this.agregarVariante();
+    }
+  } else {
+    this.productForm.get('stock')?.enable();
+    this.productForm.get('precio')?.enable();
+    this.variants.clear();
+  }
+});
+
   }
 
   ngOnChanges(changes: SimpleChanges): void {

@@ -38,7 +38,6 @@ import { InputTextModule } from 'primeng/inputtext';
     MatFormFieldModule,
     MatInputModule,
     MatPaginatorModule,
-    InputComponent,
     //primeng
     DialogModule,
     ProductDialogComponent,
