@@ -12,6 +12,12 @@ import { WhatsAppService } from '../../../shared/services/public_services/whatsa
 import { PaymentsService } from '../../../shared/services/public_services/payments.service'; // 👉 NUEVO
 import { environment } from '../../../../environments/environment';
 
+//primeng
+import { InputTextModule } from 'primeng/inputtext';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { ButtonModule } from 'primeng/button';
+
 @Component({
   selector: 'app-checkout-data',
   standalone: true,
@@ -23,6 +29,10 @@ import { environment } from '../../../../environments/environment';
     MatInputModule,
     MatIconModule,
     RouterModule,
+    InputTextModule,
+    InputTextareaModule,
+    RadioButtonModule,
+    ButtonModule,
   ],
   templateUrl: './checkout-data.component.html',
   styleUrl: './checkout-data.component.scss',

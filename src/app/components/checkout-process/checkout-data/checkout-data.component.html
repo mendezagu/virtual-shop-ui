@@ -7,86 +7,148 @@
   <!-- Cliente -->
   <section class="space-y-2 flex flex-col">
     <h2 class="font-semibold">Cliente</h2>
-    <small class="text-sm">Nombre</small>
-    <input formControlName="customerName" type="text" class="w-full border rounded-lg px-3 py-2 text-sm">
+    <label class="text-sm">Nombre</label>
+    <input pInputText formControlName="customerName" type="text" class="w-full" />
   </section>
 
   <section class="space-y-2">
-  <label class="text-sm">Correo electrónico</label>
-  <input formControlName="customerEmail" type="email" placeholder="tu@email.com"
-    class="w-full border rounded-lg px-3 py-2 text-sm">
-</section>
+    <label class="text-sm">Correo electrónico</label>
+    <input
+      pInputText
+      formControlName="customerEmail"
+      type="email"
+      placeholder="tu@email.com"
+      class="w-full"
+    />
+  </section>
 
   <!-- Contacto -->
   <section class="space-y-2">
     <label class="text-sm">Número de WhatsApp</label>
-    <input formControlName="customerWhatsapp" type="tel" placeholder="+54 9 11 ..." class="w-full border rounded-lg px-3 py-2 text-sm">
-    <p class="text-xs text-slate-500"> Usá formato internacional. Ej: +5491123456789 </p>
+    <input
+      pInputText
+      formControlName="customerWhatsapp"
+      type="tel"
+      placeholder="+54 9 11 ..."
+      class="w-full"
+    />
+    <p class="text-xs text-slate-500">
+      Usá formato internacional. Ej: +5491123456789
+    </p>
   </section>
 
   <!-- Entrega -->
   <section>
     <h2 class="font-semibold mb-2">Entrega</h2>
-    <mat-radio-group formControlName="deliveryMethod" class="flex flex-col gap-2">
-      <mat-radio-button value="delivery">Delivery ({{ deliveryFee | currency:'ARS' }})</mat-radio-button>
-      <mat-radio-button value="pickup">Retiro en tienda (gratis)</mat-radio-button>
-    </mat-radio-group>
+    <div class="flex flex-col gap-2">
+      <p-radioButton
+        name="deliveryMethod"
+        value="delivery"
+        formControlName="deliveryMethod"
+        inputId="delivery"
+      />
+      <label for="delivery">Delivery ({{ deliveryFee | currency : "ARS" }})</label>
+
+      <p-radioButton
+        name="deliveryMethod"
+        value="pickup"
+        formControlName="deliveryMethod"
+        inputId="pickup"
+      />
+      <label for="pickup">Retiro en tienda (gratis)</label>
+    </div>
   </section>
 
   <!-- Dirección (si delivery) -->
   <section *ngIf="form.value.deliveryMethod === 'delivery'" class="space-y-2">
     <h2 class="font-semibold">Dirección</h2>
-    <input formControlName="address" placeholder="Calle y número" class="w-full border rounded-lg px-3 py-2 text-sm">
+    <input pInputText formControlName="address" placeholder="Calle y número" class="w-full" />
     <div class="grid grid-cols-2 gap-2">
-      <input formControlName="city" placeholder="Ciudad" class="w-full border rounded-lg px-3 py-2 text-sm">
-      <input formControlName="province" placeholder="Provincia" class="w-full border rounded-lg px-3 py-2 text-sm">
+      <input pInputText formControlName="city" placeholder="Ciudad" class="w-full" />
+      <input pInputText formControlName="province" placeholder="Provincia" class="w-full" />
     </div>
-    <input formControlName="postalCode" placeholder="Código Postal" class="w-full border rounded-lg px-3 py-2 text-sm">
+    <input pInputText formControlName="postalCode" placeholder="Código Postal" class="w-full" />
   </section>
 
   <!-- Programación -->
   <section *ngIf="form.value.deliveryMethod === 'pickup'" class="space-y-2">
     <h2 class="font-semibold">Programar (opcional)</h2>
     <div class="grid grid-cols-2 gap-2">
-      <input formControlName="scheduleDate" type="date" class="w-full border rounded-lg px-3 py-2 text-sm">
-      <input formControlName="scheduleTime" type="time" class="w-full border rounded-lg px-3 py-2 text-sm">
+      <input pInputText formControlName="scheduleDate" type="date" class="w-full" />
+      <input pInputText formControlName="scheduleTime" type="time" class="w-full" />
     </div>
   </section>
 
   <!-- Pago -->
- <section class="space-y-2">
-  <h2 class="font-semibold">Pago</h2>
+  <section class="space-y-2">
+    <h2 class="font-semibold">Pago</h2>
+    <div class="flex flex-col gap-2">
+      <p-radioButton
+        name="paymentMethod"
+        value="Mercado Pago"
+        formControlName="paymentMethod"
+        inputId="mp"
+      />
+      <label for="mp">Mercado Pago</label>
 
-  <!-- ✅ NUEVO: radios Mercado Pago / Efectivo -->
-  <mat-radio-group formControlName="paymentMethod" class="flex flex-col gap-2">
-    <mat-radio-button value="Mercado Pago">Mercado Pago</mat-radio-button>
-    <mat-radio-button value="Efectivo">Efectivo (pago en el momento)</mat-radio-button>
-  </mat-radio-group>
-</section>
+      <p-radioButton
+        name="paymentMethod"
+        value="Efectivo"
+        formControlName="paymentMethod"
+        inputId="cash"
+      />
+      <label for="cash">Efectivo (pago en el momento)</label>
+    </div>
+  </section>
 
   <!-- Notas -->
   <section>
     <label class="font-semibold text-sm">¿Deseas agregar un comentario?</label>
-    <textarea formControlName="notes" rows="2" class="w-full border rounded-lg px-3 py-2 text-sm"></textarea>
+    <textarea pInputTextarea formControlName="notes" rows="2" class="w-full"></textarea>
   </section>
 
   <!-- Artículos -->
   <section>
     <h2 class="font-semibold mb-2">Artículos</h2>
-    <div *ngFor="let item of items" class="flex items-center justify-between border rounded-lg p-3 mb-2">
-      <img [src]="item.product?.imagen_url?.[0] || 'https://placehold.co/80x80'" class="w-14 h-14 object-cover rounded-md">
+    <div
+      *ngFor="let item of items"
+      class="flex items-center justify-between border rounded-lg p-3 mb-2"
+    >
+      <img
+        [src]="item.product?.imagen_url?.[0] || 'https://placehold.co/80x80'"
+        class="w-14 h-14 object-cover rounded-md"
+      />
       <div class="flex-1 px-3">
         <p class="text-sm font-medium">{{ item.product?.nombre_producto }}</p>
-        <p class="text-sm text-slate-500">{{ item.precio_unit | currency:'ARS' }}</p>
-        <div class="flex items-center mt-1">
-          <button (click)="decrement(item)" class="px-2">-</button>
+        <p class="text-sm text-slate-500">
+          {{ item.precio_unit | currency : "ARS" }}
+        </p>
+        <div class="flex items-center mt-1 gap-2">
+          <button
+            pButton
+            type="button"
+            icon="pi pi-minus"
+            (click)="decrement(item)"
+            [disabled]="item.cantidad <= 1"
+            class="p-button-text p-button-sm"
+          ></button>
           <span class="px-2">{{ item.cantidad }}</span>
-          <button (click)="increment(item)" class="px-2">+</button>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-plus"
+            (click)="increment(item)"
+            class="p-button-text p-button-sm"
+          ></button>
         </div>
       </div>
-      <button mat-icon-button color="warn" (click)="remove(item.id)">
-        <mat-icon>close</mat-icon>
-      </button>
+      <button
+        pButton
+        type="button"
+        icon="pi pi-times"
+        class="p-button-rounded p-button-text p-button-danger"
+        (click)="remove(item.id)"
+      ></button>
     </div>
   </section>
 
@@ -94,30 +156,32 @@
   <section class="border-t pt-3 space-y-1 text-sm">
     <div class="flex justify-between">
       <span>Subtotal</span>
-      <span>{{ subtotal | currency:'ARS' }}</span>
+      <span>{{ subtotal | currency : "ARS" }}</span>
     </div>
     <div class="flex justify-between">
       <span>Envío</span>
-      <span>{{ envio | currency:'ARS' }}</span>
+      <span>{{ envio | currency : "ARS" }}</span>
     </div>
     <div class="flex justify-between font-bold text-lg">
       <span>Total</span>
-      <span>{{ total | currency:'ARS' }}</span>
+      <span>{{ total | currency : "ARS" }}</span>
     </div>
   </section>
 
   <!-- Botón -->
   <button
-  mat-raised-button
-  color="primary"
-  class="w-full py-3 rounded-full"
-  (click)="placeOrder()"
-  [disabled]="loading"
->
-  {{ loading
-     ? 'Procesando...'
-     : (form.value.paymentMethod === 'Mercado Pago' || form.value.paymentMethod === 'MercadoPago'
-          ? 'Pagar con Mercado Pago'
-          : 'Enviar pedido por WhatsApp') }}
-</button>
+    pButton
+    type="button"
+    [label]="
+      loading
+        ? 'Procesando...'
+        : form.value.paymentMethod === 'Mercado Pago'
+        ? 'Pagar con Mercado Pago'
+        : 'Enviar pedido por WhatsApp'
+    "
+    class="w-full py-3 rounded-full"
+    [disabled]="loading"
+    (click)="placeOrder()"
+  ></button>
 </form>
+

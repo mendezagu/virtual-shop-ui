@@ -15,19 +15,21 @@
     </div>
 
     <header
-      class="px-4 sm:px-5 py-4 border-b border-slate-200 flex items-center justify-between"
+      class="px-4 sm:px-5 py-4 border-b border-slate-200 flex items-center justify-between mt-12"
     >
-      <div class="flex items-center gap-2">
-        <div class="h-2 w-2 bg-emerald-500 rounded-full"></div>
-        <h3 class="text-lg font-semibold text-slate-800">Tu carrito</h3>
-      </div>
-      <button
-        aria-label="Cerrar"
+      <div class="flex items-start gap-2">
+  <div class="h-2 w-2 bg-emerald-500 rounded-full mt-1"></div>
+  <span class="text-sm font-semibold text-slate-800">Mi Carrito</span>
+</div>
+      <p-button
+        icon="pi pi-times"
+        [text]="true"
+        severity="secondary"
         class="text-slate-500 hover:text-slate-700 rounded-full p-1.5"
         (click)="close.emit()"
-      >
-        ✕
-      </button>
+      
+        
+      />
     </header>
 
     <div class="flex-1 overflow-auto divide-y divide-slate-100">
@@ -49,31 +51,36 @@
           </div>
 
           <div class="mt-2 flex items-center gap-2">
-            <button
+            <p-button
+              [text]="true"
+              size="small"
+              icon="pi pi-minus"
               class="rounded-full px-2.5 py-1 border border-slate-300 text-sm"
               (click)="
                 updateQty.emit({ itemId: it.id, cantidad: it.cantidad - 1 })
               "
               [disabled]="it.cantidad <= 1"
-            >
-              -
-            </button>
+            />
             <span class="text-sm tabular-nums">{{ it.cantidad }}</span>
-            <button
+
+            <p-button
+              [text]="true"
+              size="small"
+              icon="pi pi-plus"
               class="rounded-full px-2.5 py-1 border border-slate-300 text-sm"
               (click)="
                 updateQty.emit({ itemId: it.id, cantidad: it.cantidad + 1 })
               "
-            >
-              +
-            </button>
+            />
 
-            <button
-              class="ml-auto text-rose-600 hover:text-rose-700 text-sm"
+            <p-button
+              [text]="true" 
+              severity="danger"
               (click)="remove.emit(it.id)"
-            >
-              Eliminar
-            </button>
+            
+              label="Eliminar"
+              icon="pi pi-trash"
+            />
           </div>
         </div>
         <div class="text-right">
@@ -97,13 +104,22 @@
 
       <!-- acciones desktop -->
       <div class="hidden sm:flex gap-2">
-        <button
+        <p-button
+          [text]="true" 
+          severity="secondary"
+          label="Vaciar"
           class="rounded-full border border-slate-300 px-4 py-2 text-slate-700"
           (click)="clear.emit()"
           [disabled]="!items.length"
-        >
-          Vaciar
-        </button>
+        />
+
+        <p-button
+          [text]="true"
+          severity="secondary"
+          class="rounded-full border border-slate-300 px-4 py-2 text-slate-700"
+          (click)="clear.emit()"
+          [disabled]="!items.length"
+        />
         <button
           mat-raised-button
           color="primary"
@@ -118,12 +134,12 @@
 
       <!-- acciones mobile: incluye botón Cerrar -->
       <div class="sm:hidden flex flex-col gap-2">
-        <button
+       <!-- <button
           class="rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 px-4 py-2"
           (click)="close.emit()"
         >
           Cerrar
-        </button>
+        </button> --> 
         <div class="flex gap-2">
           <button
             class="rounded-full border border-slate-300 px-4 py-2 text-slate-700 flex-1"

@@ -4,10 +4,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { CartItem } from '../../shared/services/public_services/cart.service';
 import { RouterModule } from '@angular/router';
 
+// PrimeNG
+import { OrderListModule } from 'primeng/orderlist';
+import { ButtonModule } from 'primeng/button';
+
 @Component({
   selector: 'app-cart-drawer',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, RouterModule],
+  imports: [CommonModule, MatButtonModule, RouterModule, OrderListModule, ButtonModule],
   templateUrl: './cart-drawer.component.html',
   styleUrls:  ['./cart-drawer.component.scss'] 
 })
