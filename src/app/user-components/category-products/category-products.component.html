@@ -1,55 +1,54 @@
-<!-- category-products.component.html -->
 <section class="max-w-6xl mx-auto px-4 sm:px-8 py-6">
-<div class="relative mb-4">
-  <!-- Botón Izquierda -->
-  <button
-    type="button"
-    style="right: 21rem;"
-    class="absolute top-1/2 -translate-y-1/2 z-10 md:hidden  p-1"
-    (click)="scrollChips(-200)"
-  >
-    <mat-icon class="text-sm">arrow_back_ios</mat-icon>
-  </button>
-
-  <!-- Carrusel de chips -->
-  <div #chipCarousel class="chip-scroll-wrap overflow-x-auto flex-nowrap flex gap-2 scroll-smooth px-8">
-    <button
-      class="px-3 py-1.5 rounded-full border text-sm flex-shrink-0"
-      [class.bg-emerald-500]="!categorySlug"
-      [class.text-white]="!categorySlug"
-      (click)="selectCategory('')"
+  <div class="relative mb-4">
+    <!-- Carrusel de chips -->
+    <p-carousel
+      [value]="categoriesWithAll"
+      [numVisible]="4"
+      [numScroll]="2"
+      [circular]="false"
+      [showIndicators]="false"
+      [showNavigators]="true"
+      class="w-full"
     >
-      Todos
-    </button>
+      <ng-template let-cat pTemplate="item">
+        <div
+          class="p-3 flex items-center gap-3 cursor-pointer transition-all duration-200 rounded-xl border-2 shadow-sm"
+          [ngClass]="{
+            'border-emerald-500 bg-emerald-50':
+              cat.slug === categorySlug || (!cat.slug && !categorySlug),
+            'border-slate-300 bg-white': !(
+              cat.slug === categorySlug ||
+              (!cat.slug && !categorySlug)
+            )
+          }"
+          (click)="selectCategory(cat.slug)"
+        >
+          <!-- Imagen de categoría -->
+          <img
+            class="w-12 h-12 flex-shrink-0 rounded-lg object-cover"
+            [src]="cat.image || '../../../assets/lomito.jpg'"
+            [alt]="cat.name"
+          />
 
-    <button
-      *ngFor="let c of categories"
-      class="px-3 py-1.5 rounded-full border text-sm whitespace-nowrap flex-shrink-0"
-      [class.bg-emerald-500]="c.slug === categorySlug"
-      [class.text-white]="c.slug === categorySlug"
-      (click)="selectCategory(c.slug)"
-    >
-      {{ c.name }} ({{ c.count }})
-    </button>
+          <!-- Texto -->
+          <div class="flex-1 flex flex-col">
+            <span
+              class="font-bold text-sm"
+              [class.text-emerald-700]="
+                cat.slug === categorySlug || (!cat.slug && !categorySlug)
+              "
+            >
+              {{ cat.name || "Todos" }}
+            </span>
+            <div class="flex items-center gap-1 text-xs text-gray-500">
+              <i class="pi pi-tag text-xs"></i>
+              <span>{{ cat.count || 0 }} productos</span>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </p-carousel>
   </div>
-
-  <!-- Botón Derecha -->
-  <button
-    type="button"
-    style="left: 21.5rem"
-    class="absolute top-1/2 -translate-y-1/2 z-10 md:hidden  p-1"
-    (click)="scrollChips(200)"
-  >
-    <mat-icon class="text-sm">arrow_forward_ios</mat-icon>
-  </button>
-</div>
-
-
-
-
-
-
-
 
   <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-4">
     <h1 class="text-2xl font-semibold text-slate-800">
@@ -69,59 +68,58 @@
 
     <div
       *ngIf="!isLoading && !hasError && products.length"
-      class="space-y-3 md:grid md:grid-cols-3 xl:grid-cols-4 md:gap-4 md:space-y-0 mt-4"
+      class="flex flex-col gap-4 md:grid md:grid-cols-3 xl:grid-cols-4 md:gap-6"
     >
-      <article
+      <p-card
         *ngFor="let p of products"
         [routerLink]="['/producto', p.id_producto]"
-        class="flex md:block items-center gap-3 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden hover:shadow-md transition"
+        class="transition hover:shadow-lg cursor-pointer mb-1"
+        [style]="{ width: '100%' }"
       >
-        <!-- Texto -->
-        <div class="flex-1 p-2 md:p-3">
-          <h3 class="text-md font-semibold line-clamp-1 text-gray-800">
-            {{ p.nombre_producto }}
-          </h3>
-          <span class="text-gray-500">
-            {{ p.descripcion }}
-          </span>
-          <p class="text-base font-bold text-slate-900 mt-1 md:mt-2">
-            {{
-          p.presentacion_multiple
-            ? (p.variants?.[0]?.precio || p.precio)
-            : (p.precio | currency: 'ARS':'symbol-narrow':'1.0-0')
-            }}
-          </p>
-        </div>
         <!-- Imagen -->
-        <img
-          [src]="
-            (p.imagen_url && p.imagen_url[0]) ||
-            'https://placehold.co/600x400?text=Producto'
-          "
-          [alt]="p.nombre_producto"
-          class="mr-2 h-20 w-20 md:h-40 md:w-full object-cover rounded-lg md:rounded-none shrink-0"
-        />
-      </article>
-    </div>
+        <ng-template pTemplate="header">
+          <img
+            [src]="
+              (p.imagen_url && p.imagen_url[0]) ||
+              '../../../assets/lomito.jpg'
+            "
+            [alt]="p.nombre_producto"
+            class="w-full h-40 object-cover rounded-t-lg"
+          />
+        </ng-template>
 
-    <div *ngIf="meta?.totalPages > 1" class="flex items-center gap-2 mt-6">
-      <button
-        class="px-3 py-1.5 rounded border"
-        (click)="prevPage()"
-        [disabled]="page === 1"
-      >
-        Anterior
-      </button>
-      <span class="text-sm text-slate-600"
-        >Página {{ page }} de {{ meta?.totalPages }}</span
-      >
-      <button
-        class="px-3 py-1.5 rounded border"
-        (click)="nextPage()"
-        [disabled]="page === meta?.totalPages"
-      >
-        Siguiente
-      </button>
+        <!-- Contenido -->
+        <h3 class="text-lg font-semibold line-clamp-1 text-gray-800">
+          {{ p.nombre_producto }}
+        </h3>
+        <p class="text-gray-500 text-sm line-clamp-2">
+          {{ p.descripcion }}
+        </p>
+        <p class="text-base font-bold text-slate-900 mt-2">
+          {{
+      p.presentacion_multiple
+        ? (p.variants?.[0]?.precio || p.precio)
+        : (p.precio | currency: 'ARS':'symbol-narrow':'1.0-0')
+          }}
+        </p>
+
+        <!-- Footer opcional 
+        <ng-template pTemplate="footer">
+          <div class="flex gap-2">
+            <p-button
+              label="Ver"
+              icon="pi pi-eye"
+              outlined
+              size="small"
+            ></p-button>
+            <p-button
+              label="Comprar"
+              icon="pi pi-shopping-cart"
+              size="small"
+            ></p-button>
+          </div>
+        </ng-template> -->
+      </p-card>
     </div>
   </div>
 </section>

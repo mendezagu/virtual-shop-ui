@@ -2,13 +2,18 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { PublicStoreService } from '../../shared/services/public_services/publicstore.service';
-import {MatChipsModule} from '@angular/material/chips';
-import { MatIcon } from "@angular/material/icon";
+import { CarouselModule } from 'primeng/carousel';
+
+// PrimeNG
+import { ChipModule } from 'primeng/chip';
+import { ButtonModule } from 'primeng/button';
+import { RippleModule } from 'primeng/ripple';
+import { CardModule } from 'primeng/card';
 
 @Component({
   standalone: true,
   selector: 'app-category-products',
-  imports: [CommonModule, RouterModule, MatChipsModule, MatIcon],
+  imports: [CommonModule, RouterModule, ChipModule, ButtonModule, RippleModule, CardModule, CarouselModule],
   templateUrl: './category-products.component.html',
 })
 export class CategoryProductsComponent {
@@ -20,6 +25,7 @@ export class CategoryProductsComponent {
 
   products: any[] = [];
   categories: any[] = [];
+  categoriesWithAll: any[] = [];
   meta?: any;
 
   page = 1;
@@ -38,18 +44,22 @@ export class CategoryProductsComponent {
     this.fetchCategories();
   }
 
-  
-fetchCategories() {
-  this.publicStoreService.getCategories(this.slug).subscribe({
-    next: (res) => {
-      this.categories = res.data;   // 👈 ya que tu servicio devuelve { data: [...] }
-    },
-    error: (err) => {
-      console.error('Error cargando categorías:', err);
-      this.categories = [];
-    }
-  });
-}
+  fetchCategories() {
+    this.publicStoreService.getCategories(this.slug).subscribe({
+      next: (res) => {
+        this.categories = res.data;
+        this.categoriesWithAll = [
+          { slug: '', name: 'Todos', count: 0 },
+          ...this.categories,
+        ];
+      },
+      error: (err) => {
+        console.error('Error cargando categorías:', err);
+        this.categories = [];
+        this.categoriesWithAll = [{ slug: '', name: 'Todos', count: 0 }];
+      }
+    });
+  }
 
   fetch() {
     this.isLoading = true;
@@ -69,19 +79,17 @@ fetchCategories() {
   }
 
   selectCategory(slug: string) {
-  this.categorySlug = slug;
-  this.page = 1;
-  
-  if (slug) {
-    this.router.navigate(['/store', this.slug, 'categoria', slug]);
-  } else {
-    this.router.navigate(['/store', this.slug]); // 👈 "Todos"
+    this.categorySlug = slug;
+    this.page = 1;
+    if (slug) {
+      this.router.navigate(['/store', this.slug, 'categoria', slug]);
+    } else {
+      this.router.navigate(['/store', this.slug]); // Todos
+    }
+    this.fetch();
   }
 
-  this.fetch();
-}
-
-scrollChips(offset: number) {
+  scrollChips(offset: number) {
     if (this.chipCarousel?.nativeElement) {
       this.chipCarousel.nativeElement.scrollBy({ left: offset, behavior: 'smooth' });
     }
