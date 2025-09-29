@@ -6,11 +6,12 @@ import { StoreService } from '../../../shared/services/private_services/store.se
 import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'primeng/tooltip';
 import { Store } from '../../../shared/models/store.model';
+import { NgxColorsModule } from 'ngx-colors';
 
 @Component({
   selector: 'app-store-personalization',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ColorPickerModule, ButtonModule, TooltipModule],
+  imports: [CommonModule, ReactiveFormsModule, ColorPickerModule, ButtonModule, TooltipModule, NgxColorsModule],
   templateUrl: './store-personalization.component.html',
   styleUrls: ['./store-personalization.component.scss']
 })

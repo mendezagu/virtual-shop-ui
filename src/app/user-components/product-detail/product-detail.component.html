@@ -1,4 +1,8 @@
-<div class="relative max-w-3xl mx-auto max-h-[100dvh] overflow-y-auto p-6">
+<div
+  class="relative max-w-3xl mx-auto max-h-[100dvh] overflow-y-auto p-6"
+  [style.--primary]="product?.store?.primary_color || '#ff4081'"
+  [style.--secondary]="product?.store?.secondary_color || '#00bfa5'"
+>
   <!-- Imagen -->
   <div class="flex justify-center mb-4">
     <img
@@ -10,7 +14,10 @@
 
   <!-- Nombre -->
   <div class="flex flex-col items-start justify-start">
-    <span class="text-xl font-bold text-slate-900 text-center mb-1">
+    <span
+      class="text-xl font-bold text-center mb-1"
+      [ngStyle]="{ color: 'var(--primary)' }"
+    >
       {{ product?.nombre_producto }}
     </span>
     <span class="text-sm text-slate-500 text-center mb-4">
@@ -20,7 +27,12 @@
 
   <!-- Variantes -->
   <div *ngIf="product?.presentacion_multiple && product?.variants?.length">
-    <h3 class="text-lg font-semibold text-slate-800 mb-2">Presentaciones</h3>
+    <h3
+      class="text-lg font-semibold mb-2"
+      [ngStyle]="{ color: 'var(--primary)' }"
+    >
+      Presentaciones
+    </h3>
 
     <div
       *ngFor="let v of product.variants"
@@ -33,38 +45,48 @@
           [ngModel]="selectedVariants.has(v.id_variant)"
           (onChange)="toggleVariant(v.id_variant, $event.checked)"
           inputId="variant-{{ v.id_variant }}"
+           [ngStyle]="{ color: 'var(--primary)' }"
         ></p-checkbox>
-        <label for="variant-{{ v.id_variant }}" class="ml-2 text-sm">
+        <label
+          for="variant-{{ v.id_variant }}"
+          class="ml-2 text-sm font-medium"
+          [ngStyle]="{ color: 'var(--primary)' }"
+        >
           {{ v.nombre }}
         </label>
       </div>
 
       <!-- Cantidad + precio -->
-      <div
-        class="flex items-center gap-3"
-        *ngIf="selectedVariants.has(v.id_variant)"
-      >
+      <div class="flex items-center gap-3" *ngIf="selectedVariants.has(v.id_variant)">
         <div class="flex items-center border rounded-full">
-          <p-button
-            [raised]="true"
+          <button
+            pButton
+            type="button"
             icon="pi pi-minus"
-            (onClick)="decrement(v.id_variant)"
-            styleClass="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
-          />
+            class="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
+            (click)="decrement(v.id_variant)"
+          ></button>
+
           <input
             type="number"
             min="0"
             [(ngModel)]="qty[v.id_variant]"
             class="w-10 text-center border-0 text-sm focus:ring-0"
           />
-          <p-button
+
+          <button
+            pButton
+            type="button"
             icon="pi pi-plus"
-            [raised]="true"
-            (onClick)="increment(v.id_variant)"
-            styleClass="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
-          />
+            class="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
+            (click)="increment(v.id_variant)"
+          ></button>
         </div>
-        <span class="text-sm font-semibold text-emerald-600 whitespace-nowrap">
+
+        <span
+          class="text-sm font-semibold whitespace-nowrap"
+          [ngStyle]="{ color: 'var(--primary)' }"
+        >
           {{ v.precio | currency : "ARS" : "symbol-narrow" : "1.0-0" }}
         </span>
       </div>
@@ -75,32 +97,45 @@
   <div *ngIf="!product?.presentacion_multiple" class="space-y-4">
     <!-- Cantidad -->
     <div class="border rounded-lg p-3 flex items-center justify-between">
-      <span class="text-sm font-semibold text-slate-800">Unidades</span>
+      <span
+        class="text-sm font-semibold"
+        [ngStyle]="{ color: 'var(--primary)' }"
+      >
+        Unidades
+      </span>
+
       <div class="flex items-center border rounded-full">
-        <p-button
-          [raised]="true"
+        <button
+          pButton
+          type="button"
           icon="pi pi-minus"
-          (onClick)="decrement('single')"
-          styleClass="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
-        />
+          class="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
+          (click)="decrement('single')"
+        ></button>
+
         <input
           type="number"
           min="1"
           [(ngModel)]="qty['single']"
           class="w-10 text-center border-0 text-sm focus:ring-0"
         />
-        <p-button
+
+        <button
+          pButton
+          type="button"
           icon="pi pi-plus"
-          [raised]="true"
-          (onClick)="increment('single')"
-          styleClass="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
-        />
+          class="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
+          (click)="increment('single')"
+        ></button>
       </div>
     </div>
 
     <!-- Aclaraciones -->
     <div>
-      <label class="block text-sm font-semibold text-slate-700 mb-1">
+      <label
+        class="block text-sm font-semibold mb-1"
+        [ngStyle]="{ color: 'var(--primary)' }"
+      >
         ¿Querés aclarar algo?
       </label>
       <textarea
@@ -109,7 +144,8 @@
         maxlength="250"
         rows="2"
         placeholder="Notas al producto"
-        class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-pink-300"
+        class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2"
+        [ngStyle]="{ '--tw-ring-color': 'var(--primary)' }"
       ></textarea>
       <p class="text-xs text-slate-400 text-right">
         {{ observaciones.length }}/250
@@ -119,17 +155,20 @@
 
   <!-- Footer -->
   <div class="mt-6 sticky bottom-0 bg-white pt-4">
-    <p-button
-      (onClick)="addToCart()"
-      styleClass="w-full rounded-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 text-base font-semibold flex items-center justify-between px-5"
+    <button
+      pButton
+      type="button"
+      class="w-full rounded-full py-3 text-base font-semibold flex items-center justify-between px-5"
+      [ngStyle]="{
+        backgroundColor: 'var(--secondary)',
+        borderColor: 'var(--secondary)',
+        color: '#fff'
+      }"
+      (click)="addToCart()"
     >
-      <ng-template pTemplate="content">
-        <span>Agregar</span>
-        <span>
-          {{ total | currency : "ARS" : "symbol-narrow" : "1.0-0" }}
-        </span>
-      </ng-template>
-    </p-button>
+      <span>Agregar</span>
+      <span>{{ total | currency : "ARS" : "symbol-narrow" : "1.0-0" }}</span>
+    </button>
   </div>
 
   <!-- Drawer del carrito -->
@@ -142,6 +181,5 @@
     (updateQty)="onUpdateQty($event)"
     (remove)="onRemove($event)"
     (clear)="onClear()"
-  >
-  </app-cart-drawer>
+  ></app-cart-drawer>
 </div>

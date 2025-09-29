@@ -1,0 +1,31 @@
+:host {
+  --primary: #ff4081;
+  --secondary: #00bfa5;
+}
+
+/* Opcional: si preferís clases en vez de [ngStyle] */
+:host ::ng-deep .btn-add.p-button {
+  background-color: var(--secondary) !important;
+  border-color: var(--secondary) !important;
+  color: #fff !important;
+}
+
+
+:host {
+  // Color principal
+  --primary: #ff4081;
+
+  // 🎨 Override de PrimeNG checkbox
+  ::ng-deep .p-checkbox .p-checkbox-box.p-highlight {
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+  }
+
+  ::ng-deep .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
+    border-color: var(--primary) !important;
+  }
+
+  ::ng-deep .p-checkbox .p-checkbox-box {
+    border-radius: 6px; // opcional, más redondeado
+  }
+}

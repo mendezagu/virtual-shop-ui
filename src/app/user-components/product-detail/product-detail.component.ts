@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, ElementRef, Inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -42,7 +42,8 @@ export class ProductDetailComponent {
   constructor(
     private route: ActivatedRoute,
     private publicStoreService: PublicStoreService,
-    public cartService: CartService
+    public cartService: CartService,
+     private elRef: ElementRef<HTMLElement>
   ) {}
 
 ngOnInit() {
@@ -54,10 +55,20 @@ loadProduct(id: string) {
   this.publicStoreService.getProductById(id).subscribe({
     next: (res) => {
       this.product = res;
-      console.log(res, 'RESPONNNNSE')
-      this.slug = res.store.link_tienda; // ✅ ahora tienes el slug real del backend
+      this.slug = res.store.link_tienda;
+
+      // 🎨 Tomar los colores de la tienda (traídos desde el backend)
+      const secondary = res.store?.secondary_color || '#00bfa5';
+      const primary = res.store?.primary_color || '#ff4081';
+
+      // Aplicar al wrapper
+      const host = this.elRef.nativeElement;
+      host.style.setProperty('--primary', primary);
+      host.style.setProperty('--secondary', secondary);
+
+      console.log('Colores aplicados:', { primary, secondary });
     },
-    error: (err) => console.error('Error cargando producto:', err)
+    error: (err) => console.error('Error cargando producto:', err),
   });
 }
 

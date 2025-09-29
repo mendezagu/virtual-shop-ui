@@ -3,26 +3,51 @@
 
   <form [formGroup]="storeForm" (ngSubmit)="onSubmit()">
     <div class="field">
-  <label for="primary">Color Primario:</label>
-    <i class="pi pi-question-circle"></i>
-  <p-colorPicker id="primary" formControlName="primary_color"></p-colorPicker>
-      <i class="pi pi-question-circle"
-          pTooltip="Color para iconos y textos resaltados" 
-    tooltipPosition="right"
+      <label for="primary">Color Primario:</label>
+      <i class="pi pi-palette"></i>
+
+      <!-- Selector con ngx-colors -->
+      <ngx-colors
+        ngx-colors-trigger
+        formControlName="primary_color"
+      ></ngx-colors>
+
+      <!-- Input PrimeNG para mostrar el valor -->
+      <p-inputText
+        formControlName="primary_color"
+        placeholder="Selecciona un color"
+        class="w-full mt-2"
+      />
+
+      <i
+        class="pi pi-question-circle"
+        pTooltip="Color para iconos y textos resaltados"
+        tooltipPosition="right"
       ></i>
+    </div>
 
-</div>
+    <div class="field">
+      <label for="secondary">Color Secundario:</label>
+      <i class="pi pi-palette"></i>
+      <!-- Selector con ngx-colors -->
+      <ngx-colors
+        ngx-colors-trigger
+        formControlName="secondary_color"
+      ></ngx-colors>
 
-<div class="field">
-  <label for="secondary">Color Secundario:</label>
-    <i class="pi pi-palette"></i>
-  <p-colorPicker id="secondary" formControlName="secondary_color"></p-colorPicker>
-      <i class="pi pi-question-circle"
-            pTooltip="Color para botones y links"
-            tooltipPosition="right"
+      <!-- Input PrimeNG para mostrar el valor -->
+      <p-inputText
+        formControlName="secondary_color"
+        placeholder="Selecciona un color"
+        class="w-full mt-2"
+      />
+      <i
+        class="pi pi-question-circle"
+        pTooltip="Color para botones y links"
+        tooltipPosition="right"
       ></i>
-</div>
+    </div>
 
-    <p-button size="small" type="submit" pButton label="Guardar cambios"/>
+    <p-button size="small" type="submit" pButton label="Guardar cambios" />
   </form>
 </div>
