@@ -7,13 +7,22 @@ import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'primeng/tooltip';
 import { Store } from '../../../shared/models/store.model';
 import { NgxColorsModule } from 'ngx-colors';
+import { SelectButtonModule } from 'primeng/selectbutton';
 
 @Component({
   selector: 'app-store-personalization',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ColorPickerModule, ButtonModule, TooltipModule, NgxColorsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ColorPickerModule,
+    ButtonModule,
+    TooltipModule,
+    NgxColorsModule,
+    SelectButtonModule,
+  ],
   templateUrl: './store-personalization.component.html',
-  styleUrls: ['./store-personalization.component.scss']
+  styleUrls: ['./store-personalization.component.scss'],
 })
 export class StorePersonalizationComponent implements OnInit {
   storeForm!: FormGroup;
@@ -25,7 +34,8 @@ export class StorePersonalizationComponent implements OnInit {
   ngOnInit(): void {
     this.storeForm = this.fb.group({
       primary_color: ['#1E90FF'],
-      secondary_color: ['#FFD700']
+      secondary_color: ['#FFD700'],
+      background_color: ['white']
     });
 
     // 🚀 Traemos las tiendas del usuario
@@ -38,7 +48,8 @@ export class StorePersonalizationComponent implements OnInit {
           // Rellenamos los colores existentes
           this.storeForm.patchValue({
             primary_color: store.primary_color || '#1E90FF',
-            secondary_color: store.secondary_color || '#FFD700'
+            secondary_color: store.secondary_color || '#FFD700',
+            background_color: store.background_color || 'white'
           });
         } else {
           alert('⚠️ No tienes ninguna tienda creada aún.');
@@ -49,7 +60,7 @@ export class StorePersonalizationComponent implements OnInit {
         console.error('Error cargando tiendas:', err);
         alert('❌ No se pudieron cargar tus tiendas');
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -65,7 +76,7 @@ export class StorePersonalizationComponent implements OnInit {
         error: (err) => {
           console.error('Error al actualizar tienda:', err);
           alert('❌ Hubo un error al guardar los cambios');
-        }
+        },
       });
     }
   }

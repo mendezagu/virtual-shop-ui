@@ -1,25 +1,23 @@
 :host {
-  --primary: #ff4081;   // fallback si no viene nada
-  --secondary: #00bfa5;
-  display: block;
-}
+  ::ng-deep .p-card,
+  ::ng-deep .p-dataview .p-dataview-content,
+  .block {
+    background: var(--bg) !important;
+    color: var(--text) !important;
 
-.store-title {
-  color: var(--primary);
-}
+    // Borde sutil pero notorio
+   // border: 1px solid rgba(255, 255, 255, 0.08) !important;
 
-.store-icon {
-  color: var(--primary);
-}
+    // Sombras más visibles
+    //box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
 
-.btn-store-primary {
-  background-color: var(--primary);
-  color: white;
-  border-radius: 9999px;
-}
+    border-radius: 1rem; // redondeo más marcado
+  }
 
-.btn-store-secondary {
-  background-color: var(--secondary);
-  color: white;
-  border-radius: 9999px;
+  // Para diferenciar aún más el contenido dentro del dark mode
+  [style*="background-color: #202123"] .p-card,
+  [style*="background-color: #202123"] .p-dataview .p-dataview-content,
+  [style*="background-color: #202123"] .block {
+    background: #2a2b32 !important; // un gris un poco más claro que el fondo
+  }
 }

@@ -20,6 +20,11 @@ export interface CartResponse {
   status?: 'ACTIVE' | 'ORDERED' | 'ABANDONED';
   items: CartItem[];
   total: number;
+  store: {
+    primary_color: string;
+    secondary_color: string;
+    background_color: 'light' | 'dark';
+  };
 }
 
 export type CheckoutResponseMP = {
@@ -48,6 +53,11 @@ export class CartService {
     cartId: null,
     items: [],
     total: 0,
+    store: {
+      primary_color: '',
+      secondary_color: '',
+      background_color: 'light',
+    },
   });
 
   cart$ = this.cartSubject.asObservable();

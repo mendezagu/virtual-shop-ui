@@ -40,6 +40,15 @@ export class PublicStoreComponent {
             '--secondary',
             this.store.secondary_color || '#00bfa5'
           );
+           // 🎨 fondo dinámico
+      el.style.setProperty(
+        '--bg',
+        this.store.background_color === 'dark' ? '#202123' : '#ffffff'
+      );
+      el.style.setProperty(
+        '--text',
+        this.store.background_color === 'dark' ? '#f5f5f5' : '#111827'
+      );
         }
       },
       error: () => {

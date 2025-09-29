@@ -1,77 +1,141 @@
 <div
-  class="relative max-w-3xl mx-auto max-h-[100dvh] overflow-y-auto p-6"
+  class="min-h-screen w-full"
   [style.--primary]="product?.store?.primary_color || '#ff4081'"
   [style.--secondary]="product?.store?.secondary_color || '#00bfa5'"
+  [style.--bg]="
+    product?.store?.background_color === 'dark' ? '#202123' : '#ffffff'
+  "
+  [style.--surface]="
+    product?.store?.background_color === 'dark' ? '#2a2b32' : '#f9fafb'
+  "
+  [style.--text]="
+    product?.store?.background_color === 'dark' ? '#f5f5f5' : '#111827'
+  "
+  [ngStyle]="{
+    backgroundColor: 'var(--bg)',
+    color: 'var(--text)'
+  }"
 >
-  <!-- Imagen -->
-  <div class="flex justify-center mb-4">
-    <img
-      [src]="product?.imagen_url?.[0] || 'https://placehold.co/400x400?text=Producto'"
-      [alt]="product?.nombre_producto"
-      class="h-52 object-contain rounded-lg"
-    />
-  </div>
+  <!-- Contenido centrado -->
+  <div class="relative max-w-3xl mx-auto max-h-[100dvh] overflow-y-auto p-6">
+    <!-- Imagen -->
+    <div class="flex justify-center mb-4">
+      <img
+        [src]="product?.imagen_url?.[0] || 'https://placehold.co/400x400?text=Producto'"
+        [alt]="product?.nombre_producto"
+        class="h-52 object-contain rounded-lg"
+      />
+    </div>
 
-  <!-- Nombre -->
-  <div class="flex flex-col items-start justify-start">
-    <span
-      class="text-xl font-bold text-center mb-1"
-      [ngStyle]="{ color: 'var(--primary)' }"
-    >
-      {{ product?.nombre_producto }}
-    </span>
-    <span class="text-sm text-slate-500 text-center mb-4">
-      {{ product?.descripcion }}
-    </span>
-  </div>
+    <!-- Nombre -->
+    <div class="flex flex-col items-start justify-start">
+      <span
+        class="text-xl font-bold text-center mb-1"
+        [ngStyle]="{ color: 'var(--primary)' }"
+      >
+        {{ product?.nombre_producto }}
+      </span>
+      <span class="text-sm opacity-80 text-center mb-4">
+        {{ product?.descripcion }}
+      </span>
+    </div>
 
-  <!-- Variantes -->
-  <div *ngIf="product?.presentacion_multiple && product?.variants?.length">
-    <h3
-      class="text-lg font-semibold mb-2"
-      [ngStyle]="{ color: 'var(--primary)' }"
-    >
-      Presentaciones
-    </h3>
+    <!-- Variantes -->
+    <div *ngIf="product?.presentacion_multiple && product?.variants?.length">
+      <h3
+        class="text-lg font-semibold mb-2"
+        [ngStyle]="{ color: 'var(--primary)' }"
+      >
+        Presentaciones
+      </h3>
 
-    <div
-      *ngFor="let v of product.variants"
-      class="flex items-center justify-between border rounded-lg px-3 py-2 mb-2"
-    >
-      <!-- Checkbox -->
-      <div class="flex items-center">
-        <p-checkbox
-          [binary]="true"
-          [ngModel]="selectedVariants.has(v.id_variant)"
-          (onChange)="toggleVariant(v.id_variant, $event.checked)"
-          inputId="variant-{{ v.id_variant }}"
-           [ngStyle]="{ color: 'var(--primary)' }"
-        ></p-checkbox>
-        <label
-          for="variant-{{ v.id_variant }}"
-          class="ml-2 text-sm font-medium"
+      <div
+        *ngFor="let v of product.variants"
+        class="flex items-center justify-between border rounded-lg px-3 py-2 mb-2"
+        [ngStyle]="{ backgroundColor: 'var(--surface)', color: 'var(--text)' }"
+      >
+        <!-- Checkbox -->
+        <div class="flex items-center">
+          <p-checkbox
+            [binary]="true"
+            [ngModel]="selectedVariants.has(v.id_variant)"
+            (onChange)="toggleVariant(v.id_variant, $event.checked)"
+            inputId="variant-{{ v.id_variant }}"
+          ></p-checkbox>
+          <label
+            for="variant-{{ v.id_variant }}"
+            class="ml-2 text-sm font-medium"
+            [ngStyle]="{ color: 'var(--primary)' }"
+          >
+            {{ v.nombre }}
+          </label>
+        </div>
+
+        <!-- Cantidad + precio -->
+        <div class="flex items-center gap-3" *ngIf="selectedVariants.has(v.id_variant)">
+          <div class="flex items-center border rounded-full">
+            <button
+              pButton
+              type="button"
+              icon="pi pi-minus"
+              class="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
+              (click)="decrement(v.id_variant)"
+            ></button>
+
+            <input
+              type="number"
+              min="0"
+              [(ngModel)]="qty[v.id_variant]"
+              class="w-10 text-center border-0 text-sm focus:ring-0 bg-transparent"
+            />
+
+            <button
+              pButton
+              type="button"
+              icon="pi pi-plus"
+              class="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
+              (click)="increment(v.id_variant)"
+            ></button>
+          </div>
+
+          <span
+            class="text-sm font-semibold whitespace-nowrap"
+            [ngStyle]="{ color: 'var(--primary)' }"
+          >
+            {{ v.precio | currency : "ARS" : "symbol-narrow" : "1.0-0" }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Si NO tiene variantes -->
+    <div *ngIf="!product?.presentacion_multiple" class="space-y-4">
+      <!-- Cantidad -->
+      <div
+        class="border rounded-lg p-3 flex items-center justify-between"
+        [ngStyle]="{ backgroundColor: 'var(--surface)', color: 'var(--text)' }"
+      >
+        <span
+          class="text-sm font-semibold"
           [ngStyle]="{ color: 'var(--primary)' }"
         >
-          {{ v.nombre }}
-        </label>
-      </div>
+          Unidades
+        </span>
 
-      <!-- Cantidad + precio -->
-      <div class="flex items-center gap-3" *ngIf="selectedVariants.has(v.id_variant)">
         <div class="flex items-center border rounded-full">
           <button
             pButton
             type="button"
             icon="pi pi-minus"
             class="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
-            (click)="decrement(v.id_variant)"
+            (click)="decrement('single')"
           ></button>
 
           <input
             type="number"
-            min="0"
-            [(ngModel)]="qty[v.id_variant]"
-            class="w-10 text-center border-0 text-sm focus:ring-0"
+            min="1"
+            [(ngModel)]="qty['single']"
+            class="w-10 text-center border-0 text-sm focus:ring-0 bg-transparent"
           />
 
           <button
@@ -79,107 +143,65 @@
             type="button"
             icon="pi pi-plus"
             class="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
-            (click)="increment(v.id_variant)"
+            (click)="increment('single')"
           ></button>
         </div>
+      </div>
 
-        <span
-          class="text-sm font-semibold whitespace-nowrap"
+      <!-- Aclaraciones -->
+      <div>
+        <label
+          class="block text-sm font-semibold mb-1"
           [ngStyle]="{ color: 'var(--primary)' }"
         >
-          {{ v.precio | currency : "ARS" : "symbol-narrow" : "1.0-0" }}
-        </span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Si NO tiene variantes -->
-  <div *ngIf="!product?.presentacion_multiple" class="space-y-4">
-    <!-- Cantidad -->
-    <div class="border rounded-lg p-3 flex items-center justify-between">
-      <span
-        class="text-sm font-semibold"
-        [ngStyle]="{ color: 'var(--primary)' }"
-      >
-        Unidades
-      </span>
-
-      <div class="flex items-center border rounded-full">
-        <button
-          pButton
-          type="button"
-          icon="pi pi-minus"
-          class="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
-          (click)="decrement('single')"
-        ></button>
-
-        <input
-          type="number"
-          min="1"
-          [(ngModel)]="qty['single']"
-          class="w-10 text-center border-0 text-sm focus:ring-0"
-        />
-
-        <button
-          pButton
-          type="button"
-          icon="pi pi-plus"
-          class="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
-          (click)="increment('single')"
-        ></button>
+          ¿Querés aclarar algo?
+        </label>
+        <textarea
+          pInputTextarea
+          [(ngModel)]="observaciones"
+          maxlength="250"
+          rows="2"
+          placeholder="Notas al producto"
+          class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 bg-transparent"
+          [ngStyle]="{ '--tw-ring-color': 'var(--primary)' }"
+        ></textarea>
+        <p class="text-xs opacity-70 text-right">
+          {{ observaciones.length }}/250
+        </p>
       </div>
     </div>
 
-    <!-- Aclaraciones -->
-    <div>
-      <label
-        class="block text-sm font-semibold mb-1"
-        [ngStyle]="{ color: 'var(--primary)' }"
-      >
-        ¿Querés aclarar algo?
-      </label>
-      <textarea
-        pInputTextarea
-        [(ngModel)]="observaciones"
-        maxlength="250"
-        rows="2"
-        placeholder="Notas al producto"
-        class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2"
-        [ngStyle]="{ '--tw-ring-color': 'var(--primary)' }"
-      ></textarea>
-      <p class="text-xs text-slate-400 text-right">
-        {{ observaciones.length }}/250
-      </p>
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <div class="mt-6 sticky bottom-0 bg-white pt-4">
-    <button
-      pButton
-      type="button"
-      class="w-full rounded-full py-3 text-base font-semibold flex items-center justify-between px-5"
-      [ngStyle]="{
-        backgroundColor: 'var(--secondary)',
-        borderColor: 'var(--secondary)',
-        color: '#fff'
-      }"
-      (click)="addToCart()"
+    <!-- Footer -->
+    <div
+      class="mt-6 sticky bottom-0 pt-4"
+      [ngStyle]="{ backgroundColor: 'var(--surface)' }"
     >
-      <span>Agregar</span>
-      <span>{{ total | currency : "ARS" : "symbol-narrow" : "1.0-0" }}</span>
-    </button>
-  </div>
+      <button
+        pButton
+        type="button"
+        class="w-full rounded-full py-3 text-base font-semibold flex items-center justify-between px-5"
+        [ngStyle]="{
+          backgroundColor: 'var(--secondary)',
+          borderColor: 'var(--secondary)',
+          color: '#fff'
+        }"
+        (click)="addToCart()"
+      >
+        <span>Agregar</span>
+        <span>{{ total | currency : "ARS" : "symbol-narrow" : "1.0-0" }}</span>
+      </button>
+    </div>
 
-  <!-- Drawer del carrito -->
-  <app-cart-drawer
-    [open]="cartOpen"
-    [items]="cart?.items ?? []"
-    [total]="cart?.total ?? 0"
-    (close)="cartOpen = false"
-    [slug]="slug"
-    (updateQty)="onUpdateQty($event)"
-    (remove)="onRemove($event)"
-    (clear)="onClear()"
-  ></app-cart-drawer>
+    <!-- Drawer del carrito -->
+    <app-cart-drawer
+      [open]="cartOpen"
+      [items]="cart?.items ?? []"
+      [total]="cart?.total ?? 0"
+      (close)="cartOpen = false"
+      [slug]="slug"
+      (updateQty)="onUpdateQty($event)"
+      (remove)="onRemove($event)"
+      (clear)="onClear()"
+    ></app-cart-drawer>
+  </div>
 </div>

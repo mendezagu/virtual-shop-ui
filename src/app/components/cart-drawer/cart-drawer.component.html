@@ -4,49 +4,59 @@
 
   <!-- drawer -->
   <aside
-    class="absolute right-0 top-0 h-full w-full sm:w-[420px] bg-white shadow-2xl rounded-l-2xl overflow-hidden flex flex-col transition-transform duration-300"
+    class="absolute right-0 top-0 h-full w-full sm:w-[420px] shadow-2xl rounded-l-2xl overflow-hidden flex flex-col transition-transform duration-300"
+    [ngStyle]="{
+      backgroundColor: 'var(--surface)',
+      color: 'var(--text)',
+      borderColor:
+        store?.background_color === 'dark'
+          ? 'rgba(255,255,255,0.08)'
+          : '#e5e7eb'
+    }"
     (touchstart)="onTouchStart($event)"
     (touchmove)="onTouchMove($event)"
     (touchend)="onTouchEnd()"
   >
     <!-- handle superior (visible en mobile) -->
     <div class="sm:hidden pt-safe px-4 pt-3 pb-1 flex justify-center">
-      <div class="h-1.5 w-12 rounded-full bg-slate-300"></div>
+      <div class="h-1.5 w-12 rounded-full bg-[var(--text)]/40"></div>
     </div>
 
+    <!-- Header -->
     <header
-      class="px-4 sm:px-5 py-4 border-b border-slate-200 flex items-center justify-between mt-12"
+      class="px-4 sm:px-5 py-4 border-b flex items-center justify-between mt-12"
+      [ngStyle]="{ borderColor: 'var(--text)' }"
     >
       <div class="flex items-start gap-2">
-  <div class="h-2 w-2 bg-emerald-500 rounded-full mt-1"></div>
-  <span class="text-sm font-semibold text-slate-800">Mi Carrito</span>
-</div>
+        <div class="h-2 w-2 rounded-full bg-[var(--secondary)] mt-1"></div>
+        <span class="text-sm font-semibold">Mi Carrito</span>
+      </div>
       <p-button
         icon="pi pi-times"
         [text]="true"
         severity="secondary"
-        class="text-slate-500 hover:text-slate-700 rounded-full p-1.5"
+        class="rounded-full p-1.5"
         (click)="close.emit()"
-      
-        
       />
     </header>
 
-    <div class="flex-1 overflow-auto divide-y divide-slate-100">
-      <div *ngIf="items.length === 0" class="p-6 text-center text-slate-500">
+    <!-- Items -->
+    <div class="flex-1 overflow-auto divide-y" [ngStyle]="{ borderColor: 'var(--text)' }">
+      <div *ngIf="items.length === 0" class="p-6 text-center opacity-70">
         Aún no agregaste productos.
       </div>
 
       <div *ngFor="let it of items" class="p-4 flex gap-3">
         <img
           [src]="it.product?.imagen_url?.[0] || 'https://placehold.co/64x64?text=%20'"
-          class="w-16 h-16 rounded-xl border border-slate-200 object-cover"
+          class="w-16 h-16 rounded-xl border object-cover"
+          [ngStyle]="{ borderColor: 'var(--text)' }"
         />
         <div class="flex-1 min-w-0">
-          <div class="text-sm font-semibold text-slate-800 line-clamp-1">
+          <div class="text-sm font-semibold line-clamp-1"  [ngStyle]="{ color: 'var(--primary)' }">
             {{ it.product?.nombre_producto }}
           </div>
-          <div class="text-xs text-slate-500" *ngIf="it.variant">
+          <div class="text-xs opacity-70" *ngIf="it.variant"  [ngStyle]="{ color: 'var(--primary)' }">
             Variante: {{ it.variant?.nombre }}
           </div>
 
@@ -55,10 +65,9 @@
               [text]="true"
               size="small"
               icon="pi pi-minus"
-              class="rounded-full px-2.5 py-1 border border-slate-300 text-sm"
-              (click)="
-                updateQty.emit({ itemId: it.id, cantidad: it.cantidad - 1 })
-              "
+              class="rounded-full px-2.5 py-1 border text-sm"
+              [ngStyle]="{ borderColor: 'var(--text)', color: 'var(--text)' }"
+              (click)="updateQty.emit({ itemId: it.id, cantidad: it.cantidad - 1 })"
               [disabled]="it.cantidad <= 1"
             />
             <span class="text-sm tabular-nums">{{ it.cantidad }}</span>
@@ -67,24 +76,22 @@
               [text]="true"
               size="small"
               icon="pi pi-plus"
-              class="rounded-full px-2.5 py-1 border border-slate-300 text-sm"
-              (click)="
-                updateQty.emit({ itemId: it.id, cantidad: it.cantidad + 1 })
-              "
+              class="rounded-full px-2.5 py-1 border text-sm"
+              [ngStyle]="{ borderColor: 'var(--text)', color: 'var(--text)' }"
+              (click)="updateQty.emit({ itemId: it.id, cantidad: it.cantidad + 1 })"
             />
 
             <p-button
-              [text]="true" 
+              [text]="true"
               severity="danger"
               (click)="remove.emit(it.id)"
-            
               label="Eliminar"
               icon="pi pi-trash"
             />
           </div>
         </div>
         <div class="text-right">
-          <div class="text-sm text-slate-500">
+          <div class="text-sm opacity-70">
             {{ it.precio_unit | currency : "ARS" : "symbol-narrow" : "1.0-0" }}
           </div>
           <div class="text-base font-bold">
@@ -94,64 +101,61 @@
       </div>
     </div>
 
-    <footer class="border-t border-slate-200 p-4 sm:p-5 bg-slate-50/60">
+    <!-- Footer -->
+    <footer class="p-4 sm:p-5 border-t" [ngStyle]="{ borderColor: 'var(--text)' }">
       <div class="flex items-center justify-between mb-3">
-        <span class="text-sm text-slate-600">Total</span>
-        <span class="text-xl font-bold text-slate-900">{{
+        <span class="text-sm opacity-70">Total</span>
+        <span class="text-xl font-bold">{{
           total | currency : "ARS" : "symbol-narrow" : "1.0-0"
         }}</span>
       </div>
 
-      <!-- acciones desktop -->
+      <!-- Acciones desktop -->
       <div class="hidden sm:flex gap-2">
         <p-button
-          [text]="true" 
+          [text]="true"
           severity="secondary"
           label="Vaciar"
-          class="rounded-full border border-slate-300 px-4 py-2 text-slate-700"
+          class="rounded-full border px-4 py-2"
+          [ngStyle]="{ borderColor: 'var(--text)', color: 'var(--text)' }"
           (click)="clear.emit()"
           [disabled]="!items.length"
         />
 
-        <p-button
-          [text]="true"
-          severity="secondary"
-          class="rounded-full border border-slate-300 px-4 py-2 text-slate-700"
-          (click)="clear.emit()"
-          [disabled]="!items.length"
-        />
         <button
           mat-raised-button
-          color="primary"
           class="rounded-full px-4 py-2 flex-1"
           [disabled]="!items.length"
           routerLinkActive="router-link-active"
           [routerLink]="['/store', slug, 'checkout-data']"
+          [ngStyle]="{
+            backgroundColor: 'var(--secondary)',
+            color: '#fff'
+          }"
         >
           Finalizar compra
         </button>
       </div>
 
-      <!-- acciones mobile: incluye botón Cerrar -->
+      <!-- Acciones mobile -->
       <div class="sm:hidden flex flex-col gap-2">
-       <!-- <button
-          class="rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 px-4 py-2"
-          (click)="close.emit()"
-        >
-          Cerrar
-        </button> --> 
         <div class="flex gap-2">
           <button
-            class="rounded-full border border-slate-300 px-4 py-2 text-slate-700 flex-1"
+            class="rounded-full border px-4 py-2 flex-1"
+            [ngStyle]="{ borderColor: 'var(--text)', color: 'var(--text)' }"
             (click)="clear.emit()"
             [disabled]="!items.length"
           >
             Vaciar
           </button>
           <button
-            class="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 flex-1"
+            class="rounded-full px-4 py-2 flex-1"
             [disabled]="!items.length"
             [routerLink]="['/store', slug, 'checkout-data']"
+            [ngStyle]="{
+              backgroundColor: 'var(--secondary)',
+              color: '#fff'
+            }"
           >
             Finalizar
           </button>

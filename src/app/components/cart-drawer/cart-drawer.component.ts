@@ -21,10 +21,14 @@ export class CartDrawerComponent {
   @Input() total = 0;
   @Input() slug!: string;  
 
+    // 👇 Agregado
+  @Input() store: any;  
+
   @Output() close = new EventEmitter<void>();
   @Output() updateQty = new EventEmitter<{ itemId: string; cantidad: number }>();
   @Output() remove = new EventEmitter<string>();
   @Output() clear = new EventEmitter<void>();
+  
 
   // --- swipe to close (mobile) ---
   private touchStartX = 0;

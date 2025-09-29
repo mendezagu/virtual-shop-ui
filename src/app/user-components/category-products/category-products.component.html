@@ -1,7 +1,25 @@
-<section
-  class="max-w-6xl mx-auto px-4 sm:px-8 py-6"
+<div
+  class="min-h-[100dvh] w-full"
   [style.--primary]="products[0]?.store?.primary_color || '#ff4081'"
   [style.--secondary]="products[0]?.store?.secondary_color || '#00bfa5'"
+  [style.--bg]="
+    products[0]?.store?.background_color === 'dark' ? '#202123' : '#ffffff'
+  "
+  [style.--text]="
+    products[0]?.store?.background_color === 'dark' ? '#f5f5f5' : '#111827'
+  "
+  [style.--surface]="
+    products[0]?.store?.background_color === 'dark' ? '#2a2b32' : '#f9fafb'
+  "
+  [ngStyle]="{ backgroundColor: 'var(--bg)', color: 'var(--text)' }"
+
+   [style.--surface-card]="'var(--surface)'"         
+  [style.--surface-ground]="'var(--bg)'"             
+  [style.--surface-section]="'var(--surface)'"       
+  [style.--text-color]="'var(--text)'"               
+  [style.--text-color-secondary]="products[0]?.store?.background_color === 'dark' ? 'rgba(255,255,255,.7)' : 'rgba(17,24,39,.7)'"
+  [style.--card-shadow]="'0 4px 12px rgba(0,0,0,.4)'"
+  [ngStyle]="{ backgroundColor: 'var(--bg)', color: 'var(--text)' }"
 >
   <!-- Carrusel de chips -->
   <div class="relative mb-4">
@@ -16,13 +34,20 @@
     >
       <ng-template let-cat pTemplate="item">
         <div
-          class="p-3 flex items-center gap-3 cursor-pointer transition-all duration-200 rounded-xl border-2 shadow-sm"
-          [ngClass]="{
-            'bg-[var(--primary)]/10 border-[var(--primary)]':
-              cat.slug === categorySlug || (!cat.slug && !categorySlug),
-            'border-slate-300 bg-white': !(
+          class="p-3 flex items-center gap-3 cursor-pointer transition-all duration-200 rounded-xl border shadow-md"
+          [ngStyle]="{
+            backgroundColor:
               cat.slug === categorySlug || (!cat.slug && !categorySlug)
-            )
+                ? 'var(--primary)'
+                : 'var(--surface)',
+            borderColor:
+              cat.slug === categorySlug || (!cat.slug && !categorySlug)
+                ? 'var(--primary)'
+                : 'var(--text)',
+            color:
+              cat.slug === categorySlug || (!cat.slug && !categorySlug)
+                ? '#fff'
+                : 'var(--text)'
           }"
           (click)="selectCategory(cat.slug)"
         >
@@ -35,18 +60,10 @@
 
           <!-- Texto -->
           <div class="flex-1 flex flex-col">
-            <span
-              class="font-bold text-sm"
-              [ngStyle]="{
-                color:
-                  cat.slug === categorySlug || (!cat.slug && !categorySlug)
-                    ? 'var(--primary)'
-                    : '#1f2937'
-              }"
-            >
+            <span class="font-bold text-sm">
               {{ cat.name || "Todos" }}
             </span>
-            <div class="flex items-center gap-1 text-xs text-gray-500">
+            <div class="flex items-center gap-1 text-xs opacity-80">
               <i class="pi pi-tag text-xs"></i>
               <span>{{ cat.count || 0 }} productos</span>
             </div>
@@ -57,18 +74,31 @@
   </div>
 
   <!-- Listado de productos -->
-  <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-4">
-    <h1 class="text-2xl font-semibold" [ngStyle]="{ color: 'var(--primary)' }">
+  <div
+    class="rounded-2xl border shadow-lg p-4 transition-colors"
+    [ngStyle]="{
+      backgroundColor: 'var(--surface)',
+      color: 'var(--text)',
+      borderColor:
+        products[0]?.store?.background_color === 'dark'
+          ? 'rgba(255,255,255,0.08)'
+          : '#e5e7eb'
+    }"
+  >
+    <h1
+      class="text-2xl font-semibold mb-4"
+      [ngStyle]="{ color: 'var(--primary)' }"
+    >
       Categoría: {{ meta?.categoria || (categorySlug | titlecase) }}
     </h1>
 
-    <div *ngIf="isLoading" class="text-slate-500 mt-4">Cargando…</div>
+    <div *ngIf="isLoading" class="opacity-80 mt-4">Cargando…</div>
     <div *ngIf="!isLoading && hasError" class="text-rose-600 mt-4">
       Error al cargar.
     </div>
     <div
       *ngIf="!isLoading && !hasError && products.length === 0"
-      class="text-slate-500 mt-4"
+      class="opacity-80 mt-4"
     >
       No hay productos en esta categoría.
     </div>
@@ -77,44 +107,40 @@
       *ngIf="!isLoading && !hasError && products.length"
       class="flex flex-col gap-4 md:grid md:grid-cols-3 xl:grid-cols-4 md:gap-6"
     >
-      <p-card
-        *ngFor="let p of products"
-        [routerLink]="['/producto', p.id_producto]"
-        class="transition hover:shadow-lg cursor-pointer mb-1"
-        [style]="{ width: '100%' }"
-      >
-        <!-- Imagen -->
-        <ng-template pTemplate="header">
-          <img
-            [src]="
-              (p.imagen_url && p.imagen_url[0]) || '../../../assets/lomito.jpg'
-            "
-            [alt]="p.nombre_producto"
-            class="w-full h-40 object-cover rounded-t-lg"
-          />
-        </ng-template>
+   <p-card
+  *ngFor="let p of products"
+  [routerLink]="['/producto', p.id_producto]"
+  [styleClass]="'!bg-transparent !rounded-xl !border shadow-lg'"
+  [ngStyle]="{
+    width: '100%',
+    color: 'var(--text)',
+    borderColor: products[0]?.store?.background_color === 'dark'
+      ? 'rgba(255,255,255,0.08)'
+      : '#e5e7eb'
+  }"
+>
+  <ng-template pTemplate="header">
+    <img
+      [src]="(p.imagen_url && p.imagen_url[0]) || '../../../assets/lomito.jpg'"
+      [alt]="p.nombre_producto"
+      class="w-full h-40 object-cover rounded-t-lg"
+    />
+  </ng-template>
 
-        <!-- Contenido -->
-        <h3
-          class="text-lg font-semibold line-clamp-1"
-          [ngStyle]="{ color: 'var(--primary)' }"
-        >
-          {{ p.nombre_producto }}
-        </h3>
-        <p class="text-gray-500 text-sm line-clamp-2">
-          {{ p.descripcion }}
-        </p>
-        <p
-          class="text-base font-bold mt-2"
-          [ngStyle]="{ color: 'var(--secondary)' }"
-        >
-          {{
-            p.presentacion_multiple
-              ? (p.variants?.[0]?.precio || p.precio)
-              : (p.precio | currency: 'ARS' : 'symbol-narrow' : '1.0-0')
-          }}
-        </p>
-      </p-card>
+  <h3 class="text-lg font-semibold line-clamp-1" [ngStyle]="{ color: 'var(--primary)' }">
+    {{ p.nombre_producto }}
+  </h3>
+  <p class="text-sm opacity-90 truncate">
+    {{ p.descripcion }}
+  </p>
+  <p class="text-base font-bold mt-2" [ngStyle]="{ color: 'var(--secondary)' }">
+    {{
+      p.presentacion_multiple
+        ? (p.variants?.[0]?.precio || p.precio)
+        : (p.precio | currency:'ARS':'symbol-narrow':'1.0-0')
+    }}
+  </p>
+</p-card>
     </div>
   </div>
-</section>
+</div>

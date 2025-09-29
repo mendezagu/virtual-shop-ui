@@ -1,4 +1,12 @@
-<div class="min-h-[100dvh] bg-neutral-50">
+<div
+  class="min-h-[100dvh]"
+  [style.--primary]="store?.primary_color || '#ff4081'"
+  [style.--secondary]="store?.secondary_color || '#00bfa5'"
+  [style.--bg]="store?.background_color === 'dark' ? '#202123' : '#ffffff'"
+  [style.--text]="store?.background_color === 'dark' ? '#f5f5f5' : '#111827'"
+  [style.--surface]="store?.background_color === 'dark' ? '#2a2b32' : '#f9fafb'"
+  [ngStyle]="{ backgroundColor: 'var(--bg)', color: 'var(--text)' }"
+>
   <!-- ===== Loading / Error mínimos ===== -->
   <div *ngIf="isLoading" class="p-6 text-slate-500">Cargando tienda…</div>
   <div *ngIf="!isLoading && hasError" class="p-6 text-rose-600">
@@ -6,7 +14,7 @@
   </div>
 
   <ng-container *ngIf="!isLoading && !hasError">
-    <!-- ===== HERO HEADER estilo PedidosYa ===== -->
+    <!-- ===== HERO HEADER ===== -->
     <header class="relative w-full h-48 sm:h-64 overflow-hidden">
       <img
         [src]="
@@ -18,24 +26,20 @@
         [alt]="'Portada ' + (store?.nombre_tienda || slug || 'Tienda')"
         class="absolute inset-0 w-full h-full object-cover"
       />
-      <div
-        class="absolute inset-0 bg-gradient-to-b from-black/0 via-black/30 to-black/70"
-      ></div>
+      <div class="absolute inset-0 bg-gradient-to-b from-black/0 via-black/30 to-black/70"></div>
 
-      <div
-        class="relative z-10 h-full max-w-6xl mx-auto px-4 sm:px-8 flex flex-col justify-end pb-4"
-      >
+      <div class="relative z-10 h-full max-w-6xl mx-auto px-4 sm:px-8 flex flex-col justify-end pb-4">
         <h1 class="text-2xl sm:text-3xl font-semibold text-white drop-shadow">
           {{ store?.nombre_tienda || slug || "Tienda" }}
         </h1>
 
         <!-- Rubros -->
-        <div *ngIf="rubros().length" class="mt-6 text-sm text-slate-600">
-          <span class="font-medium text-slate-800">Rubros:&nbsp;</span>
+        <div *ngIf="rubros().length" class="mt-6 text-sm">
+          <span class="font-medium">Rubros:&nbsp;</span>
           <span class="inline-flex flex-wrap gap-1 align-middle">
             <span
               *ngFor="let r of rubros()"
-              class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700"
+              class="px-2 py-0.5 rounded-full bg-[var(--secondary)]/20 text-[var(--secondary)]"
             >
               {{ r }}
             </span>
@@ -43,35 +47,24 @@
         </div>
 
         <!-- Descripción -->
-        <p
-          *ngIf="store?.descripcion"
-          class="text-white/90 text-sm mt-1 line-clamp-2"
-        >
-          {{ store.descripcion }}
-        </p>
+      <p
+  *ngIf="store?.descripcion"
+  class="text-white/90 text-sm mt-1 line-clamp-2"
+  [innerHTML]="store.descripcion"
+></p>
 
         <!-- Línea de info -->
         <p class="text-white/90 text-sm mt-1 flex flex-wrap gap-x-2 gap-y-0.5">
-          <span *ngIf="store?.tiempo_entrega">{{ store.tiempo_entrega }}</span>
-          <span
-            *ngIf="
-              store?.tiempo_entrega &&
-              (store?.costo_envio || store?.pedido_minimo)
-            "
-            >·</span
-          >
+          <span *ngIf="store?.tiempo_entrega">{{ store?.tiempo_entrega }}</span>
+          <span *ngIf="store?.tiempo_entrega && (store?.costo_envio || store?.pedido_minimo)">·</span>
           <span *ngIf="store?.costo_envio">
-            {{
-              store.costo_envio | currency : "ARS" : "symbol-narrow" : "1.0-0"
-            }}
+            {{ store.costo_envio | currency : "ARS" : "symbol-narrow" : "1.0-0" }}
             envío
           </span>
           <span *ngIf="store?.costo_envio && store?.pedido_minimo">·</span>
           <span *ngIf="store?.pedido_minimo">
             Mínimo
-            {{
-              store.pedido_minimo | currency : "ARS" : "symbol-narrow" : "1.0-0"
-            }}
+            {{ store.pedido_minimo | currency : "ARS" : "symbol-narrow" : "1.0-0" }}
           </span>
         </p>
 
@@ -81,7 +74,7 @@
             <input
               type="text"
               placeholder="Buscar productos..."
-              class="w-full h-10 sm:h-11 rounded-full pl-4 pr-12 bg-white text-slate-700 placeholder-slate-400 shadow-md focus:outline-none"
+              class="w-full h-10 sm:h-11 rounded-full pl-4 pr-12 text-[var(--text)] placeholder-slate-400 shadow-md focus:outline-none"
             />
             <button
               type="button"
@@ -89,9 +82,7 @@
               aria-label="Buscar"
               [ngStyle]="{ backgroundColor: 'var(--secondary)' }"
             >
-              <mat-icon class="!text-white !text-[18px] sm:!text-[20px]">
-                search
-              </mat-icon>
+              <mat-icon class="!text-white !text-[18px] sm:!text-[20px]">search</mat-icon>
             </button>
           </div>
         </div>
@@ -99,20 +90,21 @@
     </header>
 
     <!-- ===== LAYOUT: contenido + sidebar ===== -->
-    <main
-      class="max-w-6xl mx-auto px-4 sm:px-8 pb-10 grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6"
-    >
+    <main class="max-w-6xl mx-auto px-4 sm:px-8 pb-10 grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
       <!-- Contenido principal -->
       <section class="lg:col-span-8">
-        <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-4">
-          <h3
-            class="text-sm font-semibold text-slate-800 flex items-center gap-2"
-          >
-            <mat-icon
-              class="!text-[18px]"
-              [ngStyle]="{ color: 'var(--primary)' }"
-              >category</mat-icon
-            >
+        <div
+          class="rounded-2xl border shadow-lg p-4 transition-colors"
+          [ngStyle]="{
+            backgroundColor: 'var(--surface)',
+            color: 'var(--text)',
+            borderColor: store?.background_color === 'dark'
+              ? 'rgba(255,255,255,0.08)'
+              : '#e5e7eb'
+          }"
+        >
+          <h3 class="text-sm font-semibold flex items-center gap-2">
+            <mat-icon class="!text-[18px]" [ngStyle]="{ color: 'var(--primary)' }">category</mat-icon>
             Categorías
           </h3>
 
@@ -120,43 +112,35 @@
             <ng-container *ngIf="categories?.length; else noCat">
               <p-dataView [value]="categories" layout="grid" [rows]="6">
                 <ng-template pTemplate="grid" let-items>
-                  <div
-                    class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 w-full"
-                  >
+                  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 w-full">
                     <div *ngFor="let c of items" class="col">
                       <a
                         [routerLink]="['/store', slug, 'categoria', c.slug]"
-                        class="block rounded-2xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow-md transition group"
+                        class="block rounded-2xl border shadow-2xl hover:shadow-lg transition p-4"
+                        [ngStyle]="{
+                          backgroundColor: 'var(--surface)',
+                          color: 'var(--text)',
+                          
+                        }"
                       >
-                        <!-- Imagen / fallback -->
+                        <!-- Imagen -->
                         <div class="w-full flex justify-center mb-3">
-                          <ng-container *ngIf="c.imageUrl; else fallbackBubble">
-                            <img
-                              [src]="c.imageUrl"
-                              [alt]="c.name"
-                              class="h-20 w-20 object-contain rounded-xl"
-                            />
-                          </ng-container>
-
-                          <ng-template #fallbackBubble>
-                            <img
-                              src="../../../assets/lomito.jpg"
-                              alt="Lomito"
-                              class="h-20 w-20 object-contain rounded-xl"
-                            />
-                          </ng-template>
+                          <img
+                            [src]="c.imageUrl || '../../../assets/lomito.jpg'"
+                            [alt]="c.name"
+                            class="h-20 w-20 object-contain rounded-xl"
+                          />
                         </div>
 
                         <!-- Texto -->
                         <div class="text-center">
-                          <div
-                            class="font-semibold text-sm text-slate-800 group-hover:text-[var(--primary)] transition"
-                          >
-                            {{ c.name }}
+                          <div class="font-semibold text-sm transition" [ngStyle]="{ color: 'var(--secondary)' }">
+                            <span  [ngStyle]="{ color: 'var(--secondary)' }">
+                              {{ c.name }}
+                            </span>
                           </div>
-                          <div class="text-xs text-slate-500 mt-1">
-                            {{ c.count }}
-                            {{ c.count === 1 ? "producto" : "productos" }}
+                          <div class="text-xs mt-1" [ngStyle]="{ color: 'var(--secondary)' }">
+                            {{ c.count }} {{ c.count === 1 ? "producto" : "productos" }}
                           </div>
                         </div>
                       </a>
@@ -176,18 +160,21 @@
       <!-- Sidebar -->
       <aside class="lg:col-span-4 space-y-4">
         <!-- Contacto -->
-        <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-4">
-          <h3
-            class="text-sm font-semibold text-slate-800 flex items-center gap-2"
-          >
-            <mat-icon
-              class="!text-[18px]"
-              [ngStyle]="{ color: 'var(--primary)' }"
-              >call</mat-icon
-            >
+        <div
+          class="rounded-2xl border shadow-xl p-4 transition-colors"
+          [ngStyle]="{
+            backgroundColor: 'var(--surface)',
+            color: 'var(--text)',
+            borderColor: store?.background_color === 'dark'
+              ? 'rgba(255,255,255,0.08)'
+              : '#e5e7eb'
+          }"
+        >
+          <h3 class="text-sm font-semibold flex items-center gap-2">
+            <mat-icon class="!text-[18px]" [ngStyle]="{ color: 'var(--primary)' }">call</mat-icon>
             Contacto
           </h3>
-          <div class="mt-2 text-sm text-slate-600 space-y-1.5">
+          <div class="mt-2 text-sm space-y-1.5">
             <div *ngIf="store?.telefono_contacto">
               <span class="font-medium">Teléfono:</span>
               {{ store.telefono_contacto }}
@@ -222,18 +209,21 @@
         </div>
 
         <!-- Ubicación -->
-        <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-4">
-          <h3
-            class="text-sm font-semibold text-slate-800 flex items-center gap-2"
-          >
-            <mat-icon
-              class="!text-[18px]"
-              [ngStyle]="{ color: 'var(--primary)' }"
-              >location_on</mat-icon
-            >
+        <div
+          class="rounded-2xl border shadow-xl p-4 transition-colors"
+          [ngStyle]="{
+            backgroundColor: 'var(--surface)',
+            color: 'var(--text)',
+            borderColor: store?.background_color === 'dark'
+              ? 'rgba(255,255,255,0.08)'
+              : '#e5e7eb'
+          }"
+        >
+          <h3 class="text-sm font-semibold flex items-center gap-2">
+            <mat-icon class="!text-[18px]" [ngStyle]="{ color: 'var(--primary)' }">location_on</mat-icon>
             Ubicación
           </h3>
-          <div class="mt-2 text-sm text-slate-600 space-y-1.5">
+          <div class="mt-2 text-sm space-y-1.5">
             <div *ngIf="store?.direccion">
               <span class="font-medium">Dirección:</span>
               {{ store.direccion }}
@@ -246,10 +236,7 @@
               *ngIf="store?.direccion"
               class="inline-flex items-center gap-1 hover:underline mt-1"
               [ngStyle]="{ color: 'var(--secondary)' }"
-              [href]="
-                'https://www.google.com/maps/search/?api=1&query=' +
-                store.direccion
-              "
+              [href]="'https://www.google.com/maps/search/?api=1&query=' + store.direccion"
               target="_blank"
               rel="noopener"
             >
@@ -260,24 +247,24 @@
         </div>
 
         <!-- Horarios -->
-        <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-4">
-          <h3
-            class="text-sm font-semibold text-slate-800 flex items-center gap-2"
-          >
-            <mat-icon
-              class="!text-[18px]"
-              [ngStyle]="{ color: 'var(--primary)' }"
-              >schedule</mat-icon
-            >
+        <div
+          class="rounded-2xl border shadow-xl p-4 transition-colors"
+          [ngStyle]="{
+            backgroundColor: 'var(--surface)',
+            color: 'var(--text)',
+            borderColor: store?.background_color === 'dark'
+              ? 'rgba(255,255,255,0.08)'
+              : '#e5e7eb'
+          }"
+        >
+          <h3 class="text-sm font-semibold flex items-center gap-2">
+            <mat-icon class="!text-[18px]" [ngStyle]="{ color: 'var(--primary)' }">schedule</mat-icon>
             Horarios
           </h3>
-          <div class="mt-2 text-sm text-slate-600">
-            <ul
-              *ngIf="store?.horarios?.length; else horarioTexto"
-              class="space-y-1"
-            >
+          <div class="mt-2 text-sm">
+            <ul *ngIf="store?.horarios?.length; else horarioTexto" class="space-y-1">
               <li *ngFor="let h of store.horarios" class="flex justify-between">
-                <span class="text-slate-700">{{ h?.dia || h?.label }}</span>
+                <span>{{ h?.dia || h?.label }}</span>
                 <span class="font-medium">{{ h?.desde }} - {{ h?.hasta }}</span>
               </li>
             </ul>
@@ -285,10 +272,7 @@
               <p *ngIf="store?.horario_cierre" class="whitespace-pre-line">
                 {{ store.horario_apertura }} - {{ store.horario_cierre }}
               </p>
-              <p
-                *ngIf="!store?.horarios && !store?.horario_apertura"
-                class="text-slate-400"
-              >
+              <p *ngIf="!store?.horarios && !store?.horario_apertura" class="text-slate-400">
                 No informado.
               </p>
             </ng-template>

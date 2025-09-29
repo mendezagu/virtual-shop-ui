@@ -17,6 +17,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { ButtonModule } from 'primeng/button';
+import { PublicStoreService } from '../../../shared/services/public_services/publicstore.service';
+import { Store } from '../../../shared/models/store.model';
 
 @Component({
   selector: 'app-checkout-data',
@@ -42,7 +44,8 @@ export class CheckoutDataComponent implements OnInit {
   items: CartItem[] = [];
   cart?: CartResponse;
   slug!: string;
-
+  
+  store: Store | null = null;
   deliveryFee = 5000;
   loading = false; // 👉 NUEVO
    usarTarjetaDirecta = false;
@@ -52,11 +55,22 @@ export class CheckoutDataComponent implements OnInit {
     private cartService: CartService,
     private route: ActivatedRoute,
     private wa: WhatsAppService,
-    private payments: PaymentsService // 👉 NUEVO
+    private payments: PaymentsService,
+    private publicStoreService: PublicStoreService
+     // 👉 NUEVO
   ) {}
 
   ngOnInit() {
-    this.slug = this.route.snapshot.paramMap.get('slug')!;
+     this.slug = this.route.snapshot.paramMap.get('slug')!;
+
+  this.cartService.getCart(this.slug).subscribe((c) => {
+    this.cart = c;
+    this.items = c.items;
+  });
+
+  this.publicStoreService.getStoreBySlug(this.slug).subscribe((s) => {
+    this.store = s;
+  });
 
     this.form = this.fb.group({
       customerName: ['', Validators.required],
@@ -76,7 +90,26 @@ export class CheckoutDataComponent implements OnInit {
     this.cartService.getCart(this.slug).subscribe((c) => {
       this.cart = c;
       this.items = c.items;
-    });
+      // 🎨 setear variables de color a nivel host
+    const el = document.querySelector('app-checkout-data') as HTMLElement;
+    if (el && c.store) {
+      el.style.setProperty('--primary', c.store.primary_color || '#ff4081');
+      el.style.setProperty('--secondary', c.store.secondary_color || '#00bfa5');
+      el.style.setProperty(
+        '--bg',
+        c.store.background_color === 'dark' ? '#202123' : '#ffffff'
+      );
+      el.style.setProperty(
+        '--text',
+        c.store.background_color === 'dark' ? '#f5f5f5' : '#111827'
+      );
+      el.style.setProperty(
+        '--surface',
+        c.store.background_color === 'dark' ? '#2a2b32' : '#f9fafb'
+      );
+    }
+  });
+   
   }
 
   get subtotal() {
