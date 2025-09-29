@@ -16,6 +16,7 @@
       <p-stepperPanel header="Información básica"></p-stepperPanel>
       <p-stepperPanel header="Contacto"></p-stepperPanel>
       <p-stepperPanel header="Ubicación y horarios"></p-stepperPanel>
+      <p-stepperPanel header="Personalización"></p-stepperPanel>
     </p-stepper>
   </aside>
 
@@ -52,6 +53,11 @@
             (saved)="goNext()"
             (back)="goPrev()"
           ></app-store-ubication-schedule>
+
+          <app-store-personalization
+            *ngSwitchCase="3"
+            (back)="goPrev()"
+          ></app-store-personalization>
         </ng-container>
       </div>
     </div>

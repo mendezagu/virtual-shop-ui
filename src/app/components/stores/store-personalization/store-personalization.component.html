@@ -1,0 +1,28 @@
+<div class="card">
+  <h2>Personalización de la Tienda</h2>
+
+  <form [formGroup]="storeForm" (ngSubmit)="onSubmit()">
+    <div class="field">
+  <label for="primary">Color Primario:</label>
+    <i class="pi pi-question-circle"></i>
+  <p-colorPicker id="primary" formControlName="primary_color"></p-colorPicker>
+      <i class="pi pi-question-circle"
+          pTooltip="Color para iconos y textos resaltados" 
+    tooltipPosition="right"
+      ></i>
+
+</div>
+
+<div class="field">
+  <label for="secondary">Color Secundario:</label>
+    <i class="pi pi-palette"></i>
+  <p-colorPicker id="secondary" formControlName="secondary_color"></p-colorPicker>
+      <i class="pi pi-question-circle"
+            pTooltip="Color para botones y links"
+            tooltipPosition="right"
+      ></i>
+</div>
+
+    <p-button size="small" type="submit" pButton label="Guardar cambios"/>
+  </form>
+</div>

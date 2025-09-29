@@ -1,32 +1,36 @@
 /* You can add global styles to this file, and also import other style files */
-@import '@angular/material/prebuilt-themes/indigo-pink.css';
 
-/* 2️⃣ Tailwind */
+/* 1️⃣ Tailwind primero */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* 2️⃣ Angular Material ya lo cargas en angular.json,
+      por eso no hace falta importarlo aquí */
 
+/* 3️⃣ Quill */
 @import "../node_modules/quill/dist/quill.core.css";
 @import "../node_modules/quill/dist/quill.snow.css";
+
+/* 4️⃣ Tus estilos personalizados */
 :host {
   display: block;
   width: 250px;       /* ancho del sidebar */
   height: 64px;       /* igual a la altura del toolbar */
 }
 
-
-//toolbar
+/* toolbar */
 ::ng-deep mat-toolbar.custom-toolbar {
   background-color: #8CDE81 !important;
 }
 
-
+/* Variables globales */
 :root {
   --primary: #ff4081;   /* defaults */
   --secondary: #00bfa5;
 }
 
+/* Botones personalizados */
 .btn-primary {
   background-color: var(--primary);
   color: white;
@@ -37,8 +41,6 @@
   color: white;
 }
 
-
-
-
+/* Reset y tipografía */
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

@@ -17,6 +17,8 @@ export interface Store {
   horario_cierre?: string;
   latitud?: number;
   longitud?: number;
+  primary_color?: string;   // color primario de la tienda
+  secondary_color?: string; // color secundario de la tienda
 }
 
 // Lo que ENVIÁS al crear
@@ -34,6 +36,8 @@ export interface CreateStoreDto {
   horario_cierre?: string;
   latitud?: number;
   longitud?: number;
+  primary_color?: string;   // color primario de la tienda
+  secondary_color?: string; // color secundario de la tienda
 }
 
 // Lo que ENVIÁS al actualizar

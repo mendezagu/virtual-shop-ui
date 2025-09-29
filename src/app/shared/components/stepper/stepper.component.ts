@@ -8,6 +8,7 @@ import { MyStoreComponent } from "../../../components/stores/store-basic-info/st
 import { StoreContactComponent } from "../../../components/stores/store-contact/store-contact.component";
 import { StoreUbicationScheduleComponent } from "../../../components/stores/store-ubication-schedule/store-ubication-schedule.component";
 import { StoreScheduleComponent } from "../../../components/stores/store-schedule/store-schedule.component";
+import { StorePersonalizationComponent } from '../../../components/stores/store-personalization/store-personalization.component';
 
 @Component({
   selector: 'app-stepper',
@@ -20,7 +21,7 @@ import { StoreScheduleComponent } from "../../../components/stores/store-schedul
     MyStoreComponent,
     StoreContactComponent,
     StoreUbicationScheduleComponent,
-    StoreScheduleComponent
+    StorePersonalizationComponent
   ],
   templateUrl: './stepper.component.html',
   styleUrls: ['./stepper.component.scss']
@@ -33,6 +34,7 @@ export class StepperComponent {
     'Información básica',
     'Contacto',
     'Ubicación y horarios',
+    'Personalización',
 
   ];
 
@@ -40,7 +42,7 @@ export class StepperComponent {
     'Nombre, rubros y descripción',
     'Teléfono, email y redes sociales',
     'Dirección y zona de entrega',
-    'Horarios de apertura y cierre',
+    'Colores, logo y portada',
   ];
 
   goNext() {
