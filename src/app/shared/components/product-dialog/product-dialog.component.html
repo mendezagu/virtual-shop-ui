@@ -320,24 +320,18 @@
               let-files
               let-removeFileCallback="removeFileCallback"
             >
-              <div
-                class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 mt-4"
-                *ngIf="files?.length > 0"
-              >
-                <div
-                  class="border rounded-lg p-3 flex items-center justify-between"
-                  *ngFor="let file of files; let i = index"
-                >
-                  <span class="truncate">{{ file.name }}</span>
-                  <button
-                    type="button"
-                    pButton
-                    icon="pi pi-times"
-                    class="p-button-rounded p-button-text p-button-danger"
-                    (click)="removeFileCallback(i)"
-                  ></button>
-                </div>
-              </div>
+             <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 mt-4" *ngIf="preview.length > 0">
+  <div *ngFor="let img of preview; let i = index" class="relative">
+    <img [src]="img" alt="preview" class="w-full h-40 object-cover rounded-lg border" />
+    <button
+      type="button"
+      pButton
+      icon="pi pi-times"
+      class="absolute top-2 right-2 p-button-rounded p-button-danger p-button-sm"
+      (click)="removeFile(i)"
+    ></button>
+  </div>
+</div>
             </ng-template>
           </p-fileUpload>
         </div>

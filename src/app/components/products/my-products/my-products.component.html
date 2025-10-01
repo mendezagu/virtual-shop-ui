@@ -72,8 +72,8 @@
                 >
                   <img
                     class="w-full h-full object-cover"
-                    src="../../../../assets/logo-app.png"
-                    alt="Producto"
+                    [src]="product.imagen_url[0]"
+                    alt="{{ product.nombre_producto }}"
                   />
                 </div>
                 <div class="min-w-0 flex-1">

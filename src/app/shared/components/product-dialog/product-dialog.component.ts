@@ -40,6 +40,7 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { MessageService, PrimeNGConfig } from 'primeng/api';
 import { Message } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
+import { UploadService } from '../../services/private_services/upload.service';
 
 type CategorySummary = {
   id: string;
@@ -124,7 +125,8 @@ export class ProductDialogComponent implements OnInit, OnChanges {
     private storeService: StoreService,
     private publicStoreService: PublicStoreService,
     private config: PrimeNGConfig,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private uploadService: UploadService
   ) {}
 
   ngOnInit() {
@@ -296,6 +298,12 @@ private patchForm(product: Producto) {
     const { categoriaSelect, categoria, ...payload } =
       this.productForm.getRawValue();
 
+      // 🖼️ Guardar URLs de imágenes
+  const uploadedImages = this.preview.filter((url) => url !== null);
+  if (uploadedImages.length > 0) {
+    payload.imagen_url = uploadedImages;
+  }
+
     if (this.showNewCategory) {
       payload.categoria = categoria?.trim();
        delete payload.categoryId;
@@ -376,18 +384,26 @@ if (payload.vencimiento) {
     this.visibleChange.emit(this.visible);
   }
   // Manejo de archivos
-  onFileSelect(event: any): void {
-    if (event.files && event.files.length > 0) {
-      for (let file of event.files) {
+async onFileSelect(event: any): Promise<void> {
+  if (event.files && event.files.length > 0) {
+    for (let file of event.files) {
+      try {
+        // 🔹 Subir con presigned URL (recomendado)
+        const url = await this.uploadService.uploadFilePresigned(file, 'products');
+
         this.files.push(file);
-        const reader = new FileReader();
-        reader.onload = () => {
-          this.preview.push(reader.result as string);
-        };
-        reader.readAsDataURL(file);
+        this.preview.push(url); // ya guardamos la URL de S3
+      } catch (err) {
+        console.error(err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error al subir',
+          detail: `No se pudo subir ${file.name}`,
+        });
       }
     }
   }
+}
 
   removeFile(index: number) {
     this.files[index] = null;
