@@ -34,36 +34,37 @@
 
       <div class="flex-1"></div>
 
-    <!-- Formulario crear categoría -->
-<div class="flex flex-col gap-2 w-full">
- <form
-  [formGroup]="newCategoryForm"
-  (ngSubmit)="createCategory()"
-  class="flex justify-end items-end gap-2"
->
-  <!-- Label arriba del input -->
-  <div class="flex flex-col">
-    <label for="name" class="font-medium mb-1 text-gray-600">Añadir nueva categoría</label>
-    <input
-      id="name"
-      type="text"
-      pInputText
-      formControlName="name"
-      placeholder="Ej: Bebidas"
-      class="w-48"
-    />
-  </div>
+      <!-- Formulario crear categoría -->
+      <div class="flex flex-col gap-2 w-full">
+        <form
+          [formGroup]="newCategoryForm"
+          (ngSubmit)="createCategory()"
+          class="flex justify-end items-end gap-2"
+        >
+          <!-- Label arriba del input -->
+          <div class="flex flex-col">
+            <label for="name" class="font-medium mb-1 text-gray-600"
+              >Añadir nueva categoría</label
+            >
+            <input
+              id="name"
+              type="text"
+              pInputText
+              formControlName="name"
+              placeholder="Ej: Bebidas"
+              class="w-48"
+            />
+          </div>
 
-  <p-button
-    type="submit"
-    label="Añadir categoría"
-    [outlined]="true"
-    severity="success"
-    [disabled]="newCategoryForm.invalid"
-  ></p-button>
-</form>
-
-</div>
+          <p-button
+            type="submit"
+            label="Añadir categoría"
+            [outlined]="true"
+            severity="success"
+            [disabled]="newCategoryForm.invalid"
+          ></p-button>
+        </form>
+      </div>
     </div>
   </div>
 

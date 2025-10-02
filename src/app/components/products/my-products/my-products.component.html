@@ -117,56 +117,43 @@
             <!-- Panel content -->
             <div class="pt-4">
               <!-- Imágenes del producto -->
-              <div class="mt-6">
-                <h4 class="text-pink-500 font-medium mb-2">
-                  Imágenes del producto
-                </h4>
+             <!-- Imágenes del producto -->
+<div class="mt-6">
+  <h4 class="text-pink-500 font-medium mb-2">
+    Imágenes del producto
+  </h4>
 
-                <div
-                  class="flex gap-4 overflow-x-auto sm:grid sm:grid-cols-3 sm:gap-4"
-                >
-                  <div
-                    *ngFor="let i of [1, 2, 3]; let idx = index"
-                    class="min-w-[8rem] sm:min-w-0 flex-shrink-0 rounded-xl border border-slate-200 bg-white shadow-sm p-3 flex flex-col items-center justify-center text-center text-sm text-slate-500"
-                  >
-                    <ng-container
-                      *ngIf="product.imagen_url?.[idx]; else uploadTpl"
-                    >
-                      <img
-                        [src]="product.imagen_url[idx] || 'assets/lomito.jpg'"
-                        alt="Imagen producto"
-                        class="w-full aspect-square object-cover rounded-lg border mb-2"
-                      />
-                      <button
-                        pButton
-                        type="button"
-                        icon="pi pi-times"
-                        class="p-button-text p-button-danger text-xs"
-                        (click)="removeImage(product, idx)"
-                      ></button>
-                    </ng-container>
+  <div class="flex gap-4">
+    <!-- Renderizar imágenes existentes -->
+    <div
+      *ngFor="let img of product.imagen_url; let idx = index"
+      class="w-28 h-28 rounded-lg border bg-white shadow-sm flex items-center justify-center overflow-hidden relative"
+    >
+      <img
+        [src]="img || 'assets/lomito.jpg'"
+        alt="Imagen producto"
+        class="w-full h-full object-cover"
+      />
+      <!--<button
+        pButton
+        type="button"
+        icon="pi pi-times"
+        class="absolute top-1 right-1 p-button-rounded p-button-danger p-button-sm"
+        (click)="removeImage(product, idx)"
+      ></button> -->
+    </div>
 
-                    <ng-template #uploadTpl>
-                      <div
-                        class="relative w-full aspect-square rounded-lg border mb-2"
-                      >
-                        <img
-                          src="assets/lomito.jpg"
-                          alt="Imagen por defecto"
-                          class="w-full h-full object-cover rounded-lg opacity-80"
-                        />
-                        <div
-                          class="absolute inset-0 flex items-center justify-center bg-black/30 rounded-lg cursor-pointer"
-                          (click)="uploadImage(product, idx)"
-                        >
-                          <i class="pi pi-camera text-white text-xl"></i>
-                        </div>
-                      </div>
-                      <p class="mt-2 text-xs text-slate-400">Foto {{ i }}</p>
-                    </ng-template>
-                  </div>
-                </div>
-              </div>
+    <!-- Slots vacíos hasta llegar a 3 -->
+    <div
+      *ngFor="let i of [].constructor(3 - (product.imagen_url?.length || 0))"
+      class="w-28 h-28 rounded-lg border border-dashed border-slate-300 flex items-center justify-center cursor-pointer"
+      (click)="uploadImage(product, product.imagen_url.length)"
+    >
+      <i class="pi pi-camera text-slate-400 text-xl"></i>
+    </div>
+  </div>
+</div>
+
 
               <!-- Info producto -->
               <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">

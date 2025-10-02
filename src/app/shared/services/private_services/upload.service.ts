@@ -2,6 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -28,20 +29,32 @@ export class UploadService {
   /**
    * Subida directa a S3 con Presigned URL
    */
- async uploadFilePresigned(file: File, folder: string = 'products'): Promise<string> {
-  const presigned: any = await firstValueFrom(
-    this.http.post(`${this.apiUrl}/presigned`, { filename: file.name, folder }),
+async uploadFilePresigned(file: File, folder: string): Promise<string> {
+  // 1. Pedís al back un presigned URL
+  const res = await firstValueFrom(
+    this.http.post<{ key: string; url: string }>(
+      `${this.apiUrl}/presigned`, // 👈 usa apiUrl
+      { filename: file.name, folder }
+    )
   );
 
-  await fetch(presigned.url, {
+  if (!res || !res.key || !res.url) {
+    throw new Error('No se pudo obtener la URL firmada de S3');
+  }
+
+  // 2. Subís el archivo a S3 con fetch/PUT
+  await fetch(res.url, {
     method: 'PUT',
     body: file,
-    headers: { 'Content-Type': file.type },
+    headers: {
+      'Content-Type': file.type
+    }
   });
 
-  // ✅ URL pública final
-  return `https://${this.extractBucketFromUrl(presigned.url)}.s3.${this.getRegionFromUrl(presigned.url)}.amazonaws.com/${presigned.key}`;
+  // 3. Retornás la URL pública
+  return `https://${environment.AWS_S3_BUCKET}.s3.${environment.AWS_REGION}.amazonaws.com/${res.key}`;
 }
+
 
 private extractBucketFromUrl(url: string): string {
   return url.split('.s3')[0].replace('https://', '');

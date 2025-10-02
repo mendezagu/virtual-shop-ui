@@ -153,22 +153,23 @@ export class ProductDialogComponent implements OnInit, OnChanges {
       }
     });
 
-    this.productForm.get('presentacion_multiple')?.valueChanges.subscribe((val) => {
-  if (val) {
-    this.productForm.get('stock')?.disable();
-    this.productForm.get('precio')?.disable();
+    this.productForm
+      .get('presentacion_multiple')
+      ?.valueChanges.subscribe((val) => {
+        if (val) {
+          this.productForm.get('stock')?.disable();
+          this.productForm.get('precio')?.disable();
 
-    // 👉 solo al activar, agrego una variante si está vacío
-    if (this.variants.length === 0) {
-      this.agregarVariante();
-    }
-  } else {
-    this.productForm.get('stock')?.enable();
-    this.productForm.get('precio')?.enable();
-    this.variants.clear();
-  }
-});
-
+          // 👉 solo al activar, agrego una variante si está vacío
+          if (this.variants.length === 0) {
+            this.agregarVariante();
+          }
+        } else {
+          this.productForm.get('stock')?.enable();
+          this.productForm.get('precio')?.enable();
+          this.variants.clear();
+        }
+      });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -197,46 +198,49 @@ export class ProductDialogComponent implements OnInit, OnChanges {
     });
   }
 
-private patchForm(product: Producto) {
-  let categoryId = (product as any).categoryId || '';
+  private patchForm(product: Producto) {
+    let categoryId = (product as any).categoryId || '';
 
-  // fallback: si no tiene categoryId pero sí un nombre viejo
-  if (!categoryId && product.category?.name) {
-    const match = this.categories.find(c => c.name === product.category?.name);
-    if (match) categoryId = match.id;
+    // fallback: si no tiene categoryId pero sí un nombre viejo
+    if (!categoryId && product.category?.name) {
+      const match = this.categories.find(
+        (c) => c.name === product.category?.name
+      );
+      if (match) categoryId = match.id;
+    }
+
+    this.productForm.patchValue({
+      nombre_producto: product.nombre_producto,
+      categoriaSelect: categoryId,
+      categoria: product.category?.name || '',
+      descripcion: product.descripcion,
+      stock: product.stock,
+      precio: product.precio,
+      presentacion_multiple: product.presentacion_multiple,
+      sku: (product as any).sku || '',
+      codigo_barras: (product as any).codigo_barras || '',
+      unidad_medida: (product as any).unidad_medida || '',
+      color: (product as any).color || '',
+      condicion: (product as any).condicion || 'NUEVO',
+      vencimiento: product.vencimiento
+        ? new Date(product.vencimiento).toISOString().substring(0, 10)
+        : '',
+      video_youtube: (product as any).video_youtube || '',
+    });
+
+    if (product.variants?.length) {
+      this.variants.clear(); // 🔑 para no duplicar
+      product.variants.forEach((v) =>
+        this.variants.push(
+          this.fb.group({
+            nombre: [v.nombre, Validators.required],
+            stock: [v.stock, [Validators.required, Validators.min(0)]],
+            precio: [v.precio, [Validators.required, Validators.min(0)]],
+          })
+        )
+      );
+    }
   }
-
-  this.productForm.patchValue({
-    nombre_producto: product.nombre_producto,
-    categoriaSelect: categoryId,
-    categoria: product.category?.name || '',
-    descripcion: product.descripcion,
-    stock: product.stock,
-    precio: product.precio,
-    presentacion_multiple: product.presentacion_multiple,
-    sku: (product as any).sku || '',
-    codigo_barras: (product as any).codigo_barras || '',
-    unidad_medida: (product as any).unidad_medida || '',
-    color: (product as any).color || '',
-    condicion: (product as any).condicion || 'NUEVO',
-    vencimiento: product.vencimiento
-  ? new Date(product.vencimiento).toISOString().substring(0, 10): '',
-    video_youtube: (product as any).video_youtube || '',
-  });
-
-  if (product.variants?.length) {
-    this.variants.clear(); // 🔑 para no duplicar
-    product.variants.forEach((v) =>
-      this.variants.push(
-        this.fb.group({
-          nombre: [v.nombre, Validators.required],
-          stock: [v.stock, [Validators.required, Validators.min(0)]],
-          precio: [v.precio, [Validators.required, Validators.min(0)]],
-        })
-      )
-    );
-  }
-}
 
   // Variantes
   get variants() {
@@ -257,23 +261,23 @@ private patchForm(product: Producto) {
   }
 
   // Categorías
- private loadCategories() {
-  if (!this.selectedStoreSlug) return;
-  this.publicStoreService.getCategories(this.selectedStoreSlug).subscribe({
-    next: (res) => {
-      this.categories = (res.data || []).map((c: any) => ({
-        id: c.id, // 👈 usamos slug como id
-        name: c.name || c.nombre || 'Sin nombre',
-        slug: c.slug,
-        count: c.count || 0,
-        imageUrl: c.imageUrl || null,
-      }));
-    },
-    error: (_) => {
-      this.categories = [];
-    },
-  });
-}
+  private loadCategories() {
+    if (!this.selectedStoreSlug) return;
+    this.publicStoreService.getCategories(this.selectedStoreSlug).subscribe({
+      next: (res) => {
+        this.categories = (res.data || []).map((c: any) => ({
+          id: c.id, // 👈 usamos slug como id
+          name: c.name || c.nombre || 'Sin nombre',
+          slug: c.slug,
+          count: c.count || 0,
+          imageUrl: c.imageUrl || null,
+        }));
+      },
+      error: (_) => {
+        this.categories = [];
+      },
+    });
+  }
 
   onCategorySelectChange(value: string) {
     if (value === '__NEW__') {
@@ -298,24 +302,24 @@ private patchForm(product: Producto) {
     const { categoriaSelect, categoria, ...payload } =
       this.productForm.getRawValue();
 
-      // 🖼️ Guardar URLs de imágenes
-  const uploadedImages = this.preview.filter((url) => url !== null);
-  if (uploadedImages.length > 0) {
-    payload.imagen_url = uploadedImages;
-  }
+    // 🖼️ Guardar URLs de imágenes
+    const uploadedImages = this.preview.filter((url) => url !== null);
+    if (uploadedImages.length > 0) {
+      payload.imagen_url = uploadedImages;
+    }
 
     if (this.showNewCategory) {
       payload.categoria = categoria?.trim();
-       delete payload.categoryId;
+      delete payload.categoryId;
     } else {
       payload.categoryId = categoriaSelect;
     }
 
-if (payload.vencimiento) {
-  payload.vencimiento = new Date(payload.vencimiento).toISOString();
-} else {
-  delete payload.vencimiento;
-}
+    if (payload.vencimiento) {
+      payload.vencimiento = new Date(payload.vencimiento).toISOString();
+    } else {
+      delete payload.vencimiento;
+    }
     if (payload.presentacion_multiple) {
       delete payload.stock;
       delete payload.precio;
@@ -339,7 +343,7 @@ if (payload.vencimiento) {
               detail: 'Producto actualizado correctamente',
             });
             this.visible = false;
-             this.visibleChange.emit(this.visible);
+            this.visibleChange.emit(this.visible);
           },
           error: (err) => {
             console.error(err);
@@ -352,32 +356,34 @@ if (payload.vencimiento) {
         });
     } else {
       // CREAR
-      this.productService.createProduct(this.selectedStoreId, payload).subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Éxito',
-            detail: 'Producto creado correctamente',
-          });
-          this.visible = false;
-          this.visibleChange.emit(this.visible);
-        },
-        error: (err) => {
-          console.error(err);
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'No se pudo crear el producto',
-          });
-        },
-      });
+      this.productService
+        .createProduct(this.selectedStoreId, payload)
+        .subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Éxito',
+              detail: 'Producto creado correctamente',
+            });
+            this.visible = false;
+            this.visibleChange.emit(this.visible);
+          },
+          error: (err) => {
+            console.error(err);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'No se pudo crear el producto',
+            });
+          },
+        });
     }
   }
 
   handleHide() {
-  this.visible = false;
-  this.visibleChange.emit(this.visible);
-}
+    this.visible = false;
+    this.visibleChange.emit(this.visible);
+  }
 
   onCancel() {
     this.visible = false;
@@ -388,11 +394,12 @@ async onFileSelect(event: any): Promise<void> {
   if (event.files && event.files.length > 0) {
     for (let file of event.files) {
       try {
-        // 🔹 Subir con presigned URL (recomendado)
-        const url = await this.uploadService.uploadFilePresigned(file, 'products');
-
-        this.files.push(file);
-        this.preview.push(url); // ya guardamos la URL de S3
+        const uploadedUrl = await this.uploadService.uploadFilePresigned(file, 'products');
+        // guardás directamente la URL pública en el array preview
+        const idx = this.preview.findIndex(p => p === null);
+        if (idx !== -1) {
+          this.preview[idx] = uploadedUrl;
+        }
       } catch (err) {
         console.error(err);
         this.messageService.add({
