@@ -25,6 +25,9 @@ import { PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputTextModule } from 'primeng/inputtext';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from "primeng/confirmdialog";
 
 @Component({
   selector: 'app-my-products',
@@ -45,8 +48,11 @@ import { InputTextModule } from 'primeng/inputtext';
     ButtonModule,
     InputTextModule,
     PaginatorModule,
-    InputTextareaModule
-  ],
+    InputTextareaModule,
+    ToastModule,
+    ConfirmDialogModule
+],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './my-products.component.html',
   styleUrls: ['./my-products.component.scss'],
 })
@@ -74,10 +80,12 @@ export class MyProductsComponent implements OnInit {
   constructor(
     private productService: ProductService,
     private storeService: StoreService,
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit(): void {
-     this.loadProducts(this.currentPage, this.pageSize);
+    this.loadProducts(this.currentPage, this.pageSize);
 
     this.searchCtrl.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged())
@@ -87,7 +95,7 @@ export class MyProductsComponent implements OnInit {
       });
   }
 
-    openCreateDialog() {
+  openCreateDialog() {
     this.createVisible = true;
   }
 
@@ -110,14 +118,22 @@ export class MyProductsComponent implements OnInit {
     return product.precio || 0;
   }
 
-  updateVariantStock(product: Producto, variant: ProductVariant, value: number) {
+  updateVariantStock(
+    product: Producto,
+    variant: ProductVariant,
+    value: number
+  ) {
     variant.stock = value;
     if (product.presentacion_multiple) {
       product.stock = this.getTotalStock(product);
     }
   }
 
-  loadProducts(page: number = 0, limit: number = this.pageSize, search: string = '') {
+  loadProducts(
+    page: number = 0,
+    limit: number = this.pageSize,
+    search: string = ''
+  ) {
     this.isLoading = true;
 
     this.storeService.getMyStores().subscribe({
@@ -151,10 +167,49 @@ export class MyProductsComponent implements OnInit {
     });
   }
 
+  onDeleteProduct(productId: string) {
+    this.confirmationService.confirm({
+      message: '¿Estás seguro de que deseas eliminar este producto?',
+      header: 'Confirmar eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      acceptButtonStyleClass: 'p-button-danger p-button-sm',
+      rejectButtonStyleClass: 'p-button-text p-button-sm',
+      accept: () => {
+        this.productService.deleteProduct(productId).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Producto eliminado',
+              detail: 'El producto fue eliminado correctamente.',
+            });
+            this.loadProducts(
+              this.currentPage,
+              this.pageSize,
+              this.searchCtrl.value || ''
+            );
+          },
+          error: () => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'No se pudo eliminar el producto.',
+            });
+          },
+        });
+      },
+    });
+  }
+
   onPageChange(event: any) {
     this.pageSize = event.rows;
     this.currentPage = event.page;
-    this.loadProducts(this.currentPage, this.pageSize, this.searchCtrl.value || '');
+    this.loadProducts(
+      this.currentPage,
+      this.pageSize,
+      this.searchCtrl.value || ''
+    );
   }
 
   uploadImage(product: any, index: number) {
@@ -168,10 +223,10 @@ export class MyProductsComponent implements OnInit {
   }
 
   trackByProduct(index: number, product: Producto): string {
-  return product.id_producto;
-}
+    return product.id_producto;
+  }
 
-trackByVariant(index: number, variant: ProductVariant): string {
-  return variant.id_variant || variant.nombre;
-}
+  trackByVariant(index: number, variant: ProductVariant): string {
+    return variant.id_variant || variant.nombre;
+  }
 }

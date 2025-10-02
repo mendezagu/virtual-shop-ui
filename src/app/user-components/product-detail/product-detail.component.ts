@@ -14,6 +14,7 @@ import {
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextareaModule } from 'primeng/inputtextarea';
+import { CarouselModule } from 'primeng/carousel';
 
 @Component({
   selector: 'app-product-detail-dialog',
@@ -26,6 +27,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
     ButtonModule,
     CheckboxModule,
     InputTextareaModule,
+    CarouselModule
 ],
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.scss',

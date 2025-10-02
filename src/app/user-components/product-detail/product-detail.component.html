@@ -19,13 +19,37 @@
   <!-- Contenido centrado -->
   <div class="relative max-w-3xl mx-auto max-h-[100dvh] overflow-y-auto p-6">
     <!-- Imagen -->
-    <div class="flex justify-center mb-4">
-      <img
-        [src]="product?.imagen_url?.[0] || 'https://placehold.co/400x400?text=Producto'"
-        [alt]="product?.nombre_producto"
-        class="h-52 object-contain rounded-lg"
-      />
-    </div>
+  <!-- Carrusel de imágenes -->
+<div class="flex justify-center mb-4">
+  <p-carousel
+    *ngIf="product?.imagen_url?.length > 0; else noImageTpl"
+    [value]="product.imagen_url"
+    [numVisible]="1"
+    [numScroll]="1"
+    [circular]="true"
+    [autoplayInterval]="4000"
+    styleClass="w-full max-w-md"
+  >
+    <ng-template pTemplate="item" let-img>
+      <div class="flex justify-center">
+        <img
+          [src]="img"
+          [alt]="product?.nombre_producto"
+          class="h-60 object-contain rounded-lg"
+        />
+      </div>
+    </ng-template>
+  </p-carousel>
+
+  <!-- Si no hay imágenes -->
+  <ng-template #noImageTpl>
+    <img
+      src="https://placehold.co/400x400?text=Producto"
+      [alt]="product?.nombre_producto"
+      class="h-60 object-contain rounded-lg"
+    />
+  </ng-template>
+</div>
 
     <!-- Nombre -->
     <div class="flex flex-col items-start justify-start">

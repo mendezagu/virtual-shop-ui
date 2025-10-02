@@ -1,3 +1,5 @@
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
 <div class="mt-6">
   <!-- Encabezado -->
   <div class="px-4 sm:px-12 mb-4">
@@ -117,43 +119,46 @@
             <!-- Panel content -->
             <div class="pt-4">
               <!-- Imágenes del producto -->
-             <!-- Imágenes del producto -->
-<div class="mt-6">
-  <h4 class="text-pink-500 font-medium mb-2">
-    Imágenes del producto
-  </h4>
+              <!-- Imágenes del producto -->
+              <div class="mt-6">
+                <h4 class="text-pink-500 font-medium mb-2">
+                  Imágenes del producto
+                </h4>
 
-  <div class="flex gap-4">
-    <!-- Renderizar imágenes existentes -->
-    <div
-      *ngFor="let img of product.imagen_url; let idx = index"
-      class="w-28 h-28 rounded-lg border bg-white shadow-sm flex items-center justify-center overflow-hidden relative"
-    >
-      <img
-        [src]="img || 'assets/lomito.jpg'"
-        alt="Imagen producto"
-        class="w-full h-full object-cover"
-      />
-      <!--<button
+                <div class="flex gap-4">
+                  <!-- Renderizar imágenes existentes -->
+                  <div
+                    *ngFor="let img of product.imagen_url; let idx = index"
+                    class="w-48 h-48 rounded-lg border bg-white shadow-sm flex items-center justify-center overflow-hidden relative"
+                  >
+                    <img
+                      [src]="img || 'assets/lomito.jpg'"
+                      alt="Imagen producto"
+                      class="w-full h-full object-cover"
+                    />
+                    <!--<button
         pButton
         type="button"
         icon="pi pi-times"
         class="absolute top-1 right-1 p-button-rounded p-button-danger p-button-sm"
         (click)="removeImage(product, idx)"
       ></button> -->
-    </div>
+                  </div>
 
-    <!-- Slots vacíos hasta llegar a 3 -->
-    <div
-      *ngFor="let i of [].constructor(3 - (product.imagen_url?.length || 0))"
-      class="w-28 h-28 rounded-lg border border-dashed border-slate-300 flex items-center justify-center cursor-pointer"
-      (click)="uploadImage(product, product.imagen_url.length)"
-    >
-      <i class="pi pi-camera text-slate-400 text-xl"></i>
-    </div>
-  </div>
-</div>
-
+                  <!-- Slots vacíos hasta llegar a 3 -->
+                  <div
+                    *ngFor="
+                      let i of [].constructor(
+                        3 - (product.imagen_url?.length || 0)
+                      )
+                    "
+                    class="w-48 h-48 rounded-lg border border-dashed border-slate-300 flex items-center justify-center cursor-pointer"
+                    (click)="uploadImage(product, product.imagen_url.length)"
+                  >
+                    <i class="pi pi-camera text-slate-400 text-xl"></i>
+                  </div>
+                </div>
+              </div>
 
               <!-- Info producto -->
               <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
@@ -351,12 +356,24 @@
 
               <!-- Acciones -->
               <div class="mt-6 flex items-center justify-end gap-2">
-                <button
-                  pButton
+                <p-button
+                  label="Eliminar producto"
+                  severity="danger"
+                  variant="outlined"
+                  [rounded]="true"
+                  size="small"
+                  class="text-xs px-3 h-8"
+                  (onClick)="onDeleteProduct(product.id_producto)"
+                />
+
+                <p-button
+                  [rounded]="true"
+                  size="small"
                   label="Editar producto"
-                  class="p-button-outlined"
+                  severity="secondary"
+                  class="text-xs px-3 py-1 h-8"
                   (click)="openEditDialog(product)"
-                ></button>
+                />
               </div>
             </div>
           </p-accordionTab>
@@ -416,3 +433,4 @@
   [visible]="createVisible"
   (visibleChange)="createVisible = $event"
 ></app-product-dialog>
+

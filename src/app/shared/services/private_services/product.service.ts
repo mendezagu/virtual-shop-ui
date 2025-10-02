@@ -76,4 +76,9 @@ export class ProductService {
   updateCategory(id: string, name: string) {
   return this.http.put(`/api/products/category/${id}`, { name });
 }
+
+deleteProduct(id_producto: string): Observable<any> {
+  const url = `${this.baseUrl}/${id_producto}`;
+  return this.http.delete(url);
+}
 }

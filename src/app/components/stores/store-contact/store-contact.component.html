@@ -30,19 +30,27 @@
             >
               Teléfono de contacto
             </label>
-            
-            <!--
-            <p-inputMask 
-            mask="(999) 999-9999" 
-            formControlName="telefono_contacto"
-            placeholder="(999) 999-9999" 
-              styleClass="w-full"
-           
-              inputStyleClass="w-full"
-            />
 
-            -->
-            <p-inputNumber
+            <div class="flex items-center w-full gap-2">
+              <!-- Prefijo fijo -->
+              <span
+                class="px-3 py-2 bg-slate-100 text-slate-600 rounded-l-md border border-r-0 border-slate-300 text-sm"
+              >
+                +54 9
+              </span>
+
+              <!-- Input del usuario -->
+              <p-inputMask
+                mask="9999999999"
+                formControlName="telefono_contacto"
+                placeholder="999 999-9999"
+                class="flex-1 w-full"
+                styleClass="w-full rounded-r-md"
+                inputStyleClass="w-full"
+              ></p-inputMask>
+            </div>
+
+            <!--<p-inputNumber
               formControlName="telefono_contacto"
               inputId="telefono_contacto"
               pKeyFilter="int"
@@ -50,7 +58,7 @@
               styleClass="w-full"
               [inputStyle]="{ width: '100%' }"
               inputStyleClass="w-full"
-            ></p-inputNumber>
+            ></p-inputNumber> -->
           </div>
 
           <!-- Email -->
@@ -68,53 +76,52 @@
           </div>
         </div>
 
-       <!-- Redes sociales -->
-<div>
-  <label class="block text-sm font-medium text-slate-700 mb-2">
-    Redes sociales
-  </label>
+        <!-- Redes sociales -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">
+            Redes sociales
+          </label>
 
-  <div formArrayName="redes_sociales" class="space-y-3">
-    <div
-      *ngFor="let ctrl of redesSociales.controls; let i = index"
-      class="flex flex-col sm:flex-row gap-3 w-full"
-    >
-      <!-- Input -->
-      <input
-        pInputText
-        [formControlName]="i"
-        placeholder="https://instagram.com/mitienda"
-        class="flex-1 w-full"
-      />
+          <div formArrayName="redes_sociales" class="space-y-3">
+            <div
+              *ngFor="let ctrl of redesSociales.controls; let i = index"
+              class="flex flex-col sm:flex-row gap-3 w-full"
+            >
+              <!-- Input -->
+              <input
+                pInputText
+                [formControlName]="i"
+                placeholder="https://instagram.com/mitienda"
+                class="flex-1 w-full"
+              />
 
-      <!-- Botón -->
-      <div class="flex justify-center sm:justify-start">
-        <p-button
-          [disabled]="redesSociales.length <= 2"
-          size="small"
-          label="Quitar"
-          [text]="true"
-          [raised]="true"
-          severity="secondary"
-          (click)="removeRed(i)"
-          class="w-auto sm:w-auto"
-        />
-      </div>
-    </div>
-  </div>
+              <!-- Botón -->
+              <div class="flex justify-center sm:justify-start">
+                <p-button
+                  [disabled]="redesSociales.length <= 2"
+                  size="small"
+                  label="Quitar"
+                  [text]="true"
+                  [raised]="true"
+                  severity="secondary"
+                  (click)="removeRed(i)"
+                  class="w-auto sm:w-auto"
+                />
+              </div>
+            </div>
+          </div>
 
-  <p-button
-    type="button"
-    size="small"
-    label="+ Agregar red"
-    [text]="true"
-    [raised]="true"
-    severity="success"
-    (click)="addRed()"
-    class="mt-3 w-full sm:w-auto"
-  />
-</div>
-
+          <p-button
+            type="button"
+            size="small"
+            label="+ Agregar red"
+            [text]="true"
+            [raised]="true"
+            severity="success"
+            (click)="addRed()"
+            class="mt-3 w-full sm:w-auto"
+          />
+        </div>
 
         <!-- Divider -->
         <div
@@ -122,7 +129,7 @@
         ></div>
 
         <!-- Botones -->
-        <div class="flex  items-center justify-end gap-3">
+        <div class="flex items-center justify-end gap-3">
           <p-button
             type="button"
             severity="secondary"
@@ -130,7 +137,6 @@
             [outlined]="true"
             [rounded]="true"
             size="small"
-     
           />
           <p-button
             type="submit"
@@ -139,7 +145,6 @@
             [rounded]="true"
             severity="success"
             size="small"
-      
           />
         </div>
       </form>

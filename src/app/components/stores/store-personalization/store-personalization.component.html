@@ -1,13 +1,18 @@
-<div class="max-w-md mx-auto bg-white  rounded-xl shadow-lg p-6 space-y-6">
+<div class="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6 space-y-6">
   <h2 class="text-xl font-bold mb-4">🎨 Personalización de la Tienda</h2>
 
   <form [formGroup]="storeForm" (ngSubmit)="onSubmit()" class="space-y-6">
     <!-- Color Primario -->
     <div>
       <div class="flex items-center gap-3">
-        <label for="primary" class="font-medium text-gray-600">Color Primario</label>
-        <i class="pi pi-palette "></i>
-        <ngx-colors ngx-colors-trigger formControlName="primary_color"></ngx-colors>
+        <label for="primary" class="font-medium text-gray-600"
+          >Color Primario</label
+        >
+        <i class="pi pi-palette"></i>
+        <ngx-colors
+          ngx-colors-trigger
+          formControlName="primary_color"
+        ></ngx-colors>
         <i
           class="pi pi-question-circle text-slate-400 cursor-pointer ml-auto"
           pTooltip="Color para iconos y textos resaltados"
@@ -24,9 +29,14 @@
     <!-- Color Secundario -->
     <div>
       <div class="flex items-center gap-3">
-        <label for="secondary" class="font-normal text-gray-600">Color Secundario</label>
-        <i class="pi pi-palette "></i>
-        <ngx-colors ngx-colors-trigger formControlName="secondary_color"></ngx-colors>
+        <label for="secondary" class="font-normal text-gray-600"
+          >Color Secundario</label
+        >
+        <i class="pi pi-palette"></i>
+        <ngx-colors
+          ngx-colors-trigger
+          formControlName="secondary_color"
+        ></ngx-colors>
         <i
           class="pi pi-question-circle text-slate-400 cursor-pointer ml-auto"
           pTooltip="Color para botones y links"
@@ -43,18 +53,20 @@
     <!-- Color de Fondo -->
     <div>
       <div class="flex items-center gap-3">
-        <label for="background" class="font-medium text-gray-600">Color de Fondo</label>
-        <i class="pi pi-palette "></i>
-      <p-selectButton
-  formControlName="background_color"
-  [options]="[
-    { label: 'Claro', value: 'white' },
-    { label: 'Oscuro', value: 'dark' }
-  ]"
-  optionLabel="label"
-  optionValue="value"
-  class="text-xs [&_.p-button]:!py-1 [&_.p-button]:!px-3 [&_.p-button]:!text-xs"
-></p-selectButton>
+        <label for="background" class="font-medium text-gray-600"
+          >Color de Fondo</label
+        >
+        <i class="pi pi-palette"></i>
+        <p-selectButton
+          formControlName="background_color"
+          [options]="[
+            { label: 'Claro', value: 'white' },
+            { label: 'Oscuro', value: 'dark' }
+          ]"
+          optionLabel="label"
+          optionValue="value"
+          class="text-xs [&_.p-button]:!py-1 [&_.p-button]:!px-3 [&_.p-button]:!text-xs"
+        ></p-selectButton>
         <i
           class="pi pi-question-circle text-slate-400 cursor-pointer ml-auto"
           pTooltip="Puedes alternar entre un fondo claro u oscuro"
@@ -65,9 +77,14 @@
 
     <!-- Botón -->
     <div class="pt-2 flex item-end justify-content-end">
-
-
-      <p-button size="small" label="Guardar cambios"  type="submit" [text]="true" [raised]="true" severity="success" />
+      <p-button
+        size="small"
+        label="Guardar cambios"
+        type="submit"
+        [text]="true"
+        [raised]="true"
+        severity="success"
+      />
     </div>
   </form>
 </div>

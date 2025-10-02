@@ -1,11 +1,13 @@
 import {
   Component,
+  ElementRef,
   EventEmitter,
   Input,
   OnChanges,
   OnInit,
   Output,
   SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 import {
   FormArray,
@@ -103,6 +105,9 @@ export class ProductDialogComponent implements OnInit, OnChanges {
   totalSize = 0;
   totalSizePercent = 0;
 
+  @ViewChild('slotFileInput') slotFileInput!: ElementRef<HTMLInputElement>;
+  private slotToEdit: number | null = null;
+
   // Opciones enums
   unidadOptions = [
     { label: 'Unidad', value: 'UNIDAD' },
@@ -129,6 +134,16 @@ export class ProductDialogComponent implements OnInit, OnChanges {
     private uploadService: UploadService
   ) {}
 
+  get hasPreview(): boolean {
+    return this.preview.some((u) => !!u);
+  }
+
+  private setInitialPreview(product?: Producto) {
+    const imgs = product?.imagen_url ?? [];
+    this.preview = [imgs[0] ?? null, imgs[1] ?? null, imgs[2] ?? null];
+    this.files = [null, null, null]; // limpiamos referencias locales
+  }
+
   ngOnInit() {
     this.initForm();
 
@@ -139,6 +154,8 @@ export class ProductDialogComponent implements OnInit, OnChanges {
           'Agrega o edita los detalles de tu producto. Mientras más detalles brindes, mejor será la experiencia de tus clientes.',
       },
     ];
+
+    if (this.product) this.setInitialPreview(this.product);
 
     if (this.product) {
       this.patchForm(this.product);
@@ -173,8 +190,16 @@ export class ProductDialogComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['product'] && changes['product'].currentValue) {
-      this.patchForm(changes['product'].currentValue);
+    if (changes['product']) {
+      const p: Producto | undefined = changes['product'].currentValue;
+      if (p) {
+        this.patchForm(p);
+        this.setInitialPreview(p); // 👈 precarga previews en edición
+      } else {
+        // si se limpia el producto (modo crear)
+        this.preview = [null, null, null];
+        this.files = [null, null, null];
+      }
     }
   }
 
@@ -295,18 +320,102 @@ export class ProductDialogComponent implements OnInit, OnChanges {
     this.productForm.get('categoriaSelect')?.updateValueAndValidity();
   }
 
-  // CREAR o EDITAR
+  handleHide() {
+    this.visible = false;
+    this.visibleChange.emit(this.visible);
+  }
+
+  onCancel() {
+    this.visible = false;
+    this.visibleChange.emit(this.visible);
+  }
+  // Manejo de archivos
+
+async onFileSelect(event: any): Promise<void> {
+  if (!event?.files?.length) return;
+
+  for (const file of event.files as File[]) {
+    const nextIndex = this.preview.findIndex((p) => p === null);
+    if (nextIndex === -1) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Límite alcanzado',
+        detail: 'Solo puedes subir hasta 3 imágenes',
+      });
+      break;
+    }
+    try {
+      const url = await this.uploadService.uploadFilePresigned(file, 'products');
+      this.files[nextIndex] = file;
+      this.preview[nextIndex] = url;
+    } catch {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error al subir',
+        detail: `No se pudo subir ${file.name}`,
+      });
+    }
+  }
+}
+
+editSlot(i: number) {
+  this.slotToEdit = i;
+  if (this.slotFileInput) {
+    this.slotFileInput.nativeElement.value = '';
+    this.slotFileInput.nativeElement.click();
+  }
+}
+
+async onSlotFileChange(e: Event) {
+  const input = e.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (!file || this.slotToEdit === null) return;
+
+  try {
+    const url = await this.uploadService.uploadFilePresigned(file, 'products');
+    this.files[this.slotToEdit] = file;
+    this.preview[this.slotToEdit] = url;
+  } finally {
+    this.slotToEdit = null;
+    input.value = '';
+  }
+}
+
+removeFile(index: number) {
+  this.files[index] = null;
+  this.preview[index] = null;
+}
+  async replaceImage(event: any, idx: number) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      const url = await this.uploadService.uploadFilePresigned(
+        file,
+        'products'
+      );
+      this.preview[idx] = url; // reemplaza solo esta posición
+    } catch (err) {
+      console.error(err);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error al subir',
+        detail: `No se pudo subir ${file.name}`,
+      });
+    }
+  }
+
+    // CREAR o EDITAR
   submit() {
     if (this.productForm.invalid) return;
 
     const { categoriaSelect, categoria, ...payload } =
       this.productForm.getRawValue();
 
-    // 🖼️ Guardar URLs de imágenes
-    const uploadedImages = this.preview.filter((url) => url !== null);
-    if (uploadedImages.length > 0) {
-      payload.imagen_url = uploadedImages;
-    }
+    // 🖼️ Unimos imágenes existentes + nuevas
+ const images = this.preview.filter((u): u is string => !!u);
+    if (images.length) payload.imagen_url = images;
+    else delete payload.imagen_url;
 
     if (this.showNewCategory) {
       payload.categoria = categoria?.trim();
@@ -378,42 +487,5 @@ export class ProductDialogComponent implements OnInit, OnChanges {
           },
         });
     }
-  }
-
-  handleHide() {
-    this.visible = false;
-    this.visibleChange.emit(this.visible);
-  }
-
-  onCancel() {
-    this.visible = false;
-    this.visibleChange.emit(this.visible);
-  }
-  // Manejo de archivos
-async onFileSelect(event: any): Promise<void> {
-  if (event.files && event.files.length > 0) {
-    for (let file of event.files) {
-      try {
-        const uploadedUrl = await this.uploadService.uploadFilePresigned(file, 'products');
-        // guardás directamente la URL pública en el array preview
-        const idx = this.preview.findIndex(p => p === null);
-        if (idx !== -1) {
-          this.preview[idx] = uploadedUrl;
-        }
-      } catch (err) {
-        console.error(err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error al subir',
-          detail: `No se pudo subir ${file.name}`,
-        });
-      }
-    }
-  }
-}
-
-  removeFile(index: number) {
-    this.files[index] = null;
-    this.preview[index] = null;
   }
 }
