@@ -70,6 +70,7 @@ export class MyCategoriesComponent implements OnInit {
   isLoading = true;
   hasError = false;
   categoryForms: { [slug: string]: FormGroup } = {};
+  subCategoryForms: { [parentId: string]: FormGroup } = {};
   newCategoryForm!: FormGroup;
 
   searchCtrl = new FormControl('');
@@ -123,7 +124,14 @@ loadCategories(page: number = 1, limit: number = 10) {
         this.categoryForms[c.id] = this.fb.group({
           name: [c.name, [Validators.required, Validators.minLength(2)]],
         });
+
+        this.subCategoryForms[c.id] = this.fb.group({
+    name: ['', [Validators.required, Validators.minLength(2)]],
+  });
+  
       });
+
+      
 
       // ⚡ Podés usar esta metadata para armar paginador
       const { total, totalPages } = res.meta;
@@ -192,6 +200,35 @@ createCategory() {
         },
       });
     }
+  });
+}
+
+// Crear subcategoría
+createSubCategory(parentId: string) {
+  const form = this.subCategoryForms[parentId];
+  if (!form?.valid) return;
+  const name = form.value.name;
+
+  this.categoryService.createCategory(this.storeId, name, parentId).subscribe({
+    next: (sub) => {
+      const parent = this.categories.find((c) => c.id === parentId);
+      if (parent) {
+        parent.subcategories = [...(parent.subcategories || []), sub];
+      }
+      form.reset();
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Subcategoría creada',
+        detail: `"${sub.name}" fue creada exitosamente.`,
+      });
+    },
+    error: () => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo crear la subcategoría.',
+      });
+    },
   });
 }
 

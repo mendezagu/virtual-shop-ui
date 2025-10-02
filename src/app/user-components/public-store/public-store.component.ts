@@ -3,6 +3,7 @@ import { PublicStoreService } from '../../shared/services/public_services/public
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
+import { StoreStateService } from '../../shared/services/private_services/store-state.service';
 
 //primeng
 import { DataViewModule } from 'primeng/dataview';
@@ -22,11 +23,18 @@ export class PublicStoreComponent {
   isLoading = true;
   hasError = false;
 
+    constructor(
+    private route: ActivatedRoute,
+    private publicStoreService: PublicStoreService,
+    private storeState: StoreStateService
+  ) {}
+
   ngOnInit(): void {
     this.slug = this.route.snapshot.paramMap.get('slug')!;
     this.publicStoreService.getStoreBySlug(this.slug).subscribe({
       next: (data) => {
         this.store = data;
+        this.storeState.setStore(data);
         this.isLoading = false;
 
         // 🎨 Aplica variables de color a este componente (scope local)
@@ -40,15 +48,15 @@ export class PublicStoreComponent {
             '--secondary',
             this.store.secondary_color || '#00bfa5'
           );
-           // 🎨 fondo dinámico
-      el.style.setProperty(
-        '--bg',
-        this.store.background_color === 'dark' ? '#202123' : '#ffffff'
-      );
-      el.style.setProperty(
-        '--text',
-        this.store.background_color === 'dark' ? '#f5f5f5' : '#111827'
-      );
+          // 🎨 fondo dinámico
+          el.style.setProperty(
+            '--bg',
+            this.store.background_color === 'dark' ? '#202123' : '#ffffff'
+          );
+          el.style.setProperty(
+            '--text',
+            this.store.background_color === 'dark' ? '#f5f5f5' : '#111827'
+          );
         }
       },
       error: () => {
@@ -61,11 +69,6 @@ export class PublicStoreComponent {
       this.categories = res.data;
     });
   }
-
-  constructor(
-    private route: ActivatedRoute,
-    private publicStoreService: PublicStoreService
-  ) {}
 
   // Helpers
   rubros(): string[] {

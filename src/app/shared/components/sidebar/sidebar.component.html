@@ -1,66 +1,214 @@
-<p-sidebar  [(visible)]="visible"
-  [modal]="true"
- 
-  styleClass="w-18rem"
-  (onHide)="close()"  styleClass="w-18rem">
-  <div class="flex flex-col h-full">
-    <!-- Encabezado -->
-    <div class="px-4 pt-4 pb-3">
-      <div
-        class="rounded-2xl p-4 border border-slate-200 bg-gradient-to-br from-pink-50 to-white flex items-center gap-3"
-      >
-        <div class="h-10 w-10 rounded-xl bg-purple-950 text-white flex items-center justify-center shadow">
-          <i class="pi pi-shop"></i>
-        </div>
-        <div>
-          <p class="text-xs text-slate-500">Bienvenido</p>
-          <h3 class="text-sm font-semibold text-slate-800">Panel del vendedor</h3>
-        </div>
-      </div>
+<aside
+  [ngClass]="collapsed ? 'w-20' : 'w-72'"
+  class="h-screen border-r flex flex-col fixed top-0 left-0 transition-all duration-300 shadow-sm"
+  [style.--primary]="store?.primary_color || '#7e22ce'"
+  [style.--secondary]="store?.secondary_color || '#ec4899'"
+  [style.--bg]="store?.background_color === 'dark' ? '#202123' : '#ffffff'"
+  [style.--text]="store?.background_color === 'dark' ? '#f5f5f5' : '#111827'"
+  [style.--surface]="store?.background_color === 'dark' ? '#2a2b32' : '#f9fafb'"
+  [ngStyle]="mode === 'buyer' ? { backgroundColor: 'var(--bg)', color: 'var(--text)' } : {}"
+>
+  <!-- Encabezado -->
+  <div class="px-4 pt-4 pb-3 flex items-center gap-3">
+    <div
+      class="h-10 w-10 rounded-xl flex items-center justify-center shadow"
+      [ngStyle]="{ backgroundColor: 'var(--primary)', color: '#fff' }"
+    >
+      <i class="pi pi-shop"></i>
     </div>
+    <div *ngIf="!collapsed" class="transition-opacity duration-300">
+      <p class="text-xs text-slate-500">Bienvenido</p>
+      <h3 class="text-sm font-semibold" [ngStyle]="{ color: 'var(--text)' }">
+        {{ mode === 'seller' ? 'Panel del vendedor' : (store?.nombre_tienda || 'Tienda') }}
+      </h3>
+    </div>
+  </div>
 
-    <!-- Navegación -->
-    <ul class="list-none p-0 m-0 flex-1">
+  <!-- ===== MODO VENDEDOR ===== -->
+  <ng-container *ngIf="mode === 'seller'">
+    <ul class="list-none p-0 m-0 flex-1 mt-2">
       <li>
-        <a pRipple (click)="redirectToHome(); close()" class="flex items-center p-3 rounded-lg cursor-pointer text-slate-700 hover:bg-pink-50">
-          <i class="pi pi-home text-purple-500 mr-2"></i>
-          <span class="font-medium">Home</span>
+        <a
+          (click)="redirectToHome()"
+          pRipple
+          pTooltip="Home"
+          tooltipPosition="right"
+          class="flex items-center gap-3 p-3 rounded-lg cursor-pointer text-slate-700 hover:bg-pink-50 transition"
+        >
+          <div class="h-9 w-9 flex items-center justify-center rounded-lg bg-pink-100 text-purple-600">
+            <i class="pi pi-home"></i>
+          </div>
+          <span *ngIf="!collapsed" class="font-medium text-sm transition-opacity duration-200">
+            Home
+          </span>
         </a>
       </li>
+
       <li>
-        <a pRipple (click)="redirectToStepper(); close()" class="flex items-center p-3 rounded-lg cursor-pointer text-slate-700 hover:bg-pink-50">
-          <i class="pi pi-shop text-purple-500 mr-2"></i>
-          <span class="font-medium">Mi tienda</span>
+        <a
+          (click)="redirectToStepper()"
+          pRipple
+          pTooltip="Mi tienda"
+          tooltipPosition="right"
+          class="flex items-center gap-3 p-3 rounded-lg cursor-pointer text-slate-700 hover:bg-pink-50 transition"
+        >
+          <div class="h-9 w-9 flex items-center justify-center rounded-lg bg-pink-100 text-purple-600">
+            <i class="pi pi-shop"></i>
+          </div>
+          <span *ngIf="!collapsed" class="font-medium text-sm transition-opacity duration-200">
+            Mi tienda
+          </span>
         </a>
       </li>
+
       <li>
-        <a pRipple (click)="redirectToMyProducts(); close()" class="flex items-center p-3 rounded-lg cursor-pointer text-slate-700 hover:bg-pink-50">
-          <i class="pi pi-shopping-bag text-purple-500 mr-2"></i>
-          <span class="font-medium">Mis productos</span>
+        <a
+          (click)="redirectToMyProducts()"
+          pRipple
+          pTooltip="Mis productos"
+          tooltipPosition="right"
+          class="flex items-center gap-3 p-3 rounded-lg cursor-pointer text-slate-700 hover:bg-pink-50 transition"
+        >
+          <div class="h-9 w-9 flex items-center justify-center rounded-lg bg-pink-100 text-purple-600">
+            <i class="pi pi-shopping-bag"></i>
+          </div>
+          <span *ngIf="!collapsed" class="font-medium text-sm transition-opacity duration-200">
+            Mis productos
+          </span>
         </a>
       </li>
+
       <li>
-        <a pRipple (click)="redirectToMyCategories(); close()" class="flex items-center p-3 rounded-lg cursor-pointer text-slate-700 hover:bg-pink-50">
-          <i class="pi pi-tags text-purple-500 mr-2"></i>
-          <span class="font-medium">Categorías</span>
+        <a
+          (click)="redirectToMyCategories()"
+          pRipple
+          pTooltip="Categorías"
+          tooltipPosition="right"
+          class="flex items-center gap-3 p-3 rounded-lg cursor-pointer text-slate-700 hover:bg-pink-50 transition"
+        >
+          <div class="h-9 w-9 flex items-center justify-center rounded-lg bg-pink-100 text-purple-600">
+            <i class="pi pi-tags"></i>
+          </div>
+          <span *ngIf="!collapsed" class="font-medium text-sm transition-opacity duration-200">
+            Categorías
+          </span>
         </a>
       </li>
+
       <li>
-        <a pRipple (click)="logout(); close()" class="flex items-center p-3 rounded-lg cursor-pointer text-slate-700 hover:bg-pink-50">
-          <i class="pi pi-sign-out text-purple-500 mr-2"></i>
-          <span class="font-medium">Cerrar sesión</span>
+        <a
+          (click)="logout()"
+          pRipple
+          pTooltip="Cerrar sesión"
+          tooltipPosition="right"
+          class="flex items-center gap-3 p-3 rounded-lg cursor-pointer text-slate-700 hover:bg-pink-50 transition"
+        >
+          <div class="h-9 w-9 flex items-center justify-center rounded-lg bg-pink-100 text-purple-600">
+            <i class="pi pi-sign-out"></i>
+          </div>
+          <span *ngIf="!collapsed" class="font-medium text-sm transition-opacity duration-200">
+            Cerrar sesión
+          </span>
         </a>
       </li>
     </ul>
 
     <!-- Footer -->
-    <div class="px-4 pb-4">
-      <div class="rounded-xl border border-slate-200 bg-white p-3 text-xs text-slate-500 flex items-center justify-between">
+    <div class="px-4 pb-4" *ngIf="!collapsed">
+      <div
+        class="rounded-xl border border-slate-200 bg-white/70 backdrop-blur p-3 text-xs text-slate-500 flex items-center justify-between shadow-sm"
+      >
         <span>Estado</span>
-        <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5">
+        <span
+          class="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5"
+        >
           <span class="h-2 w-2 rounded-full bg-emerald-500"></span> Activo
         </span>
       </div>
     </div>
-  </div>
-</p-sidebar>
+  </ng-container>
+
+  <!-- ===== MODO COMPRADOR ===== -->
+  <ng-container *ngIf="mode === 'buyer' && store">
+    <ul class="list-none p-0 m-0 flex-1 mt-2">
+      <!-- Contacto -->
+      <li>
+        <a
+          pRipple
+          pTooltip="Contacto"
+          tooltipPosition="right"
+          class="flex items-center gap-3 p-3 rounded-lg transition cursor-default hover:bg-[var(--secondary)]/10"
+        >
+          <div
+            class="h-9 w-9 flex items-center justify-center rounded-lg"
+            [ngStyle]="{ backgroundColor: 'var(--secondary)', color: '#fff' }"
+          >
+            <i class="pi pi-phone"></i>
+          </div>
+          <div *ngIf="!collapsed" class="flex flex-col text-sm">
+            <span class="font-medium" [ngStyle]="{ color: 'var(--text)' }">Contacto</span>
+            <span *ngIf="store?.telefono_contacto">{{ store.telefono_contacto }}</span>
+            <span *ngIf="store?.email">{{ store.email }}</span>
+          </div>
+        </a>
+      </li>
+
+      <!-- Ubicación -->
+      <li>
+        <a
+          pRipple
+          pTooltip="Ubicación"
+          tooltipPosition="right"
+          class="flex items-center gap-3 p-3 rounded-lg transition cursor-default hover:bg-[var(--secondary)]/10"
+        >
+          <div
+            class="h-9 w-9 flex items-center justify-center rounded-lg"
+            [ngStyle]="{ backgroundColor: 'var(--secondary)', color: '#fff' }"
+          >
+            <i class="pi pi-map-marker"></i>
+          </div>
+          <div *ngIf="!collapsed" class="flex flex-col text-sm">
+            <span class="font-medium" [ngStyle]="{ color: 'var(--text)' }">Ubicación</span>
+            <span *ngIf="store?.direccion">{{ store.direccion }}</span>
+            <span *ngIf="store?.ciudad">{{ store.ciudad }} ({{ store?.provincia }})</span>
+            <a
+              *ngIf="store?.direccion"
+              [href]="'https://www.google.com/maps/search/?api=1&query=' + store.direccion"
+              target="_blank"
+              class="hover:underline text-xs"
+              [ngStyle]="{ color: 'var(--secondary)' }"
+            >
+              Ver en Google Maps
+            </a>
+          </div>
+        </a>
+      </li>
+
+      <!-- Horarios -->
+      <li>
+        <a
+          pRipple
+          pTooltip="Horarios"
+          tooltipPosition="right"
+          class="flex items-center gap-3 p-3 rounded-lg transition cursor-default hover:bg-[var(--secondary)]/10"
+        >
+          <div
+            class="h-9 w-9 flex items-center justify-center rounded-lg"
+            [ngStyle]="{ backgroundColor: 'var(--secondary)', color: '#fff' }"
+          >
+            <i class="pi pi-clock"></i>
+          </div>
+          <div *ngIf="!collapsed" class="flex flex-col text-sm">
+            <span class="font-medium" [ngStyle]="{ color: 'var(--text)' }">Horarios</span>
+            <span *ngIf="store?.horario_apertura && store?.horario_cierre">
+              {{ store.horario_apertura }} - {{ store.horario_cierre }}
+            </span>
+            <span *ngIf="!store?.horario_apertura" class="text-slate-400">
+              No informado
+            </span>
+          </div>
+        </a>
+      </li>
+    </ul>
+  </ng-container>
+</aside>

@@ -1,11 +1,15 @@
-import { Component, EventEmitter, Inject, Input, Output, PLATFORM_ID } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
 
 import { AuthService } from '../../services/private_services/auth.service';
 import { Router } from '@angular/router';
 import { StoreService } from '../../services/private_services/store.service';
 
-import { CommonModule, isPlatformBrowser } from '@angular/common';
-
+import { CommonModule } from '@angular/common';
 import { SidebarModule } from 'primeng/sidebar';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
@@ -27,31 +31,23 @@ import { StyleClassModule } from 'primeng/styleclass';
   styleUrl: './sidebar.component.scss',
 })
 export class SidebarComponent {
-   @Input() visible = false; // 👈 el padre controla visibilidad
+  @Input() collapsed = false; // controla si está colapsado o no
+  @Output() collapsedChange = new EventEmitter<boolean>();
 
-  // 🚀 Emite evento cuando se cierra
-  @Output() visibleChange = new EventEmitter<boolean>();
+  @Input() mode: 'seller' | 'buyer' = 'seller'; // 👈 modo
+  @Input() store: any; // 👈 datos de la tienda (solo para buyer)
 
-  toggle() {
-    this.visible = !this.visible;
-  }
-
-close() {
-    this.visible = false;
-    this.visibleChange.emit(this.visible);
-  }
-
-  sidebarVisible: boolean = false;
   role: string | null = null;
+
   constructor(
     private authService: AuthService,
     private router: Router,
-    private storeService: StoreService,
-    @Inject(PLATFORM_ID) private platformId: Object
-  ) {
-    if (isPlatformBrowser(this.platformId)) {
-    this.role = this.authService.getUserRole();
-  }
+    private storeService: StoreService
+  ) {}
+
+  toggleCollapse() {
+    this.collapsed = !this.collapsed;
+    this.collapsedChange.emit(this.collapsed);
   }
 
   logout() {
@@ -59,37 +55,9 @@ close() {
     this.router.navigate(['/login']);
   }
 
-  redirectToHome() {
-    this.router.navigate(['/landing-home']);
-  }
-
-  redirectToStepper() {
-    this.router.navigate(['/my-store']);
-  }
-
-  redirectToMyStore() {
-    this.storeService.getMyStores().subscribe({
-      next: (stores) => {
-        if (!stores || stores.length === 0) {
-          // No tiene tienda → lo mando a crear
-          this.router.navigate(['/create-store']);
-        } else {
-          // Ya tiene tienda → lo mando a "mi tienda"
-          this.router.navigate(['/my-store']);
-        }
-      },
-      error: (err) => {
-        console.error('Error al obtener tiendas', err);
-        // Manejo básico: lo mando a crear tienda por defecto
-        this.router.navigate(['/create-store']);
-      },
-    });
-  }
-  redirectToMyProducts() {
-    this.router.navigate(['/my-products']);
-  }
-
-  redirectToMyCategories() {
-    this.router.navigate(['/mis-categorias']);
-  }
+  redirectToHome() { this.router.navigate(['/landing-home']); }
+  redirectToStepper() { this.router.navigate(['/my-store']); }
+  redirectToMyStore() { this.router.navigate(['/my-store']); }
+  redirectToMyProducts() { this.router.navigate(['/my-products']); }
+  redirectToMyCategories() { this.router.navigate(['/mis-categorias']); }
 }

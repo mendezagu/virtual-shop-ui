@@ -26,9 +26,13 @@
         [alt]="'Portada ' + (store?.nombre_tienda || slug || 'Tienda')"
         class="absolute inset-0 w-full h-full object-cover"
       />
-      <div class="absolute inset-0 bg-gradient-to-b from-black/0 via-black/30 to-black/70"></div>
+      <div
+        class="absolute inset-0 bg-gradient-to-b from-black/0 via-black/30 to-black/70"
+      ></div>
 
-      <div class="relative z-10 h-full max-w-6xl mx-auto px-4 sm:px-8 flex flex-col justify-end pb-4">
+      <div
+        class="relative z-10 h-full max-w-6xl mx-auto px-4 sm:px-8 flex flex-col justify-end pb-4"
+      >
         <h1 class="text-2xl sm:text-3xl font-semibold text-white drop-shadow">
           {{ store?.nombre_tienda || slug || "Tienda" }}
         </h1>
@@ -47,24 +51,34 @@
         </div>
 
         <!-- Descripción -->
-      <p
-  *ngIf="store?.descripcion"
-  class="text-white/90 text-sm mt-1 line-clamp-2"
-  [innerHTML]="store.descripcion"
-></p>
+        <p
+          *ngIf="store?.descripcion"
+          class="text-white/90 text-sm mt-1 line-clamp-2"
+          [innerHTML]="store.descripcion"
+        ></p>
 
         <!-- Línea de info -->
         <p class="text-white/90 text-sm mt-1 flex flex-wrap gap-x-2 gap-y-0.5">
           <span *ngIf="store?.tiempo_entrega">{{ store?.tiempo_entrega }}</span>
-          <span *ngIf="store?.tiempo_entrega && (store?.costo_envio || store?.pedido_minimo)">·</span>
+          <span
+            *ngIf="
+              store?.tiempo_entrega &&
+              (store?.costo_envio || store?.pedido_minimo)
+            "
+            >·</span
+          >
           <span *ngIf="store?.costo_envio">
-            {{ store.costo_envio | currency : "ARS" : "symbol-narrow" : "1.0-0" }}
+            {{
+              store.costo_envio | currency : "ARS" : "symbol-narrow" : "1.0-0"
+            }}
             envío
           </span>
           <span *ngIf="store?.costo_envio && store?.pedido_minimo">·</span>
           <span *ngIf="store?.pedido_minimo">
             Mínimo
-            {{ store.pedido_minimo | currency : "ARS" : "symbol-narrow" : "1.0-0" }}
+            {{
+              store.pedido_minimo | currency : "ARS" : "symbol-narrow" : "1.0-0"
+            }}
           </span>
         </p>
 
@@ -82,7 +96,9 @@
               aria-label="Buscar"
               [ngStyle]="{ backgroundColor: 'var(--secondary)' }"
             >
-              <mat-icon class="!text-white !text-[18px] sm:!text-[20px]">search</mat-icon>
+              <mat-icon class="!text-white !text-[18px] sm:!text-[20px]"
+                >search</mat-icon
+              >
             </button>
           </div>
         </div>
@@ -90,7 +106,9 @@
     </header>
 
     <!-- ===== LAYOUT: contenido + sidebar ===== -->
-    <main class="max-w-6xl mx-auto px-4 sm:px-8 pb-10 grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
+    <main
+      class="max-w-6xl mx-auto px-4 sm:px-8 pb-10 grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6"
+    >
       <!-- Contenido principal -->
       <section class="lg:col-span-8">
         <div
@@ -98,13 +116,18 @@
           [ngStyle]="{
             backgroundColor: 'var(--surface)',
             color: 'var(--text)',
-            borderColor: store?.background_color === 'dark'
-              ? 'rgba(255,255,255,0.08)'
-              : '#e5e7eb'
+            borderColor:
+              store?.background_color === 'dark'
+                ? 'rgba(255,255,255,0.08)'
+                : '#e5e7eb'
           }"
         >
           <h3 class="text-sm font-semibold flex items-center gap-2">
-            <mat-icon class="!text-[18px]" [ngStyle]="{ color: 'var(--primary)' }">category</mat-icon>
+            <mat-icon
+              class="!text-[18px]"
+              [ngStyle]="{ color: 'var(--primary)' }"
+              >category</mat-icon
+            >
             Categorías
           </h3>
 
@@ -112,7 +135,9 @@
             <ng-container *ngIf="categories?.length; else noCat">
               <p-dataView [value]="categories" layout="grid" [rows]="6">
                 <ng-template pTemplate="grid" let-items>
-                  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 w-full">
+                  <div
+                    class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 w-full"
+                  >
                     <div *ngFor="let c of items" class="col">
                       <a
                         [routerLink]="['/store', slug, 'categoria', c.slug]"
@@ -134,13 +159,20 @@
 
                         <!-- Texto -->
                         <div class="text-center">
-                          <div class="font-semibold text-sm transition" [ngStyle]="{ color: 'var(--secondary)' }">
-                            <span  [ngStyle]="{ color: 'var(--secondary)' }">
+                          <div
+                            class="font-semibold text-sm transition"
+                            [ngStyle]="{ color: 'var(--secondary)' }"
+                          >
+                            <span [ngStyle]="{ color: 'var(--secondary)' }">
                               {{ c.name }}
                             </span>
                           </div>
-                          <div class="text-xs mt-1" [ngStyle]="{ color: 'var(--secondary)' }">
-                            {{ c.count }} {{ c.count === 1 ? "producto" : "productos" }}
+                          <div
+                            class="text-xs mt-1"
+                            [ngStyle]="{ color: 'var(--secondary)' }"
+                          >
+                            {{ c.count }}
+                            {{ c.count === 1 ? "producto" : "productos" }}
                           </div>
                         </div>
                       </a>
@@ -165,13 +197,18 @@
           [ngStyle]="{
             backgroundColor: 'var(--surface)',
             color: 'var(--text)',
-            borderColor: store?.background_color === 'dark'
-              ? 'rgba(255,255,255,0.08)'
-              : '#e5e7eb'
+            borderColor:
+              store?.background_color === 'dark'
+                ? 'rgba(255,255,255,0.08)'
+                : '#e5e7eb'
           }"
         >
           <h3 class="text-sm font-semibold flex items-center gap-2">
-            <mat-icon class="!text-[18px]" [ngStyle]="{ color: 'var(--primary)' }">call</mat-icon>
+            <mat-icon
+              class="!text-[18px]"
+              [ngStyle]="{ color: 'var(--primary)' }"
+              >call</mat-icon
+            >
             Contacto
           </h3>
           <div class="mt-2 text-sm space-y-1.5">
@@ -214,13 +251,18 @@
           [ngStyle]="{
             backgroundColor: 'var(--surface)',
             color: 'var(--text)',
-            borderColor: store?.background_color === 'dark'
-              ? 'rgba(255,255,255,0.08)'
-              : '#e5e7eb'
+            borderColor:
+              store?.background_color === 'dark'
+                ? 'rgba(255,255,255,0.08)'
+                : '#e5e7eb'
           }"
         >
           <h3 class="text-sm font-semibold flex items-center gap-2">
-            <mat-icon class="!text-[18px]" [ngStyle]="{ color: 'var(--primary)' }">location_on</mat-icon>
+            <mat-icon
+              class="!text-[18px]"
+              [ngStyle]="{ color: 'var(--primary)' }"
+              >location_on</mat-icon
+            >
             Ubicación
           </h3>
           <div class="mt-2 text-sm space-y-1.5">
@@ -236,7 +278,10 @@
               *ngIf="store?.direccion"
               class="inline-flex items-center gap-1 hover:underline mt-1"
               [ngStyle]="{ color: 'var(--secondary)' }"
-              [href]="'https://www.google.com/maps/search/?api=1&query=' + store.direccion"
+              [href]="
+                'https://www.google.com/maps/search/?api=1&query=' +
+                store.direccion
+              "
               target="_blank"
               rel="noopener"
             >
@@ -252,17 +297,25 @@
           [ngStyle]="{
             backgroundColor: 'var(--surface)',
             color: 'var(--text)',
-            borderColor: store?.background_color === 'dark'
-              ? 'rgba(255,255,255,0.08)'
-              : '#e5e7eb'
+            borderColor:
+              store?.background_color === 'dark'
+                ? 'rgba(255,255,255,0.08)'
+                : '#e5e7eb'
           }"
         >
           <h3 class="text-sm font-semibold flex items-center gap-2">
-            <mat-icon class="!text-[18px]" [ngStyle]="{ color: 'var(--primary)' }">schedule</mat-icon>
+            <mat-icon
+              class="!text-[18px]"
+              [ngStyle]="{ color: 'var(--primary)' }"
+              >schedule</mat-icon
+            >
             Horarios
           </h3>
           <div class="mt-2 text-sm">
-            <ul *ngIf="store?.horarios?.length; else horarioTexto" class="space-y-1">
+            <ul
+              *ngIf="store?.horarios?.length; else horarioTexto"
+              class="space-y-1"
+            >
               <li *ngFor="let h of store.horarios" class="flex justify-between">
                 <span>{{ h?.dia || h?.label }}</span>
                 <span class="font-medium">{{ h?.desde }} - {{ h?.hasta }}</span>
@@ -272,7 +325,10 @@
               <p *ngIf="store?.horario_cierre" class="whitespace-pre-line">
                 {{ store.horario_apertura }} - {{ store.horario_cierre }}
               </p>
-              <p *ngIf="!store?.horarios && !store?.horario_apertura" class="text-slate-400">
+              <p
+                *ngIf="!store?.horarios && !store?.horario_apertura"
+                class="text-slate-400"
+              >
                 No informado.
               </p>
             </ng-template>

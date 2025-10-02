@@ -194,6 +194,31 @@
                 ></button>
               </form>
             </div>
+
+            <!-- Crear subcategoría -->
+<div class="border-t border-slate-200 mt-4 pt-4">
+  <form
+    [formGroup]="subCategoryForms[c.id]"
+    (ngSubmit)="createSubCategory(c.id)"
+    class="flex items-center gap-2 flex-wrap"
+  >
+    <input
+      type="text"
+      pInputText
+      formControlName="name"
+      placeholder="Nueva subcategoría"
+      class="flex-1"
+    />
+    <button
+      type="submit"
+      pButton
+      label="Añadir"
+      icon="pi pi-plus"
+      class="p-button-rounded p-button-success"
+      [disabled]="subCategoryForms[c.id].invalid"
+    ></button>
+  </form>
+</div>
           </p-accordionTab>
         </p-accordion>
       </ng-container>

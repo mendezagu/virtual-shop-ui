@@ -12,9 +12,9 @@ export class CategoryService {
   // ✅ Crear categoría
  
 
-    createCategory(storeId: string, name: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/category`, { storeId, name });
-  }
+createCategory(storeId: string, name: string, parentId?: string): Observable<any> {
+  return this.http.post(`${this.apiUrl}/category`, { storeId, name, parentId });
+}
 
     // ✅ Actualizar categoría (PATCH en backend)
   updateCategory(categoryId: string, name: string): Observable<any> {

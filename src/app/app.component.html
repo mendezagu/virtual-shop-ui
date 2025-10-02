@@ -1,30 +1,40 @@
 <!-- Toolbar -->
 <div
-  class="sticky top-0 z-50 h-16 px-4 bg-white border-b border-slate-200 shadow-sm flex items-center justify-between"
+  [ngClass]="collapsed ? 'ml-20' : 'ml-72'"
+  class="sticky top-0 z-40 h-16 px-4 bg-white/80 backdrop-blur border-b border-slate-200 shadow-sm flex items-center justify-between transition-all duration-300"
 >
-  <div class="flex items-center gap-3">
+  <div class="flex items-center gap-4">
     <!-- Botón hamburguesa -->
-    <p-button
-      (onClick)="toggleSidebar()"
+    <button
+      pButton
       icon="pi pi-bars"
-      styleClass="p-button-text "
-    ></p-button>
+      class="p-button-rounded p-button-text hover:bg-pink-50 transition"
+      (click)="toggleSidebar()"
+    ></button>
 
-    <img class="w-10 h-10" src="assets/logo-app.png" alt="Pedi App" />
-    <span class="hidden md:inline text-slate-700 font-semibold">Panel</span>
+    <img class="w-10 h-10 rounded-xl shadow-sm" src="assets/logo-app.png" alt="Pedi App" />
+
+    <span *ngIf="!collapsed && mode === 'seller'" class="hidden md:inline text-slate-800 font-semibold tracking-tight text-lg">
+      Panel de Control
+    </span>
+    <span *ngIf="!collapsed && mode === 'buyer'" class="hidden md:inline text-slate-800 font-semibold tracking-tight text-lg">
+      Tienda
+    </span>
   </div>
 
-  <!-- Acciones -->
-  <div class="flex items-center gap-3">
-    <button pButton icon="pi pi-bell" class="p-button-text"></button>
-    <button pButton icon="pi pi-user" class="p-button-text"></button>
+  <!-- Acciones (solo para vendedor) -->
+  <div class="flex items-center gap-3" *ngIf="mode === 'seller'">
+    <button pButton icon="pi pi-bell" class="relative p-button-rounded p-button-text hover:bg-pink-50">
+      <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-pink-500 animate-pulse"></span>
+    </button>
+    <button pButton icon="pi pi-user" class="p-button-rounded p-button-text hover:bg-pink-50"></button>
   </div>
 </div>
 
-<!-- Sidebar controlado desde AppComponent -->
-<app-sidebar [(visible)]="sidebarVisible"></app-sidebar>
+<!-- Sidebar -->
+<app-sidebar [(collapsed)]="collapsed" [mode]="mode" [store]="store"></app-sidebar>
 
 <!-- Contenido -->
-<div>
+<div [ngClass]="collapsed ? 'ml-20' : 'ml-72'" class="transition-all duration-300 p-6">
   <router-outlet></router-outlet>
 </div>

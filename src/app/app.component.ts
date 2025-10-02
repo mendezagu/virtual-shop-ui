@@ -1,8 +1,9 @@
-import { Component, ViewChild } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import { RouterOutlet, Router } from '@angular/router';
 import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
+import { StoreStateService } from './shared/services/private_services/store-state.service';
 
 @Component({
   selector: 'app-root',
@@ -17,9 +18,30 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
- sidebarVisible = false;
+  collapsed = false;
+  mode: 'seller' | 'buyer' = 'seller';
+  store: any;
+
+  constructor(private router: Router, private storeState: StoreStateService) {}
 
   toggleSidebar() {
-    this.sidebarVisible = !this.sidebarVisible;
+    this.collapsed = !this.collapsed;
+  }
+
+  ngOnInit() {
+    this.router.events.subscribe(() => {
+      const url = this.router.url;
+
+      if (url.startsWith('/store/')) {
+        this.mode = 'buyer';
+        this.storeState.store$.subscribe((s) => {
+          this.store = s;
+        });
+      } else {
+        this.mode = 'seller';
+        this.storeState.clearStore();
+        this.store = null;
+      }
+    });
   }
 }
