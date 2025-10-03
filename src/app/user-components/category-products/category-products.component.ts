@@ -9,11 +9,23 @@ import { ChipModule } from 'primeng/chip';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { CardModule } from 'primeng/card';
+import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
+import { MultiSelectModule } from 'primeng/multiselect';
 
 @Component({
   standalone: true,
   selector: 'app-category-products',
-  imports: [CommonModule, RouterModule, ChipModule, ButtonModule, RippleModule, CardModule, CarouselModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    ChipModule,
+    ButtonModule,
+    RippleModule,
+    CardModule,
+    CarouselModule,
+    MultiSelectModule,
+    ReactiveFormsModule
+  ],
   templateUrl: './category-products.component.html',
 })
 export class CategoryProductsComponent {
@@ -26,10 +38,13 @@ export class CategoryProductsComponent {
   products: any[] = [];
   categories: any[] = [];
   categoriesWithAll: any[] = [];
+  subcategories: any[] = []; 
   meta?: any;
 
   page = 1;
   limit = 12;
+
+  formGroup!: FormGroup;
 
   constructor(
     private route: ActivatedRoute,
@@ -42,24 +57,39 @@ export class CategoryProductsComponent {
     this.categorySlug = this.route.snapshot.paramMap.get('categorySlug')!;
     this.fetch();
     this.fetchCategories();
-  }
 
-  fetchCategories() {
-    this.publicStoreService.getCategories(this.slug).subscribe({
-      next: (res) => {
-        this.categories = res.data;
-        this.categoriesWithAll = [
-          { slug: '', name: 'Todos', count: 0 },
-          ...this.categories,
-        ];
-      },
-      error: (err) => {
-        console.error('Error cargando categorías:', err);
-        this.categories = [];
-        this.categoriesWithAll = [{ slug: '', name: 'Todos', count: 0 }];
-      }
+    // inicializamos formulario reactivo
+    this.formGroup = new FormGroup({
+      selectedSubcategories: new FormControl([])
+    });
+
+    // escuchamos cambios en los filtros de subcategorías
+    this.formGroup.get('selectedSubcategories')?.valueChanges.subscribe(value => {
+      this.filterBySubcategories(value);
     });
   }
+
+fetchCategories() {
+  this.publicStoreService.getCategories(this.slug).subscribe({
+    next: (res) => {
+      this.categories = res.data;
+      this.categoriesWithAll = [
+        { slug: '', name: 'Todos', count: 0 },
+        ...this.categories,
+      ];
+
+      // 🔹 tomar SOLO las subcategorías de la categoría activa
+      const selectedCat = this.categories.find(c => c.slug === this.categorySlug);
+      this.subcategories = selectedCat?.subcategories || [];
+    },
+    error: (err) => {
+      console.error('Error cargando categorías:', err);
+      this.categories = [];
+      this.categoriesWithAll = [{ slug: '', name: 'Todos', count: 0 }];
+      this.subcategories = [];
+    }
+  });
+}
 
   fetch() {
     this.isLoading = true;
@@ -78,16 +108,41 @@ export class CategoryProductsComponent {
       });
   }
 
-  selectCategory(slug: string) {
-    this.categorySlug = slug;
-    this.page = 1;
-    if (slug) {
-      this.router.navigate(['/store', this.slug, 'categoria', slug]);
-    } else {
-      this.router.navigate(['/store', this.slug]); // Todos
+  filterBySubcategories(subcats: any[]) {
+    if (!subcats || subcats.length === 0) {
+      this.fetch(); // sin filtros → carga normal
+      return;
     }
-    this.fetch();
+
+    // Si tu backend tiene endpoint de productos por subcategorías, úsalo aquí
+    this.publicStoreService.getProductsBySubcategories(this.slug, subcats, this.page, this.limit)
+      .subscribe({
+        next: res => {
+          this.products = res.data;
+          this.meta = res.meta;
+        },
+        error: err => {
+          console.error('Error filtrando productos:', err);
+        }
+      });
   }
+
+selectCategory(slug: string) {
+  this.categorySlug = slug;
+  this.page = 1;
+
+  // recalcular subcategorías dinámicamente
+  const selectedCat = this.categories.find(c => c.slug === slug);
+  this.subcategories = selectedCat?.subcategories || [];
+
+  if (slug) {
+    this.router.navigate(['/store', this.slug, 'categoria', slug]);
+  } else {
+    this.router.navigate(['/store', this.slug]); // Todos
+  }
+  this.fetch();
+}
+
 
   scrollChips(offset: number) {
     if (this.chipCarousel?.nativeElement) {

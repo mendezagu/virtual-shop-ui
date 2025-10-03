@@ -20,7 +20,7 @@ import { MatSelect, MatSelectTrigger } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatOptionModule } from '@angular/material/core';
 import { MatMenuModule } from '@angular/material/menu';
-//PRIMENG 
+//PRIMENG
 import { AccordionModule } from 'primeng/accordion';
 import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
@@ -29,6 +29,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ChipModule } from 'primeng/chip';
 
 export interface CategorySummary {
   id: string; // 👈 nuevo
@@ -51,14 +52,15 @@ export interface CategorySummary {
     MatMenuModule,
     MatFormFieldModule,
     MatOptionModule,
-//primeng
+    //primeng
     AccordionModule,
     AvatarModule,
     BadgeModule,
     ButtonModule,
     InputTextModule,
     ToastModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    ChipModule,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './my-categories.component.html',
@@ -72,6 +74,7 @@ export class MyCategoriesComponent implements OnInit {
   categoryForms: { [slug: string]: FormGroup } = {};
   subCategoryForms: { [parentId: string]: FormGroup } = {};
   newCategoryForm!: FormGroup;
+  selectedImageFile?: File;
 
   searchCtrl = new FormControl('');
   storeId = ''; // ⚡ para endpoints privados
@@ -84,7 +87,7 @@ export class MyCategoriesComponent implements OnInit {
     private productService: ProductService,
     private categoryService: CategoryService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit(): void {
@@ -110,44 +113,43 @@ export class MyCategoriesComponent implements OnInit {
     });
   }
 
-loadCategories(page: number = 1, limit: number = 10) {
-  if (!this.storeSlug) return;
+  loadCategories(page: number = 1, limit: number = 10) {
+    if (!this.storeSlug) return;
 
-  this.categoryService.getCategories(this.storeSlug, page, limit).subscribe({
-    next: (res) => {
-      console.log('categorías recibidas', res);
+    this.categoryService.getCategories(this.storeSlug, page, limit).subscribe({
+      next: (res) => {
+        console.log('categorías recibidas', res);
 
-      this.categories = Array.isArray(res.data) ? res.data : [];
+        this.categories = Array.isArray(res.data) ? res.data : [];
 
-      // Generar formularios de edición para cada categoría
-      this.categories.forEach((c) => {
-        this.categoryForms[c.id] = this.fb.group({
-          name: [c.name, [Validators.required, Validators.minLength(2)]],
+        // Generar formularios de edición para cada categoría
+        this.categories.forEach((c) => {
+          this.categoryForms[c.id] = this.fb.group({
+            name: [c.name, [Validators.required, Validators.minLength(2)]],
+          });
+
+          this.subCategoryForms[c.id] = this.fb.group({
+            name: ['', [Validators.required, Validators.minLength(2)]],
+            subcategories: [c.subcategories || []],
+          });
         });
 
-        this.subCategoryForms[c.id] = this.fb.group({
-    name: ['', [Validators.required, Validators.minLength(2)]],
-  });
-  
-      });
+        // ⚡ Podés usar esta metadata para armar paginador
+        const { total, totalPages } = res.meta;
+        console.log(
+          `Página ${page} de ${totalPages}, total categorías: ${total}`
+        );
 
-      
-
-      // ⚡ Podés usar esta metadata para armar paginador
-      const { total, totalPages } = res.meta;
-      console.log(`Página ${page} de ${totalPages}, total categorías: ${total}`);
-
-      this.isLoading = false;
-    },
-    error: (err) => {
-      console.error('Error cargando categorías:', err);
-      this.isLoading = false;
-      this.hasError = true;
-      this.categories = [];
-    },
-  });
-}
-
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error cargando categorías:', err);
+        this.isLoading = false;
+        this.hasError = true;
+        this.categories = [];
+      },
+    });
+  }
 
   loadProducts(category: CategorySummary) {
     if (!this.storeSlug) return;
@@ -168,123 +170,163 @@ loadCategories(page: number = 1, limit: number = 10) {
       });
   }
 
-createCategory() {
-  if (this.newCategoryForm.invalid) return;
-  const name = this.newCategoryForm.value.name;
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (file) {
+      this.selectedImageFile = file;
+    }
+  }
 
-  this.confirmationService.confirm({
-    message: `¿Quieres crear la categoría "${name}"?`,
-    header: 'Confirmar creación',
-    icon: 'pi pi-check-circle',
-    acceptLabel: 'Sí, crear',
-    rejectLabel: 'Cancelar',
-    acceptButtonStyleClass: 'p-button-success p-button-sm',
-    rejectButtonStyleClass: 'p-button-text p-button-sm',
-    accept: () => {
-      this.categoryService.createCategory(this.storeId, name).subscribe({
-        next: (cat) => {
-          this.categories.push({ ...cat, count: 0, products: [] });
-          this.newCategoryForm.reset();
+  createCategory() {
+    if (this.newCategoryForm.invalid) return;
+    const name = this.newCategoryForm.value.name;
+
+    this.confirmationService.confirm({
+      message: `¿Quieres crear la categoría "${name}"?`,
+      header: 'Confirmar creación',
+      icon: 'pi pi-check-circle',
+      acceptLabel: 'Sí, crear',
+      rejectLabel: 'Cancelar',
+      acceptButtonStyleClass: 'p-button-success p-button-sm',
+      rejectButtonStyleClass: 'p-button-text p-button-sm',
+      accept: () => {
+        // 1️⃣ Crear la categoría (sin imagen aún)
+        this.categoryService.createCategory(this.storeId, name).subscribe({
+          next: (cat) => {
+            // 2️⃣ Si hay imagen, la subimos
+            if (this.selectedImageFile) {
+              this.categoryService
+                .uploadCategoryImage(cat.id, this.selectedImageFile)
+                .subscribe({
+                  next: (updated) => {
+                    this.categories.push({
+                      ...updated,
+                      count: 0,
+                      products: [],
+                    });
+                    this.newCategoryForm.reset();
+                    this.selectedImageFile = undefined;
+                    this.messageService.add({
+                      severity: 'success',
+                      summary: 'Categoría creada',
+                      detail: `"${updated.name}" fue creada con imagen.`,
+                    });
+                  },
+                  error: () => {
+                    this.messageService.add({
+                      severity: 'warn',
+                      summary: 'Categoría creada',
+                      detail: `"${cat.name}" fue creada, pero no se pudo subir la imagen.`,
+                    });
+                  },
+                });
+            } else {
+              // Si no hay imagen, solo agregamos la categoría
+              this.categories.push({ ...cat, count: 0, products: [] });
+              this.newCategoryForm.reset();
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Categoría creada',
+                detail: `"${cat.name}" fue creada exitosamente.`,
+              });
+            }
+          },
+          error: () => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'No se pudo crear la categoría.',
+            });
+          },
+        });
+      },
+    });
+  }
+
+  // Crear subcategoría
+  createSubCategory(parentId: string) {
+    const form = this.subCategoryForms[parentId];
+    if (!form?.valid) return;
+    const name = form.value.name;
+
+    this.categoryService
+      .createCategory(this.storeId, name, parentId)
+      .subscribe({
+        next: (sub) => {
+          const parent = this.categories.find((c) => c.id === parentId);
+          if (parent) {
+            parent.subcategories = [...(parent.subcategories || []), sub];
+          }
+          form.reset();
           this.messageService.add({
             severity: 'success',
-            summary: 'Categoría creada',
-            detail: `"${cat.name}" fue creada exitosamente.`,
+            summary: 'Subcategoría creada',
+            detail: `"${sub.name}" fue creada exitosamente.`,
           });
         },
         error: () => {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'No se pudo crear la categoría.',
+            detail: 'No se pudo crear la subcategoría.',
           });
         },
       });
-    }
-  });
-}
+  }
 
-// Crear subcategoría
-createSubCategory(parentId: string) {
-  const form = this.subCategoryForms[parentId];
-  if (!form?.valid) return;
-  const name = form.value.name;
+  updateCategory(c: CategorySummary) {
+    const form = this.categoryForms[c.id];
+    if (!form?.valid) return;
 
-  this.categoryService.createCategory(this.storeId, name, parentId).subscribe({
-    next: (sub) => {
-      const parent = this.categories.find((c) => c.id === parentId);
-      if (parent) {
-        parent.subcategories = [...(parent.subcategories || []), sub];
-      }
-      form.reset();
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Subcategoría creada',
-        detail: `"${sub.name}" fue creada exitosamente.`,
-      });
-    },
-    error: () => {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'No se pudo crear la subcategoría.',
-      });
-    },
-  });
-}
+    this.categoryService.updateCategory(c.id, form.value.name).subscribe({
+      next: () => {
+        c.name = form.value.name;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Categoría actualizada',
+          detail: `"${c.name}" se actualizó correctamente.`,
+        });
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo actualizar la categoría.',
+        });
+      },
+    });
+  }
 
-updateCategory(c: CategorySummary) {
-  const form = this.categoryForms[c.id];
-  if (!form?.valid) return;
-
-  this.categoryService.updateCategory(c.id, form.value.name).subscribe({
-    next: () => {
-      c.name = form.value.name;
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Categoría actualizada',
-        detail: `"${c.name}" se actualizó correctamente.`,
-      });
-    },
-    error: () => {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'No se pudo actualizar la categoría.',
-      });
-    }
-  });
-}
-
-deleteCategory(c: CategorySummary) {
-  this.confirmationService.confirm({
-    message: `¿Seguro que quieres eliminar la categoría "${c.name}"?`,
-    header: 'Confirmar eliminación',
-    icon: 'pi pi-exclamation-triangle',
-    acceptLabel: 'Sí, eliminar',
-    rejectLabel: 'Cancelar',
-    acceptButtonStyleClass: 'p-button-danger p-button-sm',
-    rejectButtonStyleClass: 'p-button-text p-button-sm',
-    accept: () => {
-      this.categoryService.deleteCategory(c.id).subscribe({
-        next: () => {
-          this.categories = this.categories.filter((cat) => cat.id !== c.id);
-          this.messageService.add({
-            severity: 'warn',
-            summary: 'Categoría eliminada',
-            detail: `"${c.name}" fue eliminada.`,
-          });
-        },
-        error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'No se pudo eliminar la categoría.',
-          });
-        },
-      });
-    }
-  });
-}
+  deleteCategory(c: CategorySummary) {
+    this.confirmationService.confirm({
+      message: `¿Seguro que quieres eliminar la categoría "${c.name}"?`,
+      header: 'Confirmar eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí, eliminar',
+      rejectLabel: 'Cancelar',
+      acceptButtonStyleClass: 'p-button-danger p-button-sm',
+      rejectButtonStyleClass: 'p-button-text p-button-sm',
+      accept: () => {
+        this.categoryService.deleteCategory(c.id).subscribe({
+          next: () => {
+            this.categories = this.categories.filter((cat) => cat.id !== c.id);
+            this.messageService.add({
+              severity: 'warn',
+              summary: 'Categoría eliminada',
+              detail: `"${c.name}" fue eliminada.`,
+            });
+          },
+          error: () => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'No se pudo eliminar la categoría.',
+            });
+          },
+        });
+      },
+    });
+  }
 
   onCategoryMenuAction(action: string, c: CategorySummary) {
     if (action === 'delete') {

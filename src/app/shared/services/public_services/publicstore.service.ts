@@ -46,4 +46,18 @@ export class PublicStoreService {
       { params }
     );
   }
+
+  
+  // 🔹 Nuevo: Productos filtrados por subcategorías
+  getProductsBySubcategories(slug: string, subcats: string[], page = 1, limit = 12): Observable<any> {
+    let params = new HttpParams()
+      .set('page', String(page))
+      .set('limit', String(limit))
+      .set('subcategories', subcats.join(',')); // los subcats como CSV
+
+    return this.http.get(
+      `${this.apiUrl}/products/public/store/${slug}/by-subcategories`,
+      { params }
+    );
+  }
 }
