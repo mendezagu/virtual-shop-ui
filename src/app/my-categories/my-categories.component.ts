@@ -30,6 +30,8 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ChipModule } from 'primeng/chip';
+import { TabViewModule } from 'primeng/tabview';
+import { DropdownModule } from 'primeng/dropdown';
 
 export interface CategorySummary {
   id: string; // 👈 nuevo
@@ -39,6 +41,9 @@ export interface CategorySummary {
   imageUrl?: string | null;
   products?: Producto[];
   loading?: boolean;
+    // 👇 nuevos
+  type?: 'NORMAL' | 'PROMOCION' | 'DESTACADO' | 'OFERTA';
+  subcategories?: CategorySummary[];
 }
 
 @Component({
@@ -61,6 +66,8 @@ export interface CategorySummary {
     ToastModule,
     ConfirmDialogModule,
     ChipModule,
+    TabViewModule,
+    DropdownModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './my-categories.component.html',
@@ -74,6 +81,14 @@ export class MyCategoriesComponent implements OnInit {
   categoryForms: { [slug: string]: FormGroup } = {};
   subCategoryForms: { [parentId: string]: FormGroup } = {};
   newCategoryForm!: FormGroup;
+  newSpecialCategoryForm!: FormGroup;
+  specialCategories: any[] = [];
+
+  specialTypes = [
+  { label: 'Promoción', value: 'PROMOCION' },
+  { label: 'Destacados', value: 'DESTACADO' },
+  { label: 'Ofertas', value: 'OFERTA' },
+];
   selectedImageFile?: File;
 
   searchCtrl = new FormControl('');
@@ -95,6 +110,11 @@ export class MyCategoriesComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(2)]],
     });
 
+    this.newSpecialCategoryForm = this.fb.group({
+    name: ['', [Validators.required, Validators.minLength(2)]],
+    type: ['PROMOCION', Validators.required],
+  });
+
     // 1. Traer las tiendas del usuario
     this.storeService.getMyStores().subscribe({
       next: (stores) => {
@@ -113,43 +133,49 @@ export class MyCategoriesComponent implements OnInit {
     });
   }
 
-  loadCategories(page: number = 1, limit: number = 10) {
-    if (!this.storeSlug) return;
+loadCategories(page: number = 1, limit: number = 10) {
+  if (!this.storeSlug) return;
 
-    this.categoryService.getCategories(this.storeSlug, page, limit).subscribe({
-      next: (res) => {
-        console.log('categorías recibidas', res);
+  this.categoryService.getCategories(this.storeSlug, page, limit).subscribe({
+    next: (res) => {
+      const allCategories: CategorySummary[] = Array.isArray(res.data) ? res.data : [];
 
-        this.categories = Array.isArray(res.data) ? res.data : [];
+      // 🔹 separar normales y especiales
+      this.categories = allCategories.filter((c: CategorySummary) => c.type === 'NORMAL');
+      this.specialCategories = allCategories.filter((c: CategorySummary) => c.type !== 'NORMAL');
 
-        // Generar formularios de edición para cada categoría
-        this.categories.forEach((c) => {
-          this.categoryForms[c.id] = this.fb.group({
-            name: [c.name, [Validators.required, Validators.minLength(2)]],
-          });
-
-          this.subCategoryForms[c.id] = this.fb.group({
-            name: ['', [Validators.required, Validators.minLength(2)]],
-            subcategories: [c.subcategories || []],
-          });
+      // generar formularios de edición para normales
+      this.categories.forEach((c: CategorySummary) => {
+        this.categoryForms[c.id] = this.fb.group({
+          name: [c.name, [Validators.required, Validators.minLength(2)]],
         });
 
-        // ⚡ Podés usar esta metadata para armar paginador
-        const { total, totalPages } = res.meta;
-        console.log(
-          `Página ${page} de ${totalPages}, total categorías: ${total}`
-        );
+        this.subCategoryForms[c.id] = this.fb.group({
+          name: ['', [Validators.required, Validators.minLength(2)]],
+          subcategories: [c.subcategories || []],
+        });
+      });
 
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Error cargando categorías:', err);
-        this.isLoading = false;
-        this.hasError = true;
-        this.categories = [];
-      },
-    });
-  }
+      // generar formularios de edición para especiales
+      this.specialCategories.forEach((sc: CategorySummary) => {
+        this.categoryForms[sc.id] = this.fb.group({
+          name: [sc.name, [Validators.required, Validators.minLength(2)]],
+        });
+      });
+
+      this.isLoading = false;
+    },
+    error: (err) => {
+      console.error('Error cargando categorías:', err);
+      this.isLoading = false;
+      this.hasError = true;
+      this.categories = [];
+      this.specialCategories = [];
+    },
+  });
+}
+
+
 
   loadProducts(category: CategorySummary) {
     if (!this.storeSlug) return;
@@ -242,6 +268,32 @@ export class MyCategoriesComponent implements OnInit {
       },
     });
   }
+
+createSpecialCategory() {
+  if (this.newSpecialCategoryForm.invalid) return;
+  const { name, type } = this.newSpecialCategoryForm.value;
+
+  this.categoryService.createCategory(this.storeId, name, undefined, type)
+    .subscribe({
+      next: (cat) => {
+        this.specialCategories.push(cat); // 👈 se agrega a especiales
+        this.newSpecialCategoryForm.reset({ type: 'PROMOCION' });
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Categoría especial creada',
+          detail: `"${cat.name}" fue creada como ${cat.type}.`,
+        });
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo crear la categoría especial.',
+        });
+      },
+    });
+}
+
 
   // Crear subcategoría
   createSubCategory(parentId: string) {

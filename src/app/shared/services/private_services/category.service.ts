@@ -14,12 +14,14 @@ export class CategoryService {
   createCategory(
     storeId: string,
     name: string,
-    parentId?: string
+    parentId?: string,
+    type: 'NORMAL' | 'PROMOCION' | 'DESTACADO' | 'OFERTA' = 'NORMAL'
   ): Observable<any> {
     return this.http.post(`${this.apiUrl}/category`, {
       storeId,
       name,
       parentId,
+      type,
     });
   }
 
