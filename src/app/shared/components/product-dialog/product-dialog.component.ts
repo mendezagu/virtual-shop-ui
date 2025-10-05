@@ -43,6 +43,7 @@ import { MessageService, PrimeNGConfig } from 'primeng/api';
 import { Message } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
 import { UploadService } from '../../services/private_services/upload.service';
+import { InputNumberModule } from 'primeng/inputnumber';
 
 type CategorySummary = {
   id: string;
@@ -74,6 +75,7 @@ type CategorySummary = {
     ToastModule,
     BadgeModule,
     FileUploadModule,
+    InputNumberModule,
   ],
   providers: [MessageService, PrimeNGConfig],
 })
@@ -147,6 +149,18 @@ export class ProductDialogComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.initForm();
 
+    // 👇 Escucha cambios en precio o costo y recalcula automáticamente
+    this.productForm.get('precio')?.valueChanges.subscribe(() => {
+      this.updateGananciaYPrecioFinal();
+    });
+    this.productForm.get('costo')?.valueChanges.subscribe(() => {
+      this.updateGananciaYPrecioFinal();
+    });
+
+    this.productForm.get('descuento')?.valueChanges.subscribe(() => {
+      this.updateGananciaYPrecioFinal();
+    });
+
     this.messages = [
       {
         severity: 'info',
@@ -211,6 +225,11 @@ export class ProductDialogComponent implements OnInit, OnChanges {
       descripcion: ['', Validators.required],
       stock: [0, [Validators.required, Validators.min(0)]],
       precio: [0, [Validators.required, Validators.min(0)]],
+      costo: [''],
+      descuento: [''],
+      ganancia: [''],
+      precio_final: [''],
+      precio_mayorista: [''],
       presentacion_multiple: [false],
       variants: this.fb.array([]),
       sku: [''],
@@ -222,6 +241,43 @@ export class ProductDialogComponent implements OnInit, OnChanges {
       video_youtube: [''],
     });
   }
+
+ private updateGananciaYPrecioFinal(): void {
+  const precio = Number(this.productForm.get('precio')?.value) || 0;
+  const costo = Number(this.productForm.get('costo')?.value) || 0;
+  const descuento = Number(this.productForm.get('descuento')?.value) || 0;
+
+  // Si el usuario no completó precio, reiniciamos valores
+  if (!precio) {
+    this.productForm.patchValue(
+      {
+        ganancia: 0,
+        precio_final: 0,
+      },
+      { emitEvent: false } // evitamos bucles infinitos
+    );
+    return;
+  }
+
+  // 🔹 Aplicar descuento como porcentaje
+  const descuentoAplicado = precio * (descuento / 100);
+
+  // 🔹 Calcular precio final después del descuento
+  const precioFinal = precio - descuentoAplicado;
+
+  // 🔹 Calcular ganancia en base al precio final y costo
+  const ganancia = precioFinal - costo;
+
+  // 🔹 Actualizar los campos sin disparar valueChanges nuevamente
+  this.productForm.patchValue(
+    {
+      ganancia,
+      precio_final: precioFinal,
+    },
+    { emitEvent: false }
+  );
+}
+
 
   private patchForm(product: Producto) {
     let categoryId = (product as any).categoryId || '';
@@ -241,6 +297,12 @@ export class ProductDialogComponent implements OnInit, OnChanges {
       descripcion: product.descripcion,
       stock: product.stock,
       precio: product.precio,
+      costo: product.costo,
+      descuento: product.descuento,
+      ganancia: product.ganancia,
+      precio_final: product.precio_final,
+      precio_mayorista: product.precio_mayorista,
+
       presentacion_multiple: product.presentacion_multiple,
       sku: (product as any).sku || '',
       codigo_barras: (product as any).codigo_barras || '',
@@ -331,60 +393,66 @@ export class ProductDialogComponent implements OnInit, OnChanges {
   }
   // Manejo de archivos
 
-async onFileSelect(event: any): Promise<void> {
-  if (!event?.files?.length) return;
+  async onFileSelect(event: any): Promise<void> {
+    if (!event?.files?.length) return;
 
-  for (const file of event.files as File[]) {
-    const nextIndex = this.preview.findIndex((p) => p === null);
-    if (nextIndex === -1) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Límite alcanzado',
-        detail: 'Solo puedes subir hasta 3 imágenes',
-      });
-      break;
+    for (const file of event.files as File[]) {
+      const nextIndex = this.preview.findIndex((p) => p === null);
+      if (nextIndex === -1) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Límite alcanzado',
+          detail: 'Solo puedes subir hasta 3 imágenes',
+        });
+        break;
+      }
+      try {
+        const url = await this.uploadService.uploadFilePresigned(
+          file,
+          'products'
+        );
+        this.files[nextIndex] = file;
+        this.preview[nextIndex] = url;
+      } catch {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error al subir',
+          detail: `No se pudo subir ${file.name}`,
+        });
+      }
     }
+  }
+
+  editSlot(i: number) {
+    this.slotToEdit = i;
+    if (this.slotFileInput) {
+      this.slotFileInput.nativeElement.value = '';
+      this.slotFileInput.nativeElement.click();
+    }
+  }
+
+  async onSlotFileChange(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file || this.slotToEdit === null) return;
+
     try {
-      const url = await this.uploadService.uploadFilePresigned(file, 'products');
-      this.files[nextIndex] = file;
-      this.preview[nextIndex] = url;
-    } catch {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error al subir',
-        detail: `No se pudo subir ${file.name}`,
-      });
+      const url = await this.uploadService.uploadFilePresigned(
+        file,
+        'products'
+      );
+      this.files[this.slotToEdit] = file;
+      this.preview[this.slotToEdit] = url;
+    } finally {
+      this.slotToEdit = null;
+      input.value = '';
     }
   }
-}
 
-editSlot(i: number) {
-  this.slotToEdit = i;
-  if (this.slotFileInput) {
-    this.slotFileInput.nativeElement.value = '';
-    this.slotFileInput.nativeElement.click();
+  removeFile(index: number) {
+    this.files[index] = null;
+    this.preview[index] = null;
   }
-}
-
-async onSlotFileChange(e: Event) {
-  const input = e.target as HTMLInputElement;
-  const file = input.files?.[0];
-  if (!file || this.slotToEdit === null) return;
-
-  try {
-    const url = await this.uploadService.uploadFilePresigned(file, 'products');
-    this.files[this.slotToEdit] = file;
-    this.preview[this.slotToEdit] = url;
-  } finally {
-    this.slotToEdit = null;
-    input.value = '';
-  }
-}
-
-removeFile(index: number) {
-  this.files[index] = null;
-  this.preview[index] = null;
-}
   async replaceImage(event: any, idx: number) {
     const file = event.target.files[0];
     if (!file) return;
@@ -405,7 +473,7 @@ removeFile(index: number) {
     }
   }
 
-    // CREAR o EDITAR
+  // CREAR o EDITAR
   submit() {
     if (this.productForm.invalid) return;
 
@@ -413,7 +481,7 @@ removeFile(index: number) {
       this.productForm.getRawValue();
 
     // 🖼️ Unimos imágenes existentes + nuevas
- const images = this.preview.filter((u): u is string => !!u);
+    const images = this.preview.filter((u): u is string => !!u);
     if (images.length) payload.imagen_url = images;
     else delete payload.imagen_url;
 

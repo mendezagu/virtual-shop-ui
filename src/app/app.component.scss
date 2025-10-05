@@ -1,10 +1,17 @@
-:host {
-  display: block;
-  height: 100%;
-}
-
-html,
-body {
+/* === FONDO GLOBAL === */
+html, body {
   height: 100%;
   margin: 0;
+  padding: 0;
+  background-color: var(--bg, #202123); /* usa la variable dinámica si existe */
+  color: var(--text, #f5f5f5);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Asegurar que el componente principal ocupe todo */
+app-root {
+  display: block;
+  min-height: 100vh;
+  background-color: var(--bg, #202123);
+  color: var(--text, #f5f5f5);
 }

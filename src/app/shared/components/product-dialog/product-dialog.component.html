@@ -204,15 +204,98 @@
           <i class="pi pi-dollar"></i>
           <span class="ml-2">Precio</span>
         </ng-template>
+        <div class="flex gap-4">
+          <div class="flex flex-col gap-2">
+            <label for="precio" class="font-bold">Precio</label>
+            <div class="relative">
+              <span
+                class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 text-sm font-medium"
+              >
+                ARS $
+              </span>
+              <input
+                pInputText
+                id="precio"
+                formControlName="precio"
+                type="number"
+                placeholder="0.00"
+                class="w-full pl-16 text-left"
+              />
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label for="costo" class="font-bold">Costo</label>
+            <div class="relative">
+              <span
+                class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 text-sm font-medium"
+              >
+                ARS $
+              </span>
+              <input
+                pInputText
+                id="costo"
+                formControlName="costo"
+                type="number"
+                placeholder="0.00"
+                class="w-full pl-16 text-left"
+              />
+            </div>
+          </div>
+        </div>
+
         <div class="flex flex-col gap-2">
-          <label for="precio">Precio</label>
-          <input
-            pInputText
-            id="precio"
-            formControlName="precio"
-            type="number"
+          <label for="descuento" class="font-bold">Descuento</label>
+          <p-inputNumber
+            id="descuento"
+            formControlName="descuento"
+            suffix=" %"
+            [min]="0"
+            [max]="100"
+            [minFractionDigits]="0"
+            [maxFractionDigits]="2"
             class="w-full"
-          />
+          ></p-inputNumber>
+        </div>
+
+        <div class="flex gap-4">
+          <div class="flex flex-col gap-2">
+            <label for="ganancia" class="font-bold">Ganancia</label>
+            <div class="relative">
+              <span
+                class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 text-sm font-medium"
+              >
+                ARS $
+              </span>
+              <input
+                pInputText
+                id="ganancia"
+                formControlName="ganancia"
+                type="number"
+                placeholder="0.00"
+                class="w-full pl-16 text-left"
+              />
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label for="precio_final" class="font-bold">Precio final</label>
+            <div class="relative">
+              <span
+                class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 text-sm font-medium"
+              >
+                ARS $
+              </span>
+              <input
+                pInputText
+                id="precio_final"
+                formControlName="precio_final"
+                type="number"
+                placeholder="0.00"
+                class="w-full pl-16 text-left"
+              />
+            </div>
+          </div>
         </div>
       </p-tabPanel>
 
@@ -292,108 +375,121 @@
           <span class="ml-2">Imágenes</span>
         </ng-template>
 
-       <div class="card">
-  <p-toast></p-toast>
-  <p-fileUpload
-    name="imagenes[]"
-    accept="image/*"
-    [multiple]="true"
-    [customUpload]="true"
-    maxFileSize="5000000"
-    (onSelect)="onFileSelect($event)"
-    [showUploadButton]="false"
-    [showCancelButton]="false"
-    class="w-full"
-  >
-    <!-- Toolbar -->
-    <ng-template #header let-files let-chooseCallback="chooseCallback" let-clearCallback="clearCallback">
-      <div class="flex flex-wrap justify-between items-center flex-1 gap-4">
-        <div class="flex gap-2">
-          <p-button
-            (click)="chooseCallback()"
-            icon="pi pi-images"
-            [rounded]="true"
-            [outlined]="true"
-            label="Seleccionar"
-          ></p-button>
-          <p-button
-            (click)="clearCallback()"
-            icon="pi pi-times"
-            [rounded]="true"
-            [outlined]="true"
-            severity="danger"
-            [disabled]="!files || files.length === 0"
-          ></p-button>
+        <div class="card">
+          <p-toast></p-toast>
+          <p-fileUpload
+            name="imagenes[]"
+            accept="image/*"
+            [multiple]="true"
+            [customUpload]="true"
+            maxFileSize="5000000"
+            (onSelect)="onFileSelect($event)"
+            [showUploadButton]="false"
+            [showCancelButton]="false"
+            class="w-full"
+          >
+            <!-- Toolbar -->
+            <ng-template
+              #header
+              let-files
+              let-chooseCallback="chooseCallback"
+              let-clearCallback="clearCallback"
+            >
+              <div
+                class="flex flex-wrap justify-between items-center flex-1 gap-4"
+              >
+                <div class="flex gap-2">
+                  <p-button
+                    (click)="chooseCallback()"
+                    icon="pi pi-images"
+                    [rounded]="true"
+                    [outlined]="true"
+                    label="Seleccionar"
+                  ></p-button>
+                  <p-button
+                    (click)="clearCallback()"
+                    icon="pi pi-times"
+                    [rounded]="true"
+                    [outlined]="true"
+                    severity="danger"
+                    [disabled]="!files || files.length === 0"
+                  ></p-button>
+                </div>
+                <p-progressBar
+                  [value]="totalSizePercent"
+                  [showValue]="false"
+                  class="w-full md:w-64 h-1"
+                ></p-progressBar>
+              </div>
+            </ng-template>
+
+            <!-- Content: previews -->
+            <ng-template pTemplate="content">
+              <div class="grid gap-4 sm:grid-cols-3 mt-4">
+                <ng-container *ngFor="let url of preview; let i = index">
+                  <div
+                    *ngIf="url as img"
+                    class="relative w-full h-40 rounded-lg overflow-hidden border bg-white shadow-sm"
+                  >
+                    <img
+                      [src]="img"
+                      alt="Imagen producto"
+                      class="w-full h-full object-cover"
+                    />
+
+                    <!-- eliminar -->
+                    <button
+                      type="button"
+                      class="absolute top-1 right-1 w-7 h-7 rounded-full bg-white/90 hover:bg-white text-rose-600 border shadow flex items-center justify-center"
+                      (click)="removeFile(i)"
+                    >
+                      <i class="pi pi-times text-xs"></i>
+                    </button>
+
+                    <!-- editar -->
+                    <button
+                      type="button"
+                      class="absolute bottom-1 right-1 w-7 h-7 rounded-full bg-white/90 hover:bg-white text-slate-700 border shadow flex items-center justify-center"
+                      (click)="editSlot(i)"
+                    >
+                      <i class="pi pi-pencil text-xs"></i>
+                    </button>
+                  </div>
+
+                  <!-- mostrar slot vacío si no hay imagen -->
+                  <div
+                    *ngIf="!url"
+                    class="relative w-full h-40 rounded-lg border-dashed border-2 border-slate-300 flex items-center justify-center cursor-pointer"
+                    (click)="editSlot(i)"
+                  >
+                    <i class="pi pi-camera text-slate-400 text-xl"></i>
+                  </div>
+                </ng-container>
+              </div>
+            </ng-template>
+
+            <!-- Empty state -->
+            <ng-template #empty>
+              <div class="flex items-center justify-center flex-col p-6">
+                <i
+                  class="pi pi-cloud-upload border-2 rounded-full p-8 text-4xl text-gray-400"
+                ></i>
+                <p class="mt-6 mb-0">
+                  Arrastra y suelta o usa el botón para subir imágenes
+                </p>
+              </div>
+            </ng-template>
+          </p-fileUpload>
+
+          <!-- Input oculto para editar un slot puntual -->
+          <input
+            #slotFileInput
+            type="file"
+            accept="image/*"
+            class="hidden"
+            (change)="onSlotFileChange($event)"
+          />
         </div>
-        <p-progressBar
-          [value]="totalSizePercent"
-          [showValue]="false"
-          class="w-full md:w-64 h-1"
-        ></p-progressBar>
-      </div>
-    </ng-template>
-
-    <!-- Content: previews -->
-<ng-template pTemplate="content">
-  <div class="grid gap-4 sm:grid-cols-3 mt-4">
-    <ng-container *ngFor="let url of preview; let i = index">
-      <div
-        *ngIf="url as img"
-        class="relative w-full h-40 rounded-lg overflow-hidden border bg-white shadow-sm"
-      >
-        <img [src]="img" alt="Imagen producto" class="w-full h-full object-cover" />
-
-        <!-- eliminar -->
-        <button
-          type="button"
-          class="absolute top-1 right-1 w-7 h-7 rounded-full bg-white/90 hover:bg-white text-rose-600 border shadow flex items-center justify-center"
-          (click)="removeFile(i)"
-        >
-          <i class="pi pi-times text-xs"></i>
-        </button>
-
-        <!-- editar -->
-        <button
-          type="button"
-          class="absolute bottom-1 right-1 w-7 h-7 rounded-full bg-white/90 hover:bg-white text-slate-700 border shadow flex items-center justify-center"
-          (click)="editSlot(i)"
-        >
-          <i class="pi pi-pencil text-xs"></i>
-        </button>
-      </div>
-
-      <!-- mostrar slot vacío si no hay imagen -->
-      <div
-        *ngIf="!url"
-        class="relative w-full h-40 rounded-lg border-dashed border-2 border-slate-300 flex items-center justify-center cursor-pointer"
-        (click)="editSlot(i)"
-      >
-        <i class="pi pi-camera text-slate-400 text-xl"></i>
-      </div>
-    </ng-container>
-  </div>
-</ng-template>
-
-
-    <!-- Empty state -->
-    <ng-template #empty>
-      <div class="flex items-center justify-center flex-col p-6">
-        <i class="pi pi-cloud-upload border-2 rounded-full p-8 text-4xl text-gray-400"></i>
-        <p class="mt-6 mb-0">Arrastra y suelta o usa el botón para subir imágenes</p>
-      </div>
-    </ng-template>
-  </p-fileUpload>
-
-  <!-- Input oculto para editar un slot puntual -->
-  <input
-    #slotFileInput
-    type="file"
-    accept="image/*"
-    class="hidden"
-    (change)="onSlotFileChange($event)"
-  />
-</div>
-
       </p-tabPanel>
     </p-tabView>
 

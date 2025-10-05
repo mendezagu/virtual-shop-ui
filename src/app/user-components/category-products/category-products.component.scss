@@ -15,3 +15,8 @@
 [style*="background-color: #202123"] ::ng-deep .p-card-content {
   background: #2a2b32 !important; /* gris clarito para destacar */
 }
+
+::ng-deep .custom-chip-carousel .p-carousel-item {
+  flex: 0 0 auto !important;
+  min-width: 150px !important; /* asegura espacio consistente */
+}

@@ -105,12 +105,82 @@
       </div>
     </header>
 
-    <!-- ===== LAYOUT: contenido + sidebar ===== -->
-    <main
-      class="max-w-6xl mx-auto px-4 sm:px-8 pb-10 grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6"
+    <main class="max-w-6xl mx-auto px-4 sm:px-8 pb-10 mt-6 space-y-10">
+      <!-- 🌟 CATEGORÍAS DESTACADAS -->
+      <!-- 🌟 CATEGORÍAS DESTACADAS -->
+<section *ngIf="featuredCategories.length">
+  <div
+    class="rounded-2xl border shadow-lg p-4 transition-colors"
+    [ngStyle]="{
+      backgroundColor: 'var(--surface)',
+      color: 'var(--text)',
+      borderColor:
+        store?.background_color === 'dark'
+          ? 'rgba(255,255,255,0.08)'
+          : '#e5e7eb'
+    }"
+  >
+    <h3 class="text-sm font-semibold flex items-center gap-2 mb-4">
+      <mat-icon
+        class="!text-[18px]"
+        [ngStyle]="{ color: 'var(--primary)' }"
+        >star</mat-icon
+      >
+      Categorías destacadas
+    </h3>
+
+    <p-carousel
+      [value]="featuredCategories"
+      [numVisible]="2"
+      [numScroll]="1"
+      [circular]="true"
+      [autoplayInterval]="4000"
+      styleClass="custom-carousel"
     >
-      <!-- Contenido principal -->
-      <section class="lg:col-span-8">
+      <ng-template pTemplate="item" let-cat>
+        <a
+          [routerLink]="['/store', slug, 'categoria', cat.slug]"
+          class="block rounded-2xl border shadow hover:shadow-lg transition p-4 h-full bg-[var(--surface)]"
+          [ngStyle]="{
+            color: 'var(--text)',
+            borderColor:
+              store?.background_color === 'dark'
+                ? 'rgba(255,255,255,0.1)'
+                : '#e5e7eb'
+          }"
+        >
+          <div class="flex flex-col items-center text-center gap-2">
+            <img
+              [src]="cat.imageUrl || '../../../assets/lomito.jpg'"
+              [alt]="cat.name"
+              class="h-20 w-20 object-contain rounded-xl"
+            />
+            <div
+              class="font-semibold text-sm"
+              [ngStyle]="{ color: 'var(--secondary)' }"
+            >
+              {{ cat.name }}
+            </div>
+            <div class="text-xs text-slate-500">
+              {{ cat.count }}
+              {{ cat.count === 1 ? 'producto' : 'productos' }}
+            </div>
+            <p-tag
+              *ngIf="cat.type"
+              [value]="cat.type"
+              severity="warning"
+              class="mt-2 text-xs uppercase"
+            ></p-tag>
+          </div>
+        </a>
+      </ng-template>
+    </p-carousel>
+  </div>
+</section>
+
+
+      <!-- 🏷️ CATEGORÍAS NORMALES -->
+      <section *ngIf="normalCategories.length">
         <div
           class="rounded-2xl border shadow-lg p-4 transition-colors"
           [ngStyle]="{
@@ -132,8 +202,8 @@
           </h3>
 
           <div class="mt-4">
-            <ng-container *ngIf="categories?.length; else noCat">
-              <p-dataView [value]="categories" layout="grid" [rows]="6">
+            <ng-container *ngIf="normalCategories.length; else noCat">
+              <p-dataView [value]="normalCategories" layout="grid" [rows]="6">
                 <ng-template pTemplate="grid" let-items>
                   <div
                     class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 w-full"
@@ -144,11 +214,9 @@
                         class="block rounded-2xl border shadow-2xl hover:shadow-lg transition p-4"
                         [ngStyle]="{
                           backgroundColor: 'var(--surface)',
-                          color: 'var(--text)',
-                          
+                          color: 'var(--text)'
                         }"
                       >
-                        <!-- Imagen -->
                         <div class="w-full flex justify-center mb-3">
                           <img
                             [src]="c.imageUrl || '../../../assets/lomito.jpg'"
@@ -157,20 +225,14 @@
                           />
                         </div>
 
-                        <!-- Texto -->
                         <div class="text-center">
                           <div
-                            class="font-semibold text-sm transition"
+                            class="font-semibold text-sm"
                             [ngStyle]="{ color: 'var(--secondary)' }"
                           >
-                            <span [ngStyle]="{ color: 'var(--secondary)' }">
-                              {{ c.name }}
-                            </span>
+                            {{ c.name }}
                           </div>
-                          <div
-                            class="text-xs mt-1"
-                            [ngStyle]="{ color: 'var(--secondary)' }"
-                          >
+                          <div class="text-xs mt-1 text-slate-500">
                             {{ c.count }}
                             {{ c.count === 1 ? "producto" : "productos" }}
                           </div>

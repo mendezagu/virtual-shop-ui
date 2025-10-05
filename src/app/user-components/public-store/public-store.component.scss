@@ -21,3 +21,31 @@
     background: #2a2b32 !important; // un gris un poco más claro que el fondo
   }
 }
+
+
+::ng-deep .custom-carousel .p-carousel-content {
+  padding: 0 0.5rem;
+}
+
+::ng-deep .custom-carousel .p-carousel-item {
+  padding: 0.5rem;
+}
+
+::ng-deep .p-carousel-item a {
+  display: block;
+  height: 100%;
+  text-decoration: none;
+}
+
+::ng-deep .p-carousel-item a:hover {
+  transform: translateY(-2px);
+  transition: transform 0.2s ease;
+}
+
+::ng-deep .p-tag {
+  font-size: 0.7rem !important;
+  letter-spacing: 0.5px;
+  background-color: var(--secondary) !important;
+  color: #fff !important;
+  border: none !important;
+}

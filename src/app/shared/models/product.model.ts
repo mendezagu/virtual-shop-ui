@@ -21,6 +21,11 @@ export interface Producto {
   descripcion: string;
   stock: number;
   precio: number;
+  costo: number;
+  descuento: number;
+  ganancia: number;
+  precio_final: number;
+  precio_mayorista: number;
   imagen_url: string[];
   presentacion_multiple: boolean;
   disponible: boolean;

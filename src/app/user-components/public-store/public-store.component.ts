@@ -7,23 +7,34 @@ import { StoreStateService } from '../../shared/services/private_services/store-
 
 //primeng
 import { DataViewModule } from 'primeng/dataview';
+import { CarouselModule } from 'primeng/carousel';
+import { TagModule } from 'primeng/tag';
 
 @Component({
   selector: 'app-public-store',
   standalone: true,
-  imports: [RouterModule, CommonModule, MatIcon, DataViewModule],
+  imports: [
+    RouterModule,
+    CommonModule,
+    MatIcon,
+    DataViewModule,
+    CarouselModule,
+    TagModule,
+  ],
   templateUrl: './public-store.component.html',
   styleUrl: './public-store.component.scss',
 })
 export class PublicStoreComponent {
-  categories: { name: string; slug: string; count: number }[] = [];
+  categories: any[] = [];
+  featuredCategories: any[] = []; // 👈 nuevas
+  normalCategories: any[] = [];
   slug!: string;
   store: any;
 
   isLoading = true;
   hasError = false;
 
-    constructor(
+  constructor(
     private route: ActivatedRoute,
     private publicStoreService: PublicStoreService,
     private storeState: StoreStateService
@@ -65,8 +76,15 @@ export class PublicStoreComponent {
       },
     });
 
+    // 2️⃣ Cargar categorías
     this.publicStoreService.getCategories(this.slug).subscribe((res) => {
-      this.categories = res.data;
+      this.categories = res.data || [];
+      this.featuredCategories = this.categories.filter(
+        (c) => c.type && c.type !== 'NORMAL'
+      );
+      this.normalCategories = this.categories.filter(
+        (c) => !c.type || c.type === 'NORMAL'
+      );
     });
   }
 

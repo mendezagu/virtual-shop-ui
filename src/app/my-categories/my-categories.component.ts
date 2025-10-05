@@ -32,6 +32,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ChipModule } from 'primeng/chip';
 import { TabViewModule } from 'primeng/tabview';
 import { DropdownModule } from 'primeng/dropdown';
+import { SidebarModule } from 'primeng/sidebar';
 
 export interface CategorySummary {
   id: string; // 👈 nuevo

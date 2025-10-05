@@ -12,29 +12,36 @@
     products[0]?.store?.background_color === 'dark' ? '#2a2b32' : '#f9fafb'
   "
   [ngStyle]="{ backgroundColor: 'var(--bg)', color: 'var(--text)' }"
-
-   [style.--surface-card]="'var(--surface)'"         
-  [style.--surface-ground]="'var(--bg)'"             
-  [style.--surface-section]="'var(--surface)'"       
-  [style.--text-color]="'var(--text)'"               
-  [style.--text-color-secondary]="products[0]?.store?.background_color === 'dark' ? 'rgba(255,255,255,.7)' : 'rgba(17,24,39,.7)'"
+  [style.--surface-card]="'var(--surface)'"
+  [style.--surface-ground]="'var(--bg)'"
+  [style.--surface-section]="'var(--surface)'"
+  [style.--text-color]="'var(--text)'"
+  [style.--text-color-secondary]="
+    products[0]?.store?.background_color === 'dark'
+      ? 'rgba(255,255,255,.7)'
+      : 'rgba(17,24,39,.7)'
+  "
   [style.--card-shadow]="'0 4px 12px rgba(0,0,0,.4)'"
   [ngStyle]="{ backgroundColor: 'var(--bg)', color: 'var(--text)' }"
 >
   <!-- Carrusel de chips -->
-  <div class="relative mb-4">
+  <!-- Carrusel de chips -->
+  <div class="relative mb-4 px-2">
     <p-carousel
       [value]="categoriesWithAll"
-      [numVisible]="4"
-      [numScroll]="2"
+      [numVisible]="2"
+      [numScroll]="1"
       [circular]="false"
       [showIndicators]="false"
       [showNavigators]="true"
       class="w-full"
+      styleClass="custom-chip-carousel"
+      [responsiveOptions]="responsiveOptions"
     >
       <ng-template let-cat pTemplate="item">
         <div
           class="p-3 flex items-center gap-3 cursor-pointer transition-all duration-200 rounded-xl border shadow-md"
+          style="margin: 0 8px"
           [ngStyle]="{
             backgroundColor:
               cat.slug === categorySlug || (!cat.slug && !categorySlug)
@@ -51,19 +58,21 @@
           }"
           (click)="selectCategory(cat.slug)"
         >
-          <!-- Imagen de categoría -->
           <img
             class="w-12 h-12 flex-shrink-0 rounded-lg object-cover"
             [src]="cat.image || '../../../assets/lomito.jpg'"
             [alt]="cat.name"
           />
 
-          <!-- Texto -->
-          <div class="flex-1 flex flex-col">
-            <span class="font-bold text-sm">
+          <div class="flex-1 flex flex-col overflow-hidden">
+            <span
+              class="font-bold text-sm whitespace-nowrap overflow-hidden text-ellipsis"
+            >
               {{ cat.name || "Todos" }}
             </span>
-            <div class="flex items-center gap-1 text-xs opacity-80">
+            <div
+              class="flex items-center gap-1 text-xs opacity-80 whitespace-nowrap overflow-hidden text-ellipsis"
+            >
               <i class="pi pi-tag text-xs"></i>
               <span>{{ cat.count || 0 }} productos</span>
             </div>
@@ -73,10 +82,10 @@
     </p-carousel>
   </div>
 
-  <h1>filtros</h1>
+  <h1 class="px-4">filtros</h1>
 
   <!-- MultiSelect Subcategorías -->
-  <form [formGroup]="formGroup" class="mb-6">
+  <form [formGroup]="formGroup" class="mb-6 px-4">
     <p-multiSelect
       [options]="subcategories"
       formControlName="selectedSubcategories"
@@ -89,7 +98,8 @@
   </form>
 
   <!-- Listado de productos -->
-  <div
+   <div class="px-4">
+      <div
     class="rounded-2xl border shadow-lg p-4 transition-colors"
     [ngStyle]="{
       backgroundColor: 'var(--surface)',
@@ -122,40 +132,51 @@
       *ngIf="!isLoading && !hasError && products.length"
       class="flex flex-col gap-4 md:grid md:grid-cols-3 xl:grid-cols-4 md:gap-6"
     >
-   <p-card
-  *ngFor="let p of products"
-  [routerLink]="['/producto', p.id_producto]"
-  [styleClass]="'!bg-transparent !rounded-xl !border shadow-lg'"
-  [ngStyle]="{
-    width: '100%',
-    color: 'var(--text)',
-    borderColor: products[0]?.store?.background_color === 'dark'
-      ? 'rgba(255,255,255,0.08)'
-      : '#e5e7eb'
-  }"
->
-  <ng-template pTemplate="header">
-    <img
-      [src]="(p.imagen_url && p.imagen_url[0]) || '../../../assets/lomito.jpg'"
-      [alt]="p.nombre_producto"
-      class="w-full h-40 object-cover rounded-t-lg"
-    />
-  </ng-template>
+      <p-card
+        *ngFor="let p of products"
+        [routerLink]="['/producto', p.id_producto]"
+        [styleClass]="'!bg-transparent !rounded-xl !border shadow-lg'"
+        [ngStyle]="{
+          width: '100%',
+          color: 'var(--text)',
+          borderColor:
+            products[0]?.store?.background_color === 'dark'
+              ? 'rgba(255,255,255,0.08)'
+              : '#e5e7eb'
+        }"
+      >
+        <ng-template pTemplate="header">
+          <img
+            [src]="
+              (p.imagen_url && p.imagen_url[0]) || '../../../assets/lomito.jpg'
+            "
+            [alt]="p.nombre_producto"
+            class="w-full h-40 object-cover rounded-t-lg"
+          />
+        </ng-template>
 
-  <h3 class="text-lg font-semibold line-clamp-1" [ngStyle]="{ color: 'var(--primary)' }">
-    {{ p.nombre_producto }}
-  </h3>
-  <p class="text-sm opacity-90 truncate">
-    {{ p.descripcion }}
-  </p>
-  <p class="text-base font-bold mt-2" [ngStyle]="{ color: 'var(--secondary)' }">
-    {{
+        <h3
+          class="text-lg font-semibold line-clamp-1"
+          [ngStyle]="{ color: 'var(--primary)' }"
+        >
+          {{ p.nombre_producto }}
+        </h3>
+        <p class="text-sm opacity-90 truncate">
+          {{ p.descripcion }}
+        </p>
+        <p
+          class="text-base font-bold mt-2"
+          [ngStyle]="{ color: 'var(--secondary)' }"
+        >
+          {{
       p.presentacion_multiple
         ? (p.variants?.[0]?.precio || p.precio)
         : (p.precio | currency:'ARS':'symbol-narrow':'1.0-0')
-    }}
-  </p>
-</p-card>
+          }}
+        </p>
+      </p-card>
     </div>
   </div>
+   </div>
+
 </div>
