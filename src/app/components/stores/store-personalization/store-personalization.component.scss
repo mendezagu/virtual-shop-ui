@@ -1,27 +1,69 @@
-.card {
-  padding: 1rem;
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  max-width: 400px;
+/* Elimina el recuadro feo del fileUpload */
+::ng-deep .no-frame-upload .p-fileupload-content,
+::ng-deep .no-frame-upload .p-fileupload-buttonbar {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
 }
 
-.field {
-  margin-bottom: 1.5rem;
+/* Botón moderno */
+::ng-deep .fancy-upload-btn .p-button {
+  background-color: #3b82f6 !important; /* azul suave */
+  color: #fff !important;
+  font-weight: 600;
+  border-radius: 9999px !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 0.85rem !important;
+  box-shadow: 0 2px 5px rgba(59, 130, 246, 0.3);
+  transition: all 0.2s ease-in-out;
+}
+
+::ng-deep .fancy-upload-btn .p-button:hover {
+  background-color: #2563eb !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);
+}
+
+/* Ajuste general del file upload */
+::ng-deep .no-frame-upload .p-fileupload {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: center;
 }
 
-label {
+
+/* 🔹 Quita los recuadros del fileUpload */
+::ng-deep .no-frame-upload-banner .p-fileupload-content,
+::ng-deep .no-frame-upload-banner .p-fileupload-buttonbar {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* 🔹 Ajuste visual del contenedor del upload */
+::ng-deep .no-frame-upload-banner .p-fileupload {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 🔹 Botón moderno y elegante (color rosado para distinguir del logo) */
+::ng-deep .fancy-upload-btn .p-button {
+  background-color: #ec4899 !important; /* Rosa elegante */
+  color: #fff !important;
   font-weight: 600;
-  min-width: 120px;
+  border-radius: 9999px !important;
+  padding: 0.5rem 1.25rem !important;
+  font-size: 0.85rem !important;
+  border: none !important;
+  box-shadow: 0 2px 6px rgba(236, 72, 153, 0.35);
+  transition: all 0.2s ease-in-out;
 }
 
-.preview {
-  display: inline-block;
-  width: 2rem;
-  height: 2rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+::ng-deep .fancy-upload-btn .p-button:hover {
+  background-color: #db2777 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(219, 39, 119, 0.4);
 }

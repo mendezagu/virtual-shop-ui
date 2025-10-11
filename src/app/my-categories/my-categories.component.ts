@@ -33,6 +33,10 @@ import { ChipModule } from 'primeng/chip';
 import { TabViewModule } from 'primeng/tabview';
 import { DropdownModule } from 'primeng/dropdown';
 import { SidebarModule } from 'primeng/sidebar';
+import { FileUploadModule } from 'primeng/fileupload';
+import { DialogModule } from 'primeng/dialog';
+import { OnboardingService } from '../shared/services/private_services/onboarding.service';
+import { PageHeaderComponent } from "../shared/components/page-header/page-header.component";
 
 export interface CategorySummary {
   id: string; // 👈 nuevo
@@ -42,7 +46,7 @@ export interface CategorySummary {
   imageUrl?: string | null;
   products?: Producto[];
   loading?: boolean;
-    // 👇 nuevos
+  // 👇 nuevos
   type?: 'NORMAL' | 'PROMOCION' | 'DESTACADO' | 'OFERTA';
   subcategories?: CategorySummary[];
 }
@@ -68,8 +72,11 @@ export interface CategorySummary {
     ConfirmDialogModule,
     ChipModule,
     TabViewModule,
-    DropdownModule
-  ],
+    DropdownModule,
+    FileUploadModule,
+    DialogModule,
+    PageHeaderComponent
+],
   providers: [MessageService, ConfirmationService],
   templateUrl: './my-categories.component.html',
   styleUrls: ['./my-categories.component.scss'],
@@ -86,11 +93,15 @@ export class MyCategoriesComponent implements OnInit {
   specialCategories: any[] = [];
 
   specialTypes = [
-  { label: 'Promoción', value: 'PROMOCION' },
-  { label: 'Destacados', value: 'DESTACADO' },
-  { label: 'Ofertas', value: 'OFERTA' },
-];
+    { label: 'Promoción', value: 'PROMOCION' },
+    { label: 'Destacados', value: 'DESTACADO' },
+    { label: 'Ofertas', value: 'OFERTA' },
+  ];
   selectedImageFile?: File;
+  selectedSpecialImageFile?: File;
+
+  showCategoryDialog = false;
+  showSpecialDialog = false;
 
   searchCtrl = new FormControl('');
   storeId = ''; // ⚡ para endpoints privados
@@ -103,7 +114,8 @@ export class MyCategoriesComponent implements OnInit {
     private productService: ProductService,
     private categoryService: CategoryService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private onboardingService: OnboardingService
   ) {}
 
   ngOnInit(): void {
@@ -112,9 +124,9 @@ export class MyCategoriesComponent implements OnInit {
     });
 
     this.newSpecialCategoryForm = this.fb.group({
-    name: ['', [Validators.required, Validators.minLength(2)]],
-    type: ['PROMOCION', Validators.required],
-  });
+      name: ['', [Validators.required, Validators.minLength(2)]],
+      type: ['PROMOCION', Validators.required],
+    });
 
     // 1. Traer las tiendas del usuario
     this.storeService.getMyStores().subscribe({
@@ -123,6 +135,9 @@ export class MyCategoriesComponent implements OnInit {
           this.storeId = stores[0].id_tienda;
           this.storeSlug = stores[0].link_tienda;
           this.loadCategories();
+          setTimeout(() => {
+          this.onboardingService.startCategoriesTour();
+        }, 1000);
         } else {
           this.isLoading = false;
         }
@@ -134,49 +149,53 @@ export class MyCategoriesComponent implements OnInit {
     });
   }
 
-loadCategories(page: number = 1, limit: number = 10) {
-  if (!this.storeSlug) return;
+  loadCategories(page: number = 1, limit: number = 10) {
+    if (!this.storeSlug) return;
 
-  this.categoryService.getCategories(this.storeSlug, page, limit).subscribe({
-    next: (res) => {
-      const allCategories: CategorySummary[] = Array.isArray(res.data) ? res.data : [];
+    this.categoryService.getCategories(this.storeSlug, page, limit).subscribe({
+      next: (res) => {
+        const allCategories: CategorySummary[] = Array.isArray(res.data)
+          ? res.data
+          : [];
 
-      // 🔹 separar normales y especiales
-      this.categories = allCategories.filter((c: CategorySummary) => c.type === 'NORMAL');
-      this.specialCategories = allCategories.filter((c: CategorySummary) => c.type !== 'NORMAL');
+        // 🔹 separar normales y especiales
+        this.categories = allCategories.filter(
+          (c: CategorySummary) => c.type === 'NORMAL'
+        );
+        this.specialCategories = allCategories.filter(
+          (c: CategorySummary) => c.type !== 'NORMAL'
+        );
 
-      // generar formularios de edición para normales
-      this.categories.forEach((c: CategorySummary) => {
-        this.categoryForms[c.id] = this.fb.group({
-          name: [c.name, [Validators.required, Validators.minLength(2)]],
+        // generar formularios de edición para normales
+        this.categories.forEach((c: CategorySummary) => {
+          this.categoryForms[c.id] = this.fb.group({
+            name: [c.name, [Validators.required, Validators.minLength(2)]],
+          });
+
+          this.subCategoryForms[c.id] = this.fb.group({
+            name: ['', [Validators.required, Validators.minLength(2)]],
+            subcategories: [c.subcategories || []],
+          });
         });
 
-        this.subCategoryForms[c.id] = this.fb.group({
-          name: ['', [Validators.required, Validators.minLength(2)]],
-          subcategories: [c.subcategories || []],
+        // generar formularios de edición para especiales
+        this.specialCategories.forEach((sc: CategorySummary) => {
+          this.categoryForms[sc.id] = this.fb.group({
+            name: [sc.name, [Validators.required, Validators.minLength(2)]],
+          });
         });
-      });
 
-      // generar formularios de edición para especiales
-      this.specialCategories.forEach((sc: CategorySummary) => {
-        this.categoryForms[sc.id] = this.fb.group({
-          name: [sc.name, [Validators.required, Validators.minLength(2)]],
-        });
-      });
-
-      this.isLoading = false;
-    },
-    error: (err) => {
-      console.error('Error cargando categorías:', err);
-      this.isLoading = false;
-      this.hasError = true;
-      this.categories = [];
-      this.specialCategories = [];
-    },
-  });
-}
-
-
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error cargando categorías:', err);
+        this.isLoading = false;
+        this.hasError = true;
+        this.categories = [];
+        this.specialCategories = [];
+      },
+    });
+  }
 
   loadProducts(category: CategorySummary) {
     if (!this.storeSlug) return;
@@ -198,103 +217,116 @@ loadCategories(page: number = 1, limit: number = 10) {
   }
 
   onFileSelected(event: any) {
-    const file: File = event.target.files[0];
-    if (file) {
-      this.selectedImageFile = file;
-    }
+    const file: File = event.files?.[0];
+    if (file) this.selectedImageFile = file;
+  }
+
+  onSpecialFileSelected(event: any) {
+    const file: File = event.files?.[0];
+    if (file) this.selectedSpecialImageFile = file;
+  }
+
+  // 🔹 Abrir diálogo
+  openCategoryDialog() {
+    this.showCategoryDialog = true;
+  }
+
+  openSpecialDialog() {
+    this.showSpecialDialog = true;
   }
 
   createCategory() {
     if (this.newCategoryForm.invalid) return;
     const name = this.newCategoryForm.value.name;
 
-    this.confirmationService.confirm({
-      message: `¿Quieres crear la categoría "${name}"?`,
-      header: 'Confirmar creación',
-      icon: 'pi pi-check-circle',
-      acceptLabel: 'Sí, crear',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-success p-button-sm',
-      rejectButtonStyleClass: 'p-button-text p-button-sm',
-      accept: () => {
-        // 1️⃣ Crear la categoría (sin imagen aún)
-        this.categoryService.createCategory(this.storeId, name).subscribe({
-          next: (cat) => {
-            // 2️⃣ Si hay imagen, la subimos
-            if (this.selectedImageFile) {
-              this.categoryService
-                .uploadCategoryImage(cat.id, this.selectedImageFile)
-                .subscribe({
-                  next: (updated) => {
-                    this.categories.push({
-                      ...updated,
-                      count: 0,
-                      products: [],
-                    });
-                    this.newCategoryForm.reset();
-                    this.selectedImageFile = undefined;
-                    this.messageService.add({
-                      severity: 'success',
-                      summary: 'Categoría creada',
-                      detail: `"${updated.name}" fue creada con imagen.`,
-                    });
-                  },
-                  error: () => {
-                    this.messageService.add({
-                      severity: 'warn',
-                      summary: 'Categoría creada',
-                      detail: `"${cat.name}" fue creada, pero no se pudo subir la imagen.`,
-                    });
-                  },
-                });
-            } else {
-              // Si no hay imagen, solo agregamos la categoría
-              this.categories.push({ ...cat, count: 0, products: [] });
-              this.newCategoryForm.reset();
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Categoría creada',
-                detail: `"${cat.name}" fue creada exitosamente.`,
-              });
-            }
-          },
-          error: () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo crear la categoría.',
-            });
-          },
-        });
-      },
-    });
-  }
-
-createSpecialCategory() {
-  if (this.newSpecialCategoryForm.invalid) return;
-  const { name, type } = this.newSpecialCategoryForm.value;
-
-  this.categoryService.createCategory(this.storeId, name, undefined, type)
-    .subscribe({
+    this.categoryService.createCategory(this.storeId, name).subscribe({
       next: (cat) => {
-        this.specialCategories.push(cat); // 👈 se agrega a especiales
-        this.newSpecialCategoryForm.reset({ type: 'PROMOCION' });
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Categoría especial creada',
-          detail: `"${cat.name}" fue creada como ${cat.type}.`,
-        });
+        if (this.selectedImageFile) {
+          this.categoryService
+            .uploadCategoryImage(cat.id, this.selectedImageFile)
+            .subscribe({
+              next: (updated) => {
+                this.categories.push(updated);
+                this.messageService.add({
+                  severity: 'success',
+                  summary: 'Categoría creada',
+                  detail: `"${updated.name}" fue creada con imagen.`,
+                });
+                this.resetDialogForm();
+              },
+            });
+        } else {
+          this.categories.push(cat);
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Categoría creada',
+            detail: `"${cat.name}" fue creada exitosamente.`,
+          });
+          this.resetDialogForm();
+        }
       },
-      error: () => {
+      error: () =>
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'No se pudo crear la categoría especial.',
-        });
-      },
+          detail: 'No se pudo crear la categoría.',
+        }),
     });
-}
+  }
 
+  resetDialogForm() {
+    this.newCategoryForm.reset();
+    this.selectedImageFile = undefined;
+    this.showCategoryDialog = false;
+  }
+
+  // 🔹 Crear categoría especial (con imagen)
+  createSpecialCategory() {
+    if (this.newSpecialCategoryForm.invalid) return;
+    const { name, type } = this.newSpecialCategoryForm.value;
+
+    this.categoryService
+      .createCategory(this.storeId, name, undefined, type)
+      .subscribe({
+        next: (cat) => {
+          if (this.selectedSpecialImageFile) {
+            this.categoryService
+              .uploadCategoryImage(cat.id, this.selectedSpecialImageFile)
+              .subscribe({
+                next: (updated) => {
+                  this.specialCategories.push(updated);
+                  this.messageService.add({
+                    severity: 'success',
+                    summary: 'Categoría especial creada',
+                    detail: `"${updated.name}" fue creada como ${updated.type} con imagen.`,
+                  });
+                  this.resetSpecialDialogForm();
+                },
+              });
+          } else {
+            this.specialCategories.push(cat);
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Categoría especial creada',
+              detail: `"${cat.name}" fue creada como ${cat.type}.`,
+            });
+            this.resetSpecialDialogForm();
+          }
+        },
+        error: () =>
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudo crear la categoría especial.',
+          }),
+      });
+  }
+
+  resetSpecialDialogForm() {
+    this.newSpecialCategoryForm.reset({ type: 'PROMOCION' });
+    this.selectedSpecialImageFile = undefined;
+    this.showSpecialDialog = false;
+  }
 
   // Crear subcategoría
   createSubCategory(parentId: string) {

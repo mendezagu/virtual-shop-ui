@@ -44,3 +44,115 @@
 /* Reset y tipografía */
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+/*------------------TURORIAL/
+
+/* ======= 🎯 ESTILO MODERNO DEL TOUR (Shepherd.js) ======= */
+
+/* Contenedor principal del tooltip */
+.shepherd-element {
+  max-width: 260px !important;
+  border-radius: 18px !important;
+  background: linear-gradient(145deg, #ffffff, #fafafa);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  font-family: 'Inter', 'Poppins', sans-serif;
+  color: #1f2937;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* Efecto suave al aparecer */
+.shepherd-element.shepherd-open {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+/* Header del paso (si hay título) */
+.shepherd-header {
+  background-color: var(--primary, #7e22ce);
+  color: #fff !important;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Texto del paso */
+.shepherd-text {
+  font-size: 0.85rem !important;
+  line-height: 1.4;
+  padding: 1rem;
+  color: #374151;
+  text-align: left;
+}
+
+/* Botonera */
+.shepherd-footer {
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  background-color: #fafafa;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+/* Botones */
+.shepherd-button {
+  border-radius: 9999px !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+  padding: 6px 14px !important;
+  transition: all 0.2s ease-in-out;
+  border: none;
+}
+
+/* Botón principal (Siguiente / Finalizar) */
+.shepherd-button:last-child {
+  background: var(--secondary, #ec4899) !important;
+  color: #fff !important;
+}
+.shepherd-button:last-child:hover {
+  background: #db2777 !important;
+  box-shadow: 0 4px 10px rgba(236, 72, 153, 0.3);
+}
+
+/* Botón “Atrás” */
+.shepherd-button:first-child {
+  background-color: #f3f4f6 !important;
+  color: #374151 !important;
+}
+.shepherd-button:first-child:hover {
+  background-color: #e5e7eb !important;
+}
+
+/* Botón de cerrar (X) */
+.shepherd-cancel-icon {
+  top: 0.6rem !important;
+  right: 0.8rem !important;
+  font-size: 1rem !important;
+  color: #9ca3af !important;
+  transition: color 0.2s ease;
+}
+.shepherd-cancel-icon:hover {
+  color: var(--secondary, #ec4899) !important;
+}
+
+/* Flecha que apunta al elemento */
+.shepherd-arrow:before {
+  background: linear-gradient(145deg, #ffffff, #f5f5f5);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Fondo oscuro detrás del tour */
+.shepherd-modal-overlay-container {
+  background-color: rgba(0, 0, 0, 0.55) !important;
+  backdrop-filter: blur(3px);
+}
+
+/* Animaciones sutiles */
+.shepherd-element,
+.shepherd-modal-overlay-container {
+  transition: all 0.3s ease-in-out;
+}

@@ -1,140 +1,109 @@
-<div class="mt-6">
-  <!-- Encabezado -->
-  <div class="px-4 sm:px-12 mb-4">
-    <div
-      class="inline-flex items-center gap-2 rounded-full border border-pink-200 bg-pink-50 px-3 py-1 text-xs text-pink-700"
-    >
-      <span class="h-2 w-2 rounded-full bg-pink-500"></span>
-      Inventario
-    </div>
-    <h1 class="mt-2 text-3xl font-semibold tracking-tight text-pink-500">
-      Mis categorías
-    </h1>
-    <p class="text-sm text-slate-500 mt-1">
-      Visualiza, crea y administra las categorías de tu tienda.
-    </p>
-  </div>
+<div class="mt-6 px-4 sm:px-10 lg:px-12 pb-10">
+  <!-- 🔹 Encabezado -->
+  <app-page-header
+    title="Mis categorías"
+    subtitle="Visualizá, creá y administrá las categorías de tu tienda."
+    icon="pi pi-objects-column"
+  ></app-page-header>
 
-  <!-- Contenido -->
+  <!-- 🔹 Tabs -->
   <p-tabView>
-    <!-- TAB 1: Categorías normales -->
-    <p-tabPanel header="Categorías">
-      <!-- Crear nueva categoría -->
-      <div class="px-4 sm:px-12 mb-6">
-        <form
-          [formGroup]="newCategoryForm"
-          (ngSubmit)="createCategory()"
-          class="flex flex-col sm:flex-row items-center gap-3"
-        >
-          <!-- Nombre -->
-          <input
-            type="text"
-            pInputText
-            formControlName="name"
-            placeholder="Nueva categoría"
-            class="flex-1"
-          />
+    <!-- TAB NORMAL -->
+    <p-tabPanel>
+      <ng-template pTemplate="header">
+        <i class="pi pi-objects-column"></i>
+        <span class="ml-2">Categorías</span>
+      </ng-template>
 
-          <!-- Subir imagen -->
-          <input
-            type="file"
-            accept="image/*"
-            (change)="onFileSelected($event)"
-            class="text-sm"
-          />
-
-          <!-- Botón crear -->
-          <button
-            type="submit"
-            pButton
-            icon="pi pi-plus"
-            class="p-button-rounded p-button-success"
-            [disabled]="newCategoryForm.invalid"
-          ></button>
-        </form>
+      <!-- Botón crear -->
+      <div class="flex justify-end mt-6 mb-8">
+        <button
+          pButton
+          label="Nueva categoría"
+          icon="pi pi-plus"
+          class="rounded-full font-semibold px-5 py-2.5 text-white bg-gradient-to-r from-[var(--secondary)] to-[var(--primary)] shadow-md hover:shadow-lg hover:scale-[1.02] transition-transform"
+          (click)="openCategoryDialog()"
+        ></button>
       </div>
-      <div class="px-4 sm:px-12">
+
+      <!-- 🔸 Listado -->
+      <div>
         <ng-container *ngIf="categories?.length; else emptyTpl">
-          <p-accordion
-            class="w-full"
-            expandIcon="pi pi-plus"
-            collapseIcon="pi pi-minus"
-          >
+          <p-accordion [multiple]="true" class="space-y-4">
             <p-accordionTab
               *ngFor="let c of categories"
               (onOpen)="c.isOpen = true; loadProducts(c)"
               (onClose)="c.isOpen = false"
+              class="rounded-2xl overflow-hidden border border-slate-200 bg-white/80 backdrop-blur-md shadow-sm hover:shadow-md transition-all duration-300"
             >
-              <!-- HEADER -->
+              <!-- HEADER ÚNICO (sin [header]) -->
               <ng-template pTemplate="header">
-                <span class="flex items-center gap-3 w-full">
-                  <p-avatar
-                    *ngIf="c.imageUrl; else defaultIcon"
-                    [image]="c.imageUrl"
-                    shape="circle"
-                    styleClass="border border-slate-200"
-                  ></p-avatar>
-                  <ng-template #defaultIcon>
-                    <p-avatar
-                      icon="pi pi-folder"
-                      shape="circle"
-                      styleClass="bg-pink-100 text-pink-500"
-                    ></p-avatar>
-                  </ng-template>
-                  <span
-                    class="font-medium text-slate-800 block max-w-[120px] truncate sm:max-w-none"
-                  >
+                <div class="flex items-center w-full">
+                  <!-- Columna fija para icono/avatar (8rem) -->
+                  <div class="w-20 shrink-0">
+                    <div
+                      class="w-10 h-10 rounded-full overflow-hidden ring-1 ring-slate-200 bg-white"
+                    >
+                      <ng-container *ngIf="c.imageUrl; else folderIcon">
+                        <img
+                          [src]="c.imageUrl"
+                          alt=""
+                          class="w-full h-full object-cover"
+                        />
+                      </ng-container>
+                      <ng-template #folderIcon>
+                        <div
+                          class="w-full h-full flex items-center justify-center bg-[var(--secondary)]/10 text-[var(--secondary)]"
+                        >
+                          <i class="pi pi-folder text-base"></i>
+                        </div>
+                      </ng-template>
+                    </div>
+                  </div>
+
+                  <!-- Nombre -->
+                  <span class="font-medium text-slate-700 truncate">
                     {{ c.name }}
                   </span>
-                  <p-badge
-                    [value]="c.count"
-                    severity="success"
-                    class="ml-auto mr-2"
-                  ></p-badge>
-                </span>
+
+                  <!-- Derecha -->
+                  <div class="ml-auto flex items-center gap-2">
+                    <p-badge [value]="c.count" severity="success"></p-badge>
+                    <small class="text-slate-400">Productos</small>
+                  </div>
+                </div>
               </ng-template>
 
-              <!-- CUERPO DEL TAB -->
-              <div class="space-y-4">
-                <!-- Form edición categoría -->
+              <!-- CUERPO -->
+              <div class="p-4 space-y-4">
+                <!-- Edición -->
                 <form
                   [formGroup]="categoryForms[c.id]"
                   (ngSubmit)="updateCategory(c)"
-                  class="flex items-center gap-2"
+                  class="flex items-center gap-3"
                 >
                   <i class="pi pi-bars text-slate-400"></i>
                   <input
-                    type="text"
                     pInputText
                     formControlName="name"
-                    class="flex-1"
+                    class="flex-1 rounded-xl border-slate-200 focus:border-[var(--secondary)]"
                   />
-                  <button
-                    type="button"
-                    pButton
-                    icon="pi pi-plus"
-                    class="p-button-rounded p-button-success h-10 w-10"
-                    (click)="
-                      subCategoryForms[c.id].valid && createSubCategory(c.id)
-                    "
-                  ></button>
-                  <button
-                    type="button"
-                    pButton
-                    icon="pi pi-trash"
-                    class="p-button-rounded p-button-danger h-10 w-10"
-                    (click)="deleteCategory(c)"
-                  ></button>
+                  <div class="flex gap-2">
+                    <button
+                      type="button"
+                      pButton
+                      icon="pi pi-trash"
+                      class="p-button-rounded p-button-danger h-10 w-10"
+                      (click)="deleteCategory(c)"
+                    ></button>
+                  </div>
                 </form>
 
                 <!-- Subcategorías -->
-                <div
-                  class="pl-8 mt-3 space-y-2"
-                  *ngIf="c.subcategories?.length"
-                >
+                <div *ngIf="c.subcategories?.length" class="pl-8 space-y-2">
                   <div
                     *ngFor="let sub of c.subcategories"
-                    class="flex items-center gap-2"
+                    class="flex items-center gap-3"
                   >
                     <i class="pi pi-angle-right text-slate-400"></i>
                     <input
@@ -142,37 +111,36 @@
                       pInputText
                       [value]="sub.name"
                       disabled
-                      class="flex-1"
+                      class="flex-1 rounded-xl border-slate-200"
                     />
                     <button
                       type="button"
                       pButton
                       icon="pi pi-trash"
-                      class="p-button-rounded p-button-danger h-10 w-10"
+                      class="p-button-rounded p-button-danger h-9 w-9"
                       (click)="deleteCategory(sub)"
                     ></button>
                   </div>
                 </div>
 
-                <!-- Crear subcategoría -->
+                <!-- Nueva subcategoría -->
                 <form
                   [formGroup]="subCategoryForms[c.id]"
                   (ngSubmit)="createSubCategory(c.id)"
-                  class="pl-8 mt-3 flex items-center gap-2"
+                  class="pl-8 flex items-center gap-3"
                 >
                   <i class="pi pi-angle-right text-slate-400"></i>
                   <input
-                    type="text"
                     pInputText
                     formControlName="name"
                     placeholder="Nueva Subcategoría"
-                    class="flex-1"
+                    class="flex-1 rounded-xl border-slate-200 focus:border-[var(--secondary)]"
                   />
                   <button
                     type="submit"
                     pButton
                     icon="pi pi-plus"
-                    class="p-button-rounded p-button-success h-10 w-10"
+                    class="p-button-rounded p-button-success h-9 w-9"
                     [disabled]="subCategoryForms[c.id].invalid"
                   ></button>
                 </form>
@@ -184,143 +152,219 @@
         <!-- Estado vacío -->
         <ng-template #emptyTpl>
           <div
-            class="bg-white border border-slate-200 rounded-2xl shadow-sm p-10 text-center"
+            class="text-center rounded-3xl border border-slate-200 bg-white/80 backdrop-blur-md p-12 shadow-sm hover:shadow-md transition"
           >
             <div
-              class="mx-auto w-14 h-14 rounded-2xl bg-pink-50 flex items-center justify-center text-pink-500 mb-3"
+              class="mx-auto w-16 h-16 rounded-2xl bg-[var(--secondary)]/10 text-[var(--secondary)] flex items-center justify-center mb-4"
             >
-              <i class="pi pi-tags text-2xl"></i>
+              <i class="pi pi-tags text-3xl"></i>
             </div>
             <h3 class="text-lg font-semibold text-slate-800">
               Aún no tienes categorías
             </h3>
-            <p class="text-sm text-slate-500 mt-1">
-              Crea tu primera categoría para organizar tus productos.
+            <p class="text-slate-500 text-sm mt-1">
+              Creá tu primera categoría para organizar tus productos.
             </p>
           </div>
         </ng-template>
       </div>
     </p-tabPanel>
 
-    <!-- TAB 2: Categorías especiales -->
-  <!-- TAB 2: Categorías especiales -->
-<p-tabPanel header="Categorías Especiales">
-  <!-- Crear nueva categoría especial -->
-  <div class="px-4 sm:px-12 mb-6">
-    <form
-      [formGroup]="newSpecialCategoryForm"
-      (ngSubmit)="createSpecialCategory()"
-      class="flex flex-col sm:flex-row items-center gap-3"
-    >
-      <!-- Nombre -->
-      <input
-        type="text"
-        pInputText
-        formControlName="name"
-        placeholder="Nueva categoría especial"
-        class="flex-1"
-      />
+    <!-- TAB ESPECIALES -->
+    <p-tabPanel>
+      <ng-template pTemplate="header">
+        <i class="pi pi-star"></i>
+        <span class="ml-2">Categorías especiales</span>
+      </ng-template>
 
-      <!-- Tipo de categoría especial -->
-      <p-dropdown
-        [options]="specialTypes"
-        formControlName="type"
-        placeholder="Tipo"
-        optionLabel="label"
-        optionValue="value"
-      ></p-dropdown>
-
-      <!-- Botón crear -->
-      <button
-        type="submit"
-        pButton
-        icon="pi pi-plus"
-        class="p-button-rounded p-button-success"
-        [disabled]="newSpecialCategoryForm.invalid"
-      ></button>
-    </form>
-  </div>
-
-  <div class="px-4 sm:px-12">
-    <ng-container *ngIf="specialCategories?.length; else emptySpecialTpl">
-      <p-accordion
-        class="w-full"
-        expandIcon="pi pi-plus"
-        collapseIcon="pi pi-minus"
-      >
-        <p-accordionTab *ngFor="let sc of specialCategories">
-          <!-- HEADER -->
-          <ng-template pTemplate="header">
-            <span class="flex items-center gap-3 w-full">
-              <p-avatar
-                icon="pi pi-star"
-                shape="circle"
-                styleClass="bg-yellow-100 text-yellow-600"
-              ></p-avatar>
-              <span
-                class="font-medium text-slate-800 block max-w-[120px] truncate sm:max-w-none"
-              >
-                {{ sc.name }}
-              </span>
-              <p-chip
-                [label]="sc.type"
-                class="ml-auto"
-                styleClass="bg-pink-50 text-pink-500"
-              ></p-chip>
-            </span>
-          </ng-template>
-
-          <!-- CUERPO DEL TAB (solo edición / borrado, sin subcategorías) -->
-          <div class="space-y-4">
-            <!-- Form edición categoría especial -->
-            <form
-              [formGroup]="categoryForms[sc.id]"
-              (ngSubmit)="updateCategory(sc)"
-              class="flex items-center gap-2"
-            >
-              <i class="pi pi-bars text-slate-400"></i>
-              <input
-                type="text"
-                pInputText
-                formControlName="name"
-                class="flex-1"
-              />
-              <button
-                type="button"
-                pButton
-                icon="pi pi-trash"
-                class="p-button-rounded p-button-danger h-10 w-10"
-                (click)="deleteCategory(sc)"
-              ></button>
-            </form>
-          </div>
-        </p-accordionTab>
-      </p-accordion>
-    </ng-container>
-
-    <!-- Estado vacío -->
-    <ng-template #emptySpecialTpl>
-      <div
-        class="bg-white border border-slate-200 rounded-2xl shadow-sm p-10 text-center"
-      >
-        <div
-          class="mx-auto w-14 h-14 rounded-2xl bg-yellow-50 flex items-center justify-center text-yellow-600 mb-3"
-        >
-          <i class="pi pi-star text-2xl"></i>
-        </div>
-        <h3 class="text-lg font-semibold text-slate-800">
-          Aún no tienes categorías especiales
-        </h3>
-        <p class="text-sm text-slate-500 mt-1">
-          Aquí podrás crear promociones, ofertas o productos destacados.
-        </p>
+      <div class="flex justify-end mt-6 mb-8">
+        <button
+          pButton
+          label="Nueva categoría especial"
+          icon="pi pi-plus"
+          class="rounded-full font-semibold px-5 py-2.5 text-white bg-gradient-to-r from-[var(--secondary)] to-[var(--primary)] shadow-md hover:shadow-lg hover:scale-[1.02] transition-transform"
+          (click)="openSpecialDialog()"
+        ></button>
       </div>
-    </ng-template>
-  </div>
-</p-tabPanel>
 
+      <div>
+        <ng-container *ngIf="specialCategories?.length; else emptySpecialTpl">
+          <p-accordion [multiple]="true" class="space-y-4">
+            <p-accordionTab
+              *ngFor="let sc of specialCategories"
+              class="rounded-2xl overflow-hidden border border-slate-200 bg-white/80 backdrop-blur-md shadow-sm hover:shadow-md transition-all duration-300"
+            >
+              <ng-template pTemplate="header">
+                <div class="flex items-center gap-3 w-full">
+                  <p-avatar
+                    icon="pi pi-star"
+                    shape="circle"
+                    styleClass="bg-yellow-100 text-yellow-600"
+                  ></p-avatar>
+                  <span class="font-medium text-slate-700">{{ sc.name }}</span>
+                  <p-chip
+                    [label]="sc.type"
+                    class="ml-auto text-xs font-semibold px-3 py-1 rounded-full bg-[var(--secondary)]/10 text-[var(--secondary)]"
+                  ></p-chip>
+                </div>
+              </ng-template>
+
+              <div class="p-4 space-y-4">
+                <form
+                  [formGroup]="categoryForms[sc.id]"
+                  (ngSubmit)="updateCategory(sc)"
+                  class="flex items-center gap-3"
+                >
+                  <i class="pi pi-bars text-slate-400"></i>
+                  <input
+                    pInputText
+                    formControlName="name"
+                    class="flex-1 rounded-xl border-slate-200 focus:border-[var(--secondary)]"
+                  />
+                  <button
+                    type="button"
+                    pButton
+                    icon="pi pi-trash"
+                    class="p-button-rounded p-button-danger h-10 w-10"
+                    (click)="deleteCategory(sc)"
+                  ></button>
+                </form>
+              </div>
+            </p-accordionTab>
+          </p-accordion>
+        </ng-container>
+
+        <ng-template #emptySpecialTpl>
+          <div
+            class="text-center rounded-3xl border border-slate-200 bg-white/80 backdrop-blur-md p-12 shadow-sm hover:shadow-md transition"
+          >
+            <div
+              class="mx-auto w-16 h-16 rounded-2xl bg-yellow-50 text-yellow-600 flex items-center justify-center mb-4"
+            >
+              <i class="pi pi-star text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-800">
+              Aún no tienes categorías especiales
+            </h3>
+            <p class="text-slate-500 text-sm mt-1">
+              Aquí podrás crear promociones, ofertas o productos destacados.
+            </p>
+          </div>
+        </ng-template>
+      </div>
+    </p-tabPanel>
   </p-tabView>
 </div>
+
+<!-- 🔹 Dialogos -->
+<p-dialog
+  header="Nueva categoría"
+  [(visible)]="showCategoryDialog"
+  [modal]="true"
+  class="rounded-2xl overflow-hidden"
+>
+  <form
+    [formGroup]="newCategoryForm"
+    (ngSubmit)="createCategory()"
+    class="flex flex-col gap-4"
+  >
+    <input
+      pInputText
+      formControlName="name"
+      placeholder="Nombre de la categoría"
+      class="rounded-xl border-slate-200 focus:border-[var(--secondary)]"
+    />
+
+    <p-fileUpload
+      name="imagen"
+      mode="basic"
+      chooseLabel="Subir imagen"
+      chooseIcon="pi pi-upload"
+      accept="image/*"
+      maxFileSize="2000000"
+      (onSelect)="onFileSelected($event)"
+      [auto]="false"
+      [customUpload]="true"
+    ></p-fileUpload>
+
+    <div class="flex justify-end gap-3 mt-4">
+      <button
+        pButton
+        type="button"
+        label="Cancelar"
+        class="p-button-text"
+        (click)="showCategoryDialog = false"
+      ></button>
+      <button
+        pButton
+        type="submit"
+        label="Crear"
+        icon="pi pi-check"
+        [disabled]="newCategoryForm.invalid"
+        class="bg-gradient-to-r from-[var(--secondary)] to-[var(--primary)] text-white rounded-full px-5 py-2.5 shadow-md hover:scale-[1.02] transition-transform"
+      ></button>
+    </div>
+  </form>
+</p-dialog>
+
+<p-dialog
+  header="Nueva categoría especial"
+  [(visible)]="showSpecialDialog"
+  [modal]="true"
+  class="rounded-2xl overflow-hidden"
+>
+  <form
+    [formGroup]="newSpecialCategoryForm"
+    (ngSubmit)="createSpecialCategory()"
+    class="flex flex-col gap-4"
+  >
+    <input
+      pInputText
+      formControlName="name"
+      placeholder="Nombre de la categoría especial"
+      class="rounded-xl border-slate-200 focus:border-[var(--secondary)]"
+    />
+
+    <p-dropdown
+      [options]="specialTypes"
+      formControlName="type"
+      placeholder="Tipo de categoría"
+      optionLabel="label"
+      optionValue="value"
+      class="w-full"
+    ></p-dropdown>
+
+    <p-fileUpload
+      name="imagen"
+      mode="basic"
+      chooseLabel="Subir imagen"
+      chooseIcon="pi pi-upload"
+      accept="image/*"
+      maxFileSize="2000000"
+      (onSelect)="onSpecialFileSelected($event)"
+      [auto]="false"
+      [customUpload]="true"
+    ></p-fileUpload>
+
+    <div class="flex justify-end gap-3 mt-4">
+      <button
+        pButton
+        type="button"
+        label="Cancelar"
+        class="p-button-text"
+        (click)="showSpecialDialog = false"
+      ></button>
+      <button
+        pButton
+        type="submit"
+        label="Crear"
+        icon="pi pi-check"
+        [disabled]="newSpecialCategoryForm.invalid"
+        class="bg-gradient-to-r from-[var(--secondary)] to-[var(--primary)] text-white rounded-full px-5 py-2.5 shadow-md hover:scale-[1.02] transition-transform"
+      ></button>
+    </div>
+  </form>
+</p-dialog>
 
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>

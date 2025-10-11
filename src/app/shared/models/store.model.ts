@@ -20,6 +20,8 @@ export interface Store {
   primary_color?: string;   // color primario de la tienda
   secondary_color?: string; // color secundario de la tienda
   background_color?: string;
+  logo_url?: string
+  portada_url?: string
 }
 
 // Lo que ENVIÁS al crear
@@ -39,7 +41,9 @@ export interface CreateStoreDto {
   longitud?: number;
   primary_color?: string;   // color primario de la tienda
   secondary_color?: string; // color secundario de la tienda
-   background_color?: string;
+  background_color?: string;
+  portada_url?: string
+  logo_url?: string
 }
 
 // Lo que ENVIÁS al actualizar

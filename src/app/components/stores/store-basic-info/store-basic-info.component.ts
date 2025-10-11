@@ -20,6 +20,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { DropdownModule } from 'primeng/dropdown';
 import { EditorModule } from 'primeng/editor';
 import { ButtonModule } from 'primeng/button';
+import { SkeletonModule } from "primeng/skeleton";
+import { DialogModule } from 'primeng/dialog';
 
 interface Category {
   name: string;
@@ -40,19 +42,24 @@ interface Category {
     InputTextModule,
     DropdownModule,
     EditorModule,
-    ButtonModule
-  ],
+    ButtonModule,
+    SkeletonModule,
+    DialogModule
+],
   templateUrl: './store-basic-info.component.html',
   styleUrls: ['./store-basic-info.component.scss'],
 })
 export class MyStoreComponent implements OnInit {
-  @Output() saved = new EventEmitter<void>();
+  @Output() saved = new EventEmitter<Store>();
 
   text: string | undefined;
   storeForm!: FormGroup;
   storeData!: Store | null;
   isLoading = true;
   messages: Message[] = [];
+
+  showPreview = false;
+  isMobile = false;
 
   categories: Category[] = [
     { name: 'Tecnologia', code: 'Tech' },
@@ -63,6 +70,13 @@ export class MyStoreComponent implements OnInit {
   constructor(private storeService: StoreService, private fb: FormBuilder) {}
 
 ngOnInit(): void {
+
+  // 🔹 Detectar si es mobile
+  this.isMobile = window.innerWidth < 1024;
+
+  window.addEventListener('resize', () => {
+    this.isMobile = window.innerWidth < 1024;
+  });
   this.messages = [
     {
       severity: 'info',
@@ -138,37 +152,29 @@ saveChanges() {
   }
 
   const v = this.storeForm.value;
-
-  // 🔥 rubro debe ser array
   const payload = {
     ...v,
     rubro: v.rubro ? [v.rubro.code] : [],
   };
-
-  // 🚫 el backend no acepta link_tienda → lo quitamos
   delete (payload as any).link_tienda;
 
-  if (this.storeData) {
-    this.storeService
-      .updateStore(this.storeData.id_tienda, payload)
-      .subscribe({
-        next: () => {
-          alert('Cambios guardados correctamente');
-          this.storeForm.markAsPristine();
-          this.saved.emit();
-        },
-        error: () => alert('Error al guardar cambios'),
-      });
-  } else {
-    this.storeService.createStore(payload).subscribe({
-      next: (newStore) => {
-        alert('Tienda creada correctamente');
-        this.storeData = newStore;
-        this.saved.emit();
-      },
-      error: () => alert('Error al crear tienda'),
-    });
-  }
+  this.isLoading = true;
+
+  const request$ = this.storeData
+    ? this.storeService.updateStore(this.storeData.id_tienda, payload)
+    : this.storeService.createStore(payload);
+
+  request$.subscribe({
+    next: (newStore) => {
+      this.storeData = newStore;
+      this.isLoading = false;
+      this.saved.emit(this.storeData); // 🔥 Esto avanza al siguiente paso automáticamente
+    },
+    error: () => {
+      this.isLoading = false;
+      alert('Error al guardar tienda');
+    },
+  });
 }
 
 

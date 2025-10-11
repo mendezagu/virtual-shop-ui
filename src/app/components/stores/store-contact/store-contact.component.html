@@ -1,45 +1,60 @@
 <div class="mt-5 px-4 sm:px-8 w-full">
-  <!-- Descripción -->
-  <div class="mb-5">
-    <p class="text-sm text-slate-500 mt-1">
-      Agrega tu información de contacto para que los clientes se comuniquen con
-      vos
-    </p>
-  </div>
+  <!-- ===== CONTENIDO PRINCIPAL ===== -->
+  <div class="flex flex-col lg:grid lg:grid-cols-5 gap-8 items-start w-full">
 
-  <div>
-    <!-- Loading skeleton -->
-    <ng-container *ngIf="isLoading; else formTpl">
-      <div class="p-6 sm:p-10 space-y-4 animate-pulse">
-        <div class="h-5 w-1/3 bg-slate-200 rounded"></div>
-        <div class="h-12 bg-slate-200 rounded"></div>
-        <div class="h-12 bg-slate-200 rounded"></div>
+    <!-- ===== FORMULARIO ===== -->
+    <div class="lg:col-span-3 flex flex-col w-full">
+      <!-- Encabezado -->
+      <div class="flex gap-3 font-semibold items-center mb-3">
+        <i class="pi pi-question-circle text-gray-600 text-lg"></i>
+        <span class="text-gray-700">Información de contacto</span>
       </div>
-    </ng-container>
 
-    <!-- Formulario -->
-    <ng-template #formTpl>
-      <form [formGroup]="form" (ngSubmit)="save()" class="space-y-6">
-        <!-- Fila 1: Teléfono + Email -->
+      <!-- Card informativa -->
+      <div
+        class="rounded-2xl border border-gray-200 bg-white shadow-md p-5 transition-shadow duration-300 hover:shadow-lg"
+      >
+        <div class="flex gap-1">
+          <i class="pi pi-info-circle text-gray-500 mt-1"></i>
+          <small class="block text-gray-500 leading-relaxed font-medium">
+            Podes ingresar tus datos de contacto, email y redes sociales para
+            que los clientes puedan comunicarse con vos fácilmente.
+          </small>
+        </div>
+
+        <div class="flex gap-1 mt-3">
+          <i class="pi pi-mobile text-gray-500 mt-1"></i>
+          <small class="block text-gray-500 leading-relaxed font-medium">
+            Podes previsualizar en tiempo real los datos ingresados con el simulador de tu tienda que se encuentra en la seccion final de la pagina.
+          </small>
+        </div>
+      </div>
+
+      <!-- Descripción -->
+      <div class="mb-5 mt-6">
+        <p class="text-sm text-slate-500 mt-1">
+          Agregá tus datos para que tus clientes puedan comunicarse.
+        </p>
+      </div>
+
+      <!-- Formulario -->
+      <form [formGroup]="form" (ngSubmit)="save()" class="space-y-6 w-full">
+        <!-- Teléfono + Email -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <!-- Teléfono -->
           <div class="flex flex-col w-full">
-            <label
-              for="telefono_contacto"
-              class="mb-1 text-sm font-medium text-slate-700"
-            >
+            <label class="mb-1 text-sm font-medium text-slate-700">
               Teléfono de contacto
             </label>
+            <small class="text-gray-600 mb-1">
+              El número asociado a tu WhatsApp
+            </small>
 
             <div class="flex items-center w-full gap-2">
-              <!-- Prefijo fijo -->
               <span
                 class="px-3 py-2 bg-slate-100 text-slate-600 rounded-l-md border border-r-0 border-slate-300 text-sm"
               >
                 +54 9
               </span>
-
-              <!-- Input del usuario -->
               <p-inputMask
                 mask="9999999999"
                 formControlName="telefono_contacto"
@@ -49,23 +64,15 @@
                 inputStyleClass="w-full"
               ></p-inputMask>
             </div>
-
-            <!--<p-inputNumber
-              formControlName="telefono_contacto"
-              inputId="telefono_contacto"
-              pKeyFilter="int"
-              class="block w-full"
-              styleClass="w-full"
-              [inputStyle]="{ width: '100%' }"
-              inputStyleClass="w-full"
-            ></p-inputNumber> -->
           </div>
 
-          <!-- Email -->
           <div class="flex flex-col w-full">
-            <label for="email" class="mb-1 text-sm font-medium text-slate-700">
+            <label class="mb-1 text-sm font-medium text-slate-700">
               Email de contacto
             </label>
+            <small class="text-gray-600 mb-1">
+              Este email estará visible para tus clientes
+            </small>
             <input
               pInputText
               formControlName="email_contacto"
@@ -81,13 +88,15 @@
           <label class="block text-sm font-medium text-slate-700 mb-2">
             Redes sociales
           </label>
+          <small class="text-gray-600 mb-2">
+            Si tu tienda tiene redes sociales, podés agregarlas acá
+          </small>
 
           <div formArrayName="redes_sociales" class="space-y-3">
             <div
               *ngFor="let ctrl of redesSociales.controls; let i = index"
               class="flex flex-col sm:flex-row gap-3 w-full"
             >
-              <!-- Input -->
               <input
                 pInputText
                 [formControlName]="i"
@@ -95,59 +104,136 @@
                 class="flex-1 w-full"
               />
 
-              <!-- Botón -->
-              <div class="flex justify-center sm:justify-start">
-                <p-button
-                  [disabled]="redesSociales.length <= 2"
-                  size="small"
-                  label="Quitar"
-                  [text]="true"
-                  [raised]="true"
-                  severity="secondary"
-                  (click)="removeRed(i)"
-                  class="w-auto sm:w-auto"
-                />
-              </div>
+              <p-button
+                [disabled]="redesSociales.length <= 2"
+                size="small"
+                label="Quitar"
+                [text]="true"
+                [raised]="true"
+                severity="secondary"
+                (click)="removeRed(i)"
+                class="w-auto sm:w-auto"
+              />
             </div>
           </div>
 
-          <p-button
-            type="button"
-            size="small"
-            label="+ Agregar red"
-            [text]="true"
-            [raised]="true"
-            severity="success"
-            (click)="addRed()"
-            class="mt-3 w-full sm:w-auto"
-          />
+          <!-- Botón agregar -->
+          <div class="flex flex-row gap-3 mt-3 w-full">
+            <p-button
+              type="button"
+              size="small"
+              label="+ Agregar red"
+              [text]="true"
+              [raised]="true"
+              severity="success"
+              (click)="addRed()"
+              class="flex-1 sm:flex-none sm:w-auto"
+            />
+          </div>
         </div>
 
         <!-- Divider -->
         <div
           class="my-4 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"
         ></div>
-
-        <!-- Botones -->
-        <div class="flex items-center justify-end gap-3">
-          <p-button
-            type="button"
-            severity="secondary"
-            label="Cancelar"
-            [outlined]="true"
-            [rounded]="true"
-            size="small"
-          />
-          <p-button
-            type="submit"
-            [disabled]="form.invalid || form.pristine"
-            label="Guardar cambios"
-            [rounded]="true"
-            severity="success"
-            size="small"
-          />
-        </div>
       </form>
-    </ng-template>
+    </div>
+
+    <!-- ===== VISTA PREVIA (Desktop) ===== -->
+    <div class="lg:col-span-2 flex justify-center lg:justify-end w-full mt-6 lg:mt-0">
+      <div
+        class="relative w-[320px] aspect-[9/16] bg-black rounded-[2.3rem] shadow-2xl border-[10px] border-black overflow-hidden transform scale-95 lg:scale-100 transition-transform duration-300"
+      >
+        <div class="absolute inset-0 bg-white rounded-[2rem] overflow-hidden flex flex-row">
+          <!-- Sidebar (80%) -->
+          <div class="w-[80%] bg-white border-r border-slate-200 shadow-lg z-10 flex flex-col justify-between">
+            <div class="p-4 flex flex-col gap-4 text-[13px]">
+              <div>
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 bg-slate-700 rounded-md flex items-center justify-center text-[10px] font-bold text-white">
+                    LOGO
+                  </div>
+                  <span class="font-semibold text-[14px] text-slate-900 truncate">
+                    {{ storeData?.nombre_tienda || "Mi tienda" }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-2">
+                <i class="pi pi-whatsapp text-green-500 text-[14px] mt-[2px]"></i>
+                <div>
+                  <p class="font-medium text-slate-700 text-[12px] mb-[1px]">Contacto</p>
+                  <p class="text-slate-500 text-[12px]">
+                    {{ form.value.telefono_contacto || "Sin número asignado" }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-2">
+                <i class="pi pi-envelope text-blue-500 text-[14px] mt-[2px]"></i>
+                <div>
+                  <p class="font-medium text-slate-700 text-[12px] mb-[1px]">Email</p>
+                  <p class="text-slate-500 text-[12px]">
+                    {{ form.value.email_contacto || "Sin email asignado" }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-2">
+                <i class="pi pi-globe text-purple-500 text-[14px] mt-[2px]"></i>
+                <div>
+                  <p class="font-medium text-slate-700 text-[12px] mb-[1px]">Redes sociales</p>
+                  <ul class="text-slate-500 text-[11px] list-disc pl-4 space-y-1">
+                    <li *ngFor="let r of form.value.redes_sociales">
+                      {{ r || "Sin URL" }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-4 py-2 border-t border-slate-200 text-[11px] text-slate-400">
+              <p>© Tu tienda</p>
+            </div>
+          </div>
+
+          <!-- Zona blanca -->
+          <div class="w-[20%] bg-white flex items-center justify-center relative">
+            <div class="absolute top-0 left-0 w-full h-full bg-white shadow-inner"></div>
+            <i class="pi pi-angle-left text-slate-300 text-lg"></i>
+          </div>
+        </div>
+
+        <!-- Notch superior -->
+        <div
+          class="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-4 bg-black rounded-b-2xl"
+        ></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BOTONES FINALES ===== -->
+  <div class="flex flex-row justify-end gap-3 mt-8 w-full lg:max-w-5xl mx-auto">
+    <p-button
+      type="button"
+      severity="secondary"
+      label="Atrás"
+      [outlined]="true"
+      [rounded]="true"
+      size="small"
+      class="flex-1 sm:flex-none min-w-[120px]"
+    ></p-button>
+
+  <p-button
+  type="button"
+  (click)="save()"
+  [disabled]="form.invalid || isLoading"
+  label="Siguiente paso"
+  severity="success"
+  [rounded]="true"
+  size="small"
+  class="flex-1 sm:flex-none min-w-[120px]"
+></p-button>
   </div>
 </div>

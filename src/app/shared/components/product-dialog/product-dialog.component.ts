@@ -44,6 +44,8 @@ import { Message } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
 import { UploadService } from '../../services/private_services/upload.service';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { ProductStateService } from '../../services/private_services/product-state.service';
+
 
 type CategorySummary = {
   id: string;
@@ -80,28 +82,21 @@ type CategorySummary = {
   providers: [MessageService, PrimeNGConfig],
 })
 export class ProductDialogComponent implements OnInit, OnChanges {
-  // Inputs para reutilizar en crear/editar
   @Input() product?: Producto;
   @Input() storeId?: string;
-
   @Input() visible: boolean = false;
   @Output() visibleChange = new EventEmitter<boolean>();
 
-  // UI
-  //visible = false;
   messages: Message[] = [];
   showNewCategory = false;
 
-  // Formulario
   productForm!: FormGroup;
-
   myStores: Store[] = [];
   selectedStoreId!: string;
   selectedStoreSlug = '';
 
   categories: CategorySummary[] = [];
 
-  // 📂 Upload
   files: (File | null)[] = [null, null, null];
   preview: (string | null)[] = [null, null, null];
   totalSize = 0;
@@ -110,7 +105,6 @@ export class ProductDialogComponent implements OnInit, OnChanges {
   @ViewChild('slotFileInput') slotFileInput!: ElementRef<HTMLInputElement>;
   private slotToEdit: number | null = null;
 
-  // Opciones enums
   unidadOptions = [
     { label: 'Unidad', value: 'UNIDAD' },
     { label: 'Kilogramo', value: 'KILOGRAMO' },
@@ -130,10 +124,12 @@ export class ProductDialogComponent implements OnInit, OnChanges {
     private fb: FormBuilder,
     private productService: ProductService,
     private storeService: StoreService,
-    private publicStoreService: PublicStoreService,
     private config: PrimeNGConfig,
     private messageService: MessageService,
-    private uploadService: UploadService
+    private uploadService: UploadService,
+    private productState: ProductStateService
+    // ✅ Nuevo
+    
   ) {}
 
   get hasPreview(): boolean {
@@ -143,23 +139,15 @@ export class ProductDialogComponent implements OnInit, OnChanges {
   private setInitialPreview(product?: Producto) {
     const imgs = product?.imagen_url ?? [];
     this.preview = [imgs[0] ?? null, imgs[1] ?? null, imgs[2] ?? null];
-    this.files = [null, null, null]; // limpiamos referencias locales
+    this.files = [null, null, null];
   }
 
   ngOnInit() {
     this.initForm();
 
-    // 👇 Escucha cambios en precio o costo y recalcula automáticamente
-    this.productForm.get('precio')?.valueChanges.subscribe(() => {
-      this.updateGananciaYPrecioFinal();
-    });
-    this.productForm.get('costo')?.valueChanges.subscribe(() => {
-      this.updateGananciaYPrecioFinal();
-    });
-
-    this.productForm.get('descuento')?.valueChanges.subscribe(() => {
-      this.updateGananciaYPrecioFinal();
-    });
+    this.productForm.get('precio')?.valueChanges.subscribe(() => this.updateGananciaYPrecioFinal());
+    this.productForm.get('costo')?.valueChanges.subscribe(() => this.updateGananciaYPrecioFinal());
+    this.productForm.get('descuento')?.valueChanges.subscribe(() => this.updateGananciaYPrecioFinal());
 
     this.messages = [
       {
@@ -169,18 +157,22 @@ export class ProductDialogComponent implements OnInit, OnChanges {
       },
     ];
 
-    if (this.product) this.setInitialPreview(this.product);
-
     if (this.product) {
+      this.setInitialPreview(this.product);
       this.patchForm(this.product);
     }
 
-    this.storeService.getMyStores().subscribe((stores) => {
-      this.myStores = stores;
-      if (stores.length > 0) {
-        this.selectedStoreId = stores[0].id_tienda as any;
-        this.selectedStoreSlug = (stores[0] as any)?.link_tienda || '';
-        this.loadCategories();
+    // ✅ Ya no llamamos a getMyStores ni loadCategories
+    // En lugar de eso, usamos el estado compartido:
+    this.productState.categories$.subscribe((cats) => {
+      if (cats) {
+        this.categories = cats.map((c: any) => ({
+          id: c.id,
+          name: c.name,
+          slug: c.slug,
+          count: c.count || 0,
+          imageUrl: c.imageUrl || null,
+        }));
       }
     });
 
@@ -190,11 +182,7 @@ export class ProductDialogComponent implements OnInit, OnChanges {
         if (val) {
           this.productForm.get('stock')?.disable();
           this.productForm.get('precio')?.disable();
-
-          // 👉 solo al activar, agrego una variante si está vacío
-          if (this.variants.length === 0) {
-            this.agregarVariante();
-          }
+          if (this.variants.length === 0) this.agregarVariante();
         } else {
           this.productForm.get('stock')?.enable();
           this.productForm.get('precio')?.enable();
@@ -208,9 +196,8 @@ export class ProductDialogComponent implements OnInit, OnChanges {
       const p: Producto | undefined = changes['product'].currentValue;
       if (p) {
         this.patchForm(p);
-        this.setInitialPreview(p); // 👈 precarga previews en edición
+        this.setInitialPreview(p);
       } else {
-        // si se limpia el producto (modo crear)
         this.preview = [null, null, null];
         this.files = [null, null, null];
       }
@@ -242,51 +229,28 @@ export class ProductDialogComponent implements OnInit, OnChanges {
     });
   }
 
- private updateGananciaYPrecioFinal(): void {
-  const precio = Number(this.productForm.get('precio')?.value) || 0;
-  const costo = Number(this.productForm.get('costo')?.value) || 0;
-  const descuento = Number(this.productForm.get('descuento')?.value) || 0;
+  private updateGananciaYPrecioFinal(): void {
+    const precio = Number(this.productForm.get('precio')?.value) || 0;
+    const costo = Number(this.productForm.get('costo')?.value) || 0;
+    const descuento = Number(this.productForm.get('descuento')?.value) || 0;
 
-  // Si el usuario no completó precio, reiniciamos valores
-  if (!precio) {
-    this.productForm.patchValue(
-      {
-        ganancia: 0,
-        precio_final: 0,
-      },
-      { emitEvent: false } // evitamos bucles infinitos
-    );
-    return;
+    if (!precio) {
+      this.productForm.patchValue({ ganancia: 0, precio_final: 0 }, { emitEvent: false });
+      return;
+    }
+
+    const descuentoAplicado = precio * (descuento / 100);
+    const precioFinal = precio - descuentoAplicado;
+    const ganancia = precioFinal - costo;
+
+    this.productForm.patchValue({ ganancia, precio_final: precioFinal }, { emitEvent: false });
   }
-
-  // 🔹 Aplicar descuento como porcentaje
-  const descuentoAplicado = precio * (descuento / 100);
-
-  // 🔹 Calcular precio final después del descuento
-  const precioFinal = precio - descuentoAplicado;
-
-  // 🔹 Calcular ganancia en base al precio final y costo
-  const ganancia = precioFinal - costo;
-
-  // 🔹 Actualizar los campos sin disparar valueChanges nuevamente
-  this.productForm.patchValue(
-    {
-      ganancia,
-      precio_final: precioFinal,
-    },
-    { emitEvent: false }
-  );
-}
-
 
   private patchForm(product: Producto) {
     let categoryId = (product as any).categoryId || '';
 
-    // fallback: si no tiene categoryId pero sí un nombre viejo
     if (!categoryId && product.category?.name) {
-      const match = this.categories.find(
-        (c) => c.name === product.category?.name
-      );
+      const match = this.categories.find((c) => c.name === product.category?.name);
       if (match) categoryId = match.id;
     }
 
@@ -302,7 +266,6 @@ export class ProductDialogComponent implements OnInit, OnChanges {
       ganancia: product.ganancia,
       precio_final: product.precio_final,
       precio_mayorista: product.precio_mayorista,
-
       presentacion_multiple: product.presentacion_multiple,
       sku: (product as any).sku || '',
       codigo_barras: (product as any).codigo_barras || '',
@@ -316,7 +279,7 @@ export class ProductDialogComponent implements OnInit, OnChanges {
     });
 
     if (product.variants?.length) {
-      this.variants.clear(); // 🔑 para no duplicar
+      this.variants.clear();
       product.variants.forEach((v) =>
         this.variants.push(
           this.fb.group({
@@ -329,7 +292,6 @@ export class ProductDialogComponent implements OnInit, OnChanges {
     }
   }
 
-  // Variantes
   get variants() {
     return this.productForm.get('variants') as FormArray;
   }
@@ -347,25 +309,6 @@ export class ProductDialogComponent implements OnInit, OnChanges {
     this.variants.removeAt(index);
   }
 
-  // Categorías
-  private loadCategories() {
-    if (!this.selectedStoreSlug) return;
-    this.publicStoreService.getCategories(this.selectedStoreSlug).subscribe({
-      next: (res) => {
-        this.categories = (res.data || []).map((c: any) => ({
-          id: c.id, // 👈 usamos slug como id
-          name: c.name || c.nombre || 'Sin nombre',
-          slug: c.slug,
-          count: c.count || 0,
-          imageUrl: c.imageUrl || null,
-        }));
-      },
-      error: (_) => {
-        this.categories = [];
-      },
-    });
-  }
-
   onCategorySelectChange(value: string) {
     if (value === '__NEW__') {
       this.showNewCategory = true;
@@ -374,9 +317,7 @@ export class ProductDialogComponent implements OnInit, OnChanges {
     } else {
       this.showNewCategory = false;
       this.productForm.get('categoria')?.clearValidators();
-      this.productForm
-        .get('categoriaSelect')
-        ?.setValidators([Validators.required]);
+      this.productForm.get('categoriaSelect')?.setValidators([Validators.required]);
     }
     this.productForm.get('categoria')?.updateValueAndValidity();
     this.productForm.get('categoriaSelect')?.updateValueAndValidity();
@@ -391,6 +332,7 @@ export class ProductDialogComponent implements OnInit, OnChanges {
     this.visible = false;
     this.visibleChange.emit(this.visible);
   }
+
   // Manejo de archivos
 
   async onFileSelect(event: any): Promise<void> {

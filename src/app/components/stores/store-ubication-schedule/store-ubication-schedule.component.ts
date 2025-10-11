@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -16,6 +16,8 @@ import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
 import { Message } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
+import { SkeletonModule } from "primeng/skeleton";
+import { DialogModule } from "primeng/dialog";
 
 interface City {
   name: string;
@@ -35,7 +37,9 @@ interface City {
     ButtonModule,
     AvatarModule,
     MessagesModule,
-  ],
+    SkeletonModule,
+    DialogModule
+],
   templateUrl: './store-ubication-schedule.component.html',
   styleUrl: './store-ubication-schedule.component.scss',
 })
@@ -48,8 +52,9 @@ export class StoreUbicationScheduleComponent {
   selectedCity: City | undefined;
 
   form!: FormGroup;
-  storeData!: Store | null;
+  @Input() storeData: any;
   isLoading = true;
+  showPreview = false;
 
   constructor(private storeService: StoreService, private fb: FormBuilder) {}
 
@@ -152,26 +157,40 @@ private parseTime(value: string | null): Date | null {
     return `${hours}:${minutes}`;
   }
 
-  save() {
-    if (!this.storeData) return;
-
-    const v = this.form.value;
-    const payload = {
-      direccion: v.direccion || undefined,
-      ciudad: v.ciudad || undefined,
-      latitud: v.latitud != null ? Number(v.latitud) : undefined,
-      longitud: v.longitud != null ? Number(v.longitud) : undefined,
-      horario_apertura: this.formatTime(v.horario_apertura),
-      horario_cierre: this.formatTime(v.horario_cierre),
-    };
-
-    this.storeService.updateStore(this.storeData.id_tienda, payload).subscribe({
-      next: () => {
-        alert('Ubicación actualizada');
-        this.form.markAsPristine();
-        this.saved.emit();
-      },
-      error: () => alert('Error al guardar ubicación'),
-    });
+save() {
+  if (!this.storeData) {
+    alert('Primero debes crear la información básica de la tienda.');
+    return;
   }
+
+  if (this.form.invalid) {
+    this.form.markAllAsTouched();
+    return;
+  }
+
+  this.isLoading = true;
+
+  const v = this.form.value;
+  const payload = {
+    direccion: v.direccion || undefined,
+    ciudad: v.ciudad || undefined,
+    latitud: v.latitud != null ? Number(v.latitud) : undefined,
+    longitud: v.longitud != null ? Number(v.longitud) : undefined,
+    horario_apertura: this.formatTime(v.horario_apertura),
+    horario_cierre: this.formatTime(v.horario_cierre),
+  };
+
+  this.storeService.updateStore(this.storeData.id_tienda, payload).subscribe({
+    next: () => {
+      this.isLoading = false;
+      this.form.markAsPristine();
+      this.saved.emit(); // 🔥 Hace avanzar el stepper automáticamente
+    },
+    error: () => {
+      this.isLoading = false;
+      alert('Error al guardar la ubicación');
+    },
+  });
+}
+
 }

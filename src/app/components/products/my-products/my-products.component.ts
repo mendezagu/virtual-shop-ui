@@ -28,6 +28,11 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from "primeng/confirmdialog";
+import { SkeletonModule } from 'primeng/skeleton';
+
+// Estado reactivo
+import { ProductStateService } from '../../../shared/services/private_services/product-state.service';
+import { PageHeaderComponent } from "../../../shared/components/page-header/page-header.component";
 
 @Component({
   selector: 'app-my-products',
@@ -41,7 +46,7 @@ import { ConfirmDialogModule } from "primeng/confirmdialog";
     MatFormFieldModule,
     MatInputModule,
     MatPaginatorModule,
-    //primeng
+    // PrimeNG
     DialogModule,
     ProductDialogComponent,
     AccordionModule,
@@ -50,7 +55,9 @@ import { ConfirmDialogModule } from "primeng/confirmdialog";
     PaginatorModule,
     InputTextareaModule,
     ToastModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    SkeletonModule,
+    PageHeaderComponent
 ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './my-products.component.html',
@@ -59,17 +66,20 @@ import { ConfirmDialogModule } from "primeng/confirmdialog";
 export class MyProductsComponent implements OnInit {
   @ViewChild('accordion') accordion: any;
 
+  /** Estado reactivo */
+  products$ = this.productState.products$;
+  categories$ = this.productState.categories$;
+
+  /** UI */
   disabledFields = true;
   isLoading = true;
-
-  productos: Producto[] = [];
 
   totalItems = 0;
   pageSize = 5;
   currentPage = 0;
 
-  /** 👇 Guardamos el slug público de la tienda para pasarlo al diálogo */
   currentStoreSlug?: string;
+  currentStoreId?: string;
 
   searchCtrl = new FormControl<string>('', { nonNullable: true });
 
@@ -81,20 +91,38 @@ export class MyProductsComponent implements OnInit {
     private productService: ProductService,
     private storeService: StoreService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private productState: ProductStateService
   ) {}
 
-  ngOnInit(): void {
-    this.loadProducts(this.currentPage, this.pageSize);
+ngOnInit(): void {
+    /** 🔹 Cargar tienda del usuario solo una vez */
+    this.storeService.getMyPrimaryStore().subscribe((store) => {
+      if (store) {
+        this.currentStoreSlug = store.link_tienda;
+        this.currentStoreId = store.id_tienda;
 
+        // Inicializar estado reactivo global
+        this.productState.init(store.id_tienda, store.link_tienda);
+        this.isLoading = false;
+      }
+    });
+
+    /** 🔹 Búsqueda reactiva */
     this.searchCtrl.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe((term) => {
-        this.currentPage = 0;
-        this.loadProducts(this.currentPage, this.pageSize, term || '');
+        this.productState.setSearch(term);
       });
   }
 
+  /** Mantiene la carga tradicional (retrocompatibilidad con tu template actual) */
+
+
+  /** ========================
+   * 🔸 Diálogos y Acciones CRUD
+   * ======================== */
+ /** CRUD */
   openCreateDialog() {
     this.createVisible = true;
   }
@@ -104,14 +132,57 @@ export class MyProductsComponent implements OnInit {
     this.editVisible = true;
   }
 
-  getTotalStock(product: Producto): number {
+ onDeleteProduct(productId: string) {
+    this.confirmationService.confirm({
+      message: '¿Deseas eliminar este producto?',
+      header: 'Confirmar eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      acceptButtonStyleClass: 'p-button-danger p-button-sm',
+      rejectButtonStyleClass: 'p-button-text p-button-sm',
+      accept: () => {
+        this.productService.deleteProduct(productId).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Eliminado',
+              detail: 'El producto fue eliminado correctamente.',
+            });
+            this.productState.deleteProduct(productId);
+          },
+          error: () => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'No se pudo eliminar el producto.',
+            });
+          },
+        });
+      },
+    });
+  }
+
+  /** ========================
+   * 🔸 Paginación
+   * ======================== */
+  onPageChange(event: any) {
+    this.pageSize = event.rows;
+    this.currentPage = event.page;
+    this.productState.setPage(event.page + 1);
+  }
+
+  /** ========================
+   * 🔸 Utilidades visuales
+   * ======================== */
+getTotalStock(product: Producto): number {
     if (product.presentacion_multiple && product.variants?.length) {
       return product.variants.reduce((sum, v) => sum + (v.stock || 0), 0);
     }
     return product.stock || 0;
   }
 
-  getMinPrice(product: Producto): number {
+getMinPrice(product: Producto): number {
     if (product.presentacion_multiple && product.variants?.length) {
       return Math.min(...product.variants.map((v) => v.precio || 0));
     }
@@ -127,89 +198,6 @@ export class MyProductsComponent implements OnInit {
     if (product.presentacion_multiple) {
       product.stock = this.getTotalStock(product);
     }
-  }
-
-  loadProducts(
-    page: number = 0,
-    limit: number = this.pageSize,
-    search: string = ''
-  ) {
-    this.isLoading = true;
-
-    this.storeService.getMyStores().subscribe({
-      next: (stores) => {
-        const store = stores?.[0];
-        const idTienda = store?.id_tienda;
-
-        this.currentStoreSlug = store?.link_tienda;
-
-        if (!idTienda) {
-          this.productos = [];
-          this.totalItems = 0;
-          this.isLoading = false;
-          return;
-        }
-
-        this.productService
-          .getProductsByStore(idTienda, page + 1, limit, search)
-          .subscribe({
-            next: (res) => {
-              this.productos = res.data;
-              this.totalItems = res.meta?.total ?? res.data?.length ?? 0;
-              this.isLoading = false;
-            },
-            error: () => {
-              this.isLoading = false;
-            },
-          });
-      },
-      error: () => (this.isLoading = false),
-    });
-  }
-
-  onDeleteProduct(productId: string) {
-    this.confirmationService.confirm({
-      message: '¿Estás seguro de que deseas eliminar este producto?',
-      header: 'Confirmar eliminación',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sí',
-      rejectLabel: 'No',
-      acceptButtonStyleClass: 'p-button-danger p-button-sm',
-      rejectButtonStyleClass: 'p-button-text p-button-sm',
-      accept: () => {
-        this.productService.deleteProduct(productId).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Producto eliminado',
-              detail: 'El producto fue eliminado correctamente.',
-            });
-            this.loadProducts(
-              this.currentPage,
-              this.pageSize,
-              this.searchCtrl.value || ''
-            );
-          },
-          error: () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo eliminar el producto.',
-            });
-          },
-        });
-      },
-    });
-  }
-
-  onPageChange(event: any) {
-    this.pageSize = event.rows;
-    this.currentPage = event.page;
-    this.loadProducts(
-      this.currentPage,
-      this.pageSize,
-      this.searchCtrl.value || ''
-    );
   }
 
   uploadImage(product: any, index: number) {

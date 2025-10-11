@@ -1,55 +1,208 @@
-/* Accordion look moderno */
-.modern-accordion .mat-expansion-panel {
-  border: 1px solid #e5e7eb; /* slate-200 */
+:host {
+  display: block;
+  --primary: var(--primary, #7e22ce);
+  --secondary: var(--secondary, #ec4899);
+}
+
+/* === CONTENEDOR BASE === */
+.products-container {
+  background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+  min-height: 100vh;
+}
+
+/* === ACCORDION === */
+.modern-accordion .p-accordion-tab {
   border-radius: 1rem;
+  margin-bottom: 0.75rem !important;
   overflow: hidden;
-  margin-bottom: 12px;
-  box-shadow: 0 1px 2px rgba(2, 6, 23, 0.04);
+}
+
+.p-accordion-content {
+  padding: 1rem 1.25rem !important;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.08);
+  transition: all 0.3s ease;
+}
+
+.accordion-body > div {
+  margin-top: 0.75rem !important;
+}
+
+/* === SECCIONES === */
+.section-title {
+  color: var(--secondary);
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+/* === IMÁGENES === */
+.img-slot {
+  width: 7.5rem;
+  height: 7.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
   background: #fff;
-}
-.modern-accordion .mat-expansion-panel:hover {
-  box-shadow: 0 4px 12px rgba(2, 6, 23, 0.06);
-}
-
-/* Header cómodo */
-.custom-expansion-header .mat-expansion-panel-header {
-  min-height: 4.5rem;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #f1f5f9; /* slate-100 */
-}
-.mat-expansion-panel.mat-expanded .mat-expansion-panel-header {
-  border-bottom-color: #e5e7eb; /* slate-200 */
-}
-
-/* Chips suaves */
-.chip {
-  display: inline-flex;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 9999px;
-  font-size: 12px;
-  line-height: 1;
-  white-space: nowrap;
+  justify-content: center;
 }
-.chip-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
+
+/* === CAMPOS === */
+.field label {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.field input,
+.field textarea {
+  border-radius: 0.6rem;
+  border: 1px solid #e5e7eb;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.85rem;
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.15);
+  outline: none;
+}
+
+/* === VARIANTES === */
+.variant-card {
+  background: #fff;
+  border-radius: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.variant-card:hover {
+  border-color: var(--secondary);
+  transform: translateY(-2px);
+}
+
+/* === CHIPS === */
+.chip {
+  font-size: 0.75rem;
+  padding: 0.3rem 0.6rem;
   border-radius: 9999px;
 }
+
 .chip-soft {
-  background: #f8fafc; /* slate-50 */
-  color: #334155;      /* slate-700 */
-  border: 1px solid #e2e8f0; /* slate-200 */
+  background: rgba(236, 72, 153, 0.08);
+  color: var(--secondary);
 }
+
 .chip-outline {
   background: #fff;
-  color: #6b7280;        /* gray-500 */
-  border: 1px dashed #e5e7eb;
+  border: 1px dashed rgba(126, 34, 206, 0.3);
+  color: #7e22ce;
 }
 
-/* Imagen del título (si querés ocultarla expandido, descomenta)
-.mat-expansion-panel.mat-expanded .mat-expansion-panel-header .panel-title-img {
-  display: none;
-} */
+/* === ESTADO VACÍO === */
+.empty-state .icon-wrap {
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: 0 auto 1rem;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, #fce7f3, #f5f3ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.1);
+}
+
+/* === BOTONES === */
+button[pButton][label='Agregar producto'] {
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 9999px;
+  padding: 0.6rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+button[pButton][label='Agregar producto']:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+}
+
+/* === PAGINADOR === */
+.p-paginator {
+  background: transparent;
+  color: #6b7280;
+}
+
+.p-paginator .p-paginator-page.p-highlight {
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+  color: #fff;
+  border-radius: 0.5rem;
+}
+
+/* === 💎 BOTÓN “AGREGAR PRODUCTO” — ESTILO HERMOSO Y MODERNO === */
+button[pButton][label='Agregar producto'],
+.p-button:has(.pi-plus) {
+  position: relative;
+  z-index: 1;
+  border: none !important;
+  border-radius: 9999px !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em;
+  padding: 0.75rem 1.75rem !important;
+  background: linear-gradient(135deg, var(--secondary, #ec4899), var(--primary, #7e22ce)) !important;
+  box-shadow:
+    0 4px 15px rgba(236, 72, 153, 0.25),
+    0 0 20px rgba(126, 34, 206, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(8px);
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+  transition: all 0.35s ease;
+}
+
+/* Hover y Active */
+button[pButton][label='Agregar producto']:hover,
+.p-button:has(.pi-plus):hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow:
+    0 6px 20px rgba(236, 72, 153, 0.3),
+    0 0 25px rgba(126, 34, 206, 0.25);
+  filter: brightness(1.08);
+}
+
+button[pButton][label='Agregar producto']:active,
+.p-button:has(.pi-plus):active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.2);
+}
+
+/* Icono */
+button[pButton][label='Agregar producto'] .pi,
+.p-button:has(.pi-plus) .pi {
+  font-size: 1rem;
+  margin-right: 0.4rem;
+}
+
+/* Pequeño brillo decorativo */
+button[pButton][label='Agregar producto']::after,
+.p-button:has(.pi-plus)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(255,255,255,0.25), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+button[pButton][label='Agregar producto']:hover::after,
+.p-button:has(.pi-plus):hover::after {
+  opacity: 1;
+}
+

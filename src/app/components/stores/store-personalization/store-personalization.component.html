@@ -1,90 +1,283 @@
-<div class="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6 space-y-6">
-  <h2 class="text-xl font-bold mb-4">🎨 Personalización de la Tienda</h2>
+<div class="mt-5 px-4 sm:px-6 md:px-8 w-full">
+  <!-- ===== CONTENIDO PRINCIPAL ===== -->
+  <div class="flex flex-col lg:grid lg:grid-cols-5 gap-8 items-start w-full">
 
-  <form [formGroup]="storeForm" (ngSubmit)="onSubmit()" class="space-y-6">
-    <!-- Color Primario -->
-    <div>
-      <div class="flex items-center gap-3">
-        <label for="primary" class="font-medium text-gray-600"
-          >Color Primario</label
-        >
-        <i class="pi pi-palette"></i>
-        <ngx-colors
-          ngx-colors-trigger
-          formControlName="primary_color"
-        ></ngx-colors>
-        <i
-          class="pi pi-question-circle text-slate-400 cursor-pointer ml-auto"
-          pTooltip="Color para iconos y textos resaltados"
-          tooltipPosition="right"
-        ></i>
+    <!-- ===== FORMULARIO ===== -->
+    <div class="lg:col-span-3 flex flex-col w-full">
+      <!-- Encabezado -->
+      <div class="flex gap-3 font-semibold items-center mb-3">
+        <i class="pi pi-question-circle text-gray-600 text-lg"></i>
+        <span class="text-gray-700 text-sm md:text-base">Personalización visual</span>
       </div>
-      <p-inputText
-        formControlName="primary_color"
-        placeholder="Selecciona un color"
-        class="w-full mt-3"
-      />
-    </div>
 
-    <!-- Color Secundario -->
-    <div>
-      <div class="flex items-center gap-3">
-        <label for="secondary" class="font-normal text-gray-600"
-          >Color Secundario</label
-        >
-        <i class="pi pi-palette"></i>
-        <ngx-colors
-          ngx-colors-trigger
-          formControlName="secondary_color"
-        ></ngx-colors>
-        <i
-          class="pi pi-question-circle text-slate-400 cursor-pointer ml-auto"
-          pTooltip="Color para botones y links"
-          tooltipPosition="right"
-        ></i>
+      <!-- Card informativa -->
+      <div class="rounded-2xl border border-gray-200 bg-white shadow-md p-4 sm:p-5 transition-shadow duration-300 hover:shadow-lg">
+        <div class="flex gap-1">
+          <i class="pi pi-palette text-pink-400 mt-1"></i>
+          <small class="block text-gray-500 leading-relaxed font-medium text-xs md:text-sm">
+            Elegí tu paleta de colores para personalizar la identidad visual de tu tienda.
+          </small>
+        </div>
+
+        <div class="flex gap-1 mt-3">
+          <i class="pi pi-image text-blue-400 mt-1"></i>
+          <small class="block text-gray-500 leading-relaxed font-medium text-xs md:text-sm">
+            Agregá tu logo e imagen de portada para que tu marca destaque.
+          </small>
+        </div>
+
+            <div class="flex gap-1 mt-3">
+          <i class="pi pi-mobile text-gray-500 mt-1"></i>
+          <small class="block text-gray-500 leading-relaxed font-medium">
+            Podes previsualizar en tiempo real los datos ingresados con el simulador de tu tienda que se encuentra en la seccion final de la pagina.
+          </small>
+        </div>
       </div>
-      <p-inputText
-        formControlName="secondary_color"
-        placeholder="Selecciona un color"
-        class="w-full mt-3"
-      />
+
+      <!-- Descripción -->
+      <div class="mb-5 mt-6">
+        <p class="text-xs md:text-sm text-slate-500">
+          Personalizá la apariencia de tu tienda eligiendo colores, logo y portada.
+        </p>
+      </div>
+
+      <!-- ===== FORM SECTIONS ===== -->
+      <form [formGroup]="storeForm" class="space-y-10">
+        <!-- Paleta -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-8">
+          <h2 class="text-xl font-semibold text-slate-800 mb-2 flex items-center gap-2">
+            <i class="pi pi-palette text-pink-500"></i> Paleta de Colores
+          </h2>
+          <p class="text-slate-500 text-sm mb-6">
+            Personalizá los colores principales de tu tienda para reflejar tu marca.
+          </p>
+
+          <!-- Color Primario -->
+          <div class="flex flex-col sm:grid sm:grid-cols-[160px_auto_30px] items-center sm:items-center gap-3 sm:gap-4 mb-4">
+            <label class="font-medium text-gray-700 w-full sm:w-auto text-center sm:text-left">
+              Color Primario
+            </label>
+            <div class="flex justify-center sm:justify-start w-full">
+              <ngx-colors ngx-colors-trigger formControlName="primary_color"></ngx-colors>
+            </div>
+            <i
+              class="pi pi-question-circle text-slate-400 cursor-pointer sm:justify-self-end hidden sm:block"
+              pTooltip="Color principal para botones e íconos"
+            ></i>
+          </div>
+
+          <!-- Color Secundario -->
+          <div class="flex flex-col sm:grid sm:grid-cols-[160px_auto_30px] items-center sm:items-center gap-3 sm:gap-4 mb-4">
+            <label class="font-medium text-gray-700 w-full sm:w-auto text-center sm:text-left">
+              Color Secundario
+            </label>
+            <div class="flex justify-center sm:justify-start w-full">
+              <ngx-colors ngx-colors-trigger formControlName="secondary_color"></ngx-colors>
+            </div>
+            <i
+              class="pi pi-question-circle text-slate-400 cursor-pointer sm:justify-self-end hidden sm:block"
+              pTooltip="Color complementario para acentos y enlaces"
+            ></i>
+          </div>
+
+          <!-- Color de Fondo -->
+          <div class="flex flex-col sm:grid sm:grid-cols-[160px_auto_30px] items-center sm:items-center gap-3 sm:gap-4">
+            <label class="font-medium text-gray-700 w-full sm:w-auto text-center sm:text-left">
+              Color de Fondo
+            </label>
+            <div class="flex justify-center sm:justify-start w-full">
+              <p-selectButton
+                formControlName="background_color"
+                [options]="[
+                  { label: 'Claro', value: 'white' },
+                  { label: 'Oscuro', value: 'dark' }
+                ]"
+                optionLabel="label"
+                optionValue="value"
+                class="text-xs [&_.p-button]:!py-1 [&_.p-button]:!px-3"
+              ></p-selectButton>
+            </div>
+            <i
+              class="pi pi-question-circle text-slate-400 cursor-pointer sm:justify-self-end hidden sm:block"
+              pTooltip="Elige entre fondo claro u oscuro"
+            ></i>
+          </div>
+        </section>
+
+        <!-- Logo -->
+        <section class="p-6 bg-gradient-to-r from-sky-50 to-indigo-50 rounded-xl border border-slate-100 shadow-sm">
+          <h3 class="text-slate-700 font-semibold mb-4 flex items-center gap-2">
+            <i class="pi pi-image text-sky-500"></i> Logo de la tienda
+          </h3>
+
+          <div class="flex flex-col sm:flex-row items-center gap-6">
+            <p-fileUpload
+              name="logo"
+              accept="image/*"
+              [customUpload]="true"
+              [showUploadButton]="false"
+              [showCancelButton]="false"
+              (onSelect)="onLogoSelect($event)"
+              chooseLabel="Subir Logo"
+              styleClass="no-frame-upload p-button-sm fancy-upload-btn"
+            ></p-fileUpload>
+
+            <div
+              *ngIf="logoPreview"
+              class="w-28 h-28 rounded-xl border border-sky-200 flex items-center justify-center overflow-hidden bg-white shadow-sm"
+            >
+              <img [src]="logoPreview" alt="Logo" class="w-full h-full object-contain" />
+            </div>
+          </div>
+        </section>
+
+        <!-- Banner -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+          <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2 mb-2">
+            <i class="pi pi-images text-pink-500"></i> Imagen de Portada
+          </h2>
+          <p class="text-slate-500 text-sm mb-6">
+            Subí una imagen de portada que se mostrará como banner principal.
+          </p>
+
+          <p-fileUpload
+            name="banner"
+            accept="image/*"
+            [customUpload]="true"
+            [showUploadButton]="false"
+            [showCancelButton]="false"
+            (onSelect)="onBannerSelect($event)"
+            chooseLabel="Subir Portada"
+            styleClass="no-frame-upload-banner fancy-upload-btn"
+          ></p-fileUpload>
+
+          <div
+            *ngIf="bannerPreview"
+            class="mt-6 w-full rounded-xl overflow-hidden bg-white shadow-sm border border-pink-100"
+          >
+            <img [src]="bannerPreview" alt="Banner" class="w-full h-56 object-cover" />
+          </div>
+        </section>
+      </form>
     </div>
 
-    <!-- Color de Fondo -->
-    <div>
-      <div class="flex items-center gap-3">
-        <label for="background" class="font-medium text-gray-600"
-          >Color de Fondo</label
+    <!-- ===== VISTA PREVIA (desktop estilo celular) ===== -->
+    <div class="lg:col-span-2 flex justify-center lg:justify-end w-full">
+      <div
+        class="relative w-[320px] aspect-[9/16] bg-black rounded-[2.4rem] shadow-2xl border-[10px] border-black overflow-hidden transform scale-95 lg:scale-100 transition-transform duration-300"
+      >
+        <div
+          class="absolute inset-0 rounded-[2rem] overflow-hidden flex flex-col transition-all duration-300"
+          [ngStyle]="{
+            backgroundColor:
+              storeForm.value.background_color === 'dark' ? '#1f1f1f' : '#ffffff',
+            color: storeForm.value.background_color === 'dark' ? '#f1f1f1' : '#111'
+          }"
         >
-        <i class="pi pi-palette"></i>
-        <p-selectButton
-          formControlName="background_color"
-          [options]="[
-            { label: 'Claro', value: 'white' },
-            { label: 'Oscuro', value: 'dark' }
-          ]"
-          optionLabel="label"
-          optionValue="value"
-          class="text-xs [&_.p-button]:!py-1 [&_.p-button]:!px-3 [&_.p-button]:!text-xs"
-        ></p-selectButton>
-        <i
-          class="pi pi-question-circle text-slate-400 cursor-pointer ml-auto"
-          pTooltip="Puedes alternar entre un fondo claro u oscuro"
-          tooltipPosition="right"
-        ></i>
+          <div
+            class="flex items-center justify-between px-3 py-2 border-b"
+            [ngStyle]="{
+              borderColor:
+                storeForm.value.background_color === 'dark' ? '#333' : '#e2e8f0'
+            }"
+          >
+            <i
+              class="pi pi-bars text-sm"
+              [ngStyle]="{ color: storeForm.value.primary_color }"
+            ></i>
+
+            <div class="flex items-center justify-center mt-2">
+              <div
+                class="flex items-center justify-center rounded-full w-7 h-7 font-bold text-[10px]"
+                [ngStyle]="{
+                  backgroundColor: storeForm.value.primary_color || '#f472b6',
+                  color: '#fff'
+                }"
+              >
+                P
+              </div>
+              <span
+                class="ml-1 text-[11px] font-semibold"
+                [ngStyle]="{ color: storeForm.value.secondary_color }"
+                >PediApp</span
+              >
+            </div>
+
+            <span class="text-transparent text-xs">•••</span>
+          </div>
+
+          <div class="flex flex-col items-center p-4 text-center space-y-3">
+            <div
+              class="w-16 h-16 rounded-xl border border-gray-200 flex items-center justify-center overflow-hidden"
+              [ngStyle]="{
+                backgroundColor:
+                  storeForm.value.background_color === 'dark' ? '#2a2b32' : '#ffffff'
+              }"
+            >
+              <img
+                *ngIf="logoPreview; else noLogo"
+                [src]="logoPreview"
+                alt="Logo"
+                class="w-full h-full object-contain"
+              />
+              <ng-template #noLogo>
+                <i
+                  class="pi pi-image text-2xl opacity-40"
+                  [ngStyle]="{ color: storeForm.value.secondary_color }"
+                ></i>
+              </ng-template>
+            </div>
+
+            <p class="text-[11px] opacity-70">Vista previa del estilo</p>
+
+            <div
+              *ngIf="bannerPreview"
+              class="w-full h-20 rounded-xl overflow-hidden shadow-sm border border-gray-200"
+            >
+              <img [src]="bannerPreview" alt="Banner" class="w-full h-full object-cover" />
+            </div>
+
+            <button
+              class="px-4 py-1.5 mt-2 rounded-full font-medium text-[11px] transition-all"
+              [ngStyle]="{
+                backgroundColor: storeForm.value.primary_color || '#f472b6',
+                color: '#fff'
+              }"
+            >
+              Comprar ahora
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-4 bg-black rounded-b-2xl"
+        ></div>
       </div>
     </div>
+  </div>
 
-    <!-- Botón -->
-    <div class="pt-2 flex item-end justify-content-end">
-      <p-button
-        size="small"
-        label="Guardar cambios"
-        type="submit"
-        [text]="true"
-        [raised]="true"
-        severity="success"
-      />
-    </div>
-  </form>
+  <!-- ===== BOTONES FINALES ===== -->
+  <div
+    class="flex flex-row justify-end items-center gap-3 mt-8 w-full flex-wrap lg:max-w-5xl mx-auto"
+  >
+    <p-button
+      type="button"
+      label="Atrás"
+      severity="secondary"
+      [outlined]="true"
+      [rounded]="true"
+      size="small"
+      class="flex-1 sm:flex-none min-w-[120px]"
+    ></p-button>
+
+   <p-button
+  size="small"
+  label="Crear tienda"
+  type="button"
+  [rounded]="true"
+  severity="success"
+  class="flex-1 sm:flex-none min-w-[120px]"
+  (click)="onSubmit()"
+></p-button>
+  </div>
 </div>

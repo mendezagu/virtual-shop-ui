@@ -1,20 +1,21 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Producto } from '../../models/product.model';
 import { Observable } from 'rxjs';
+import { tap, shareReplay } from 'rxjs/operators';
+import { Producto } from '../../models/product.model';
 
-// 👇 DTO de creación (match con CreateProductDto del backend)
+// DTOs
 export interface CreateProductPayload {
   nombre_producto: string;
   categoria?: string;
   grupo?: string;
   descripcion?: string;
-  stock?: number;                 // usado si NO hay variantes
-  precio?: number;                // usado si NO hay variantes
+  stock?: number;
+  precio?: number;
   imagen_url?: string[];
   presentacion_multiple?: boolean;
   disponible?: boolean;
-  variants?: {                    // usado si presentacion_multiple = true
+  variants?: {
     nombre: string;
     stock: number;
     precio: number;
@@ -31,54 +32,85 @@ export interface PaginatedResponse<T> {
   };
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class ProductService {
   private baseUrl = 'http://localhost:3000/api/products';
 
+  /** Cache de productos: clave = id_tienda + page + limit + search */
+  private productCache: Record<string, Observable<PaginatedResponse<Producto>>> = {};
+
+  /** Cache de categorías por tienda (slug) */
+  private categoryCache: Record<string, Observable<any>> = {};
+
   constructor(private http: HttpClient) {}
 
-  // Método para crear un producto en una tienda específica
+  /** 🟢 Crear producto y limpiar cache */
   createProduct(id_tienda: string, producto: Producto): Observable<any> {
     const url = `${this.baseUrl}/${id_tienda}`;
-    return this.http.post(url, producto);
+    return this.http.post(url, producto).pipe(tap(() => this.clearCache(id_tienda)));
   }
 
-   // 👇 Nuevo método
-  getCategories(storeSlug?: string): Observable<any> {
-    if (storeSlug) {
-      // categorías públicas por tienda
-      return this.http.get(`${this.baseUrl}/public/store/${storeSlug}/categories`);
+  /** 🟡 Obtener categorías (con cache por tienda pública) */
+  getCategories(storeSlug?: string, forceRefresh = false): Observable<any> {
+    if (!storeSlug) return this.http.get(`${this.baseUrl}/categories`);
+
+    if (!this.categoryCache[storeSlug] || forceRefresh) {
+      this.categoryCache[storeSlug] = this.http
+        .get(`${this.baseUrl}/public/store/${storeSlug}/categories`)
+        .pipe(shareReplay(1));
     }
-    // si no pasás slug, que devuelva todas las categorías del usuario (admin)
-    return this.http.get(`${this.baseUrl}/categories`);
+
+    return this.categoryCache[storeSlug];
   }
 
-  // Obtener productos de una tienda
- // (el resto de métodos puede seguir igual)
+  /** 🟣 Obtener productos de una tienda (cacheados por página y búsqueda) */
   getProductsByStore(
     id_tienda: string,
     page = 1,
     limit = 5,
-    searchTerm: string = ''
+    searchTerm: string = '',
+    forceRefresh = false
   ): Observable<PaginatedResponse<Producto>> {
-    let url = `${this.baseUrl}/shop/${id_tienda}?page=${page}&limit=${limit}`;
-    if (searchTerm.trim()) url += `&search=${encodeURIComponent(searchTerm)}`;
-    return this.http.get<PaginatedResponse<Producto>>(url);
+    const key = `${id_tienda}-p${page}-l${limit}-s${searchTerm.trim().toLowerCase()}`;
+
+    if (!this.productCache[key] || forceRefresh) {
+      let url = `${this.baseUrl}/shop/${id_tienda}?page=${page}&limit=${limit}`;
+      if (searchTerm.trim()) url += `&search=${encodeURIComponent(searchTerm)}`;
+
+      this.productCache[key] = this.http
+        .get<PaginatedResponse<Producto>>(url)
+        .pipe(shareReplay(1));
+    }
+
+    return this.productCache[key];
   }
 
-  updateProduct(id_producto: string, producto: Partial<CreateProductPayload>): Observable<any> {
+  /** 🔵 Actualizar producto y limpiar cache */
+  updateProduct(
+    id_producto: string,
+    producto: Partial<CreateProductPayload>
+  ): Observable<any> {
     const url = `${this.baseUrl}/${id_producto}`;
-    return this.http.put(url, producto);
+    return this.http.put(url, producto).pipe(tap(() => this.clearCache()));
   }
 
-  updateCategory(id: string, name: string) {
-  return this.http.put(`/api/products/category/${id}`, { name });
-}
+  /** 🔴 Eliminar producto y limpiar cache */
+  deleteProduct(id_producto: string): Observable<any> {
+    const url = `${this.baseUrl}/${id_producto}`;
+    return this.http.delete(url).pipe(tap(() => this.clearCache()));
+  }
 
-deleteProduct(id_producto: string): Observable<any> {
-  const url = `${this.baseUrl}/${id_producto}`;
-  return this.http.delete(url);
-}
+  /** 🧹 Limpia cache completa o solo de una tienda específica */
+  clearCache(storeId?: string): void {
+    if (storeId) {
+      Object.keys(this.productCache).forEach((key) => {
+        if (key.startsWith(storeId)) delete this.productCache[key];
+      });
+    } else {
+      this.productCache = {};
+    }
+
+    // limpiar categorías también si hay cambios de productos
+    this.categoryCache = {};
+  }
 }

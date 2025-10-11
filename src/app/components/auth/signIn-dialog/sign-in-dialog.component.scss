@@ -1,0 +1,23 @@
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+form {
+  width: 100%;
+  max-width: 380px;
+}
+
+input.p-inputtext {
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  padding: 0.75rem;
+  transition: all 0.2s ease;
+
+  &:focus {
+    border-color: #ec4899;
+    box-shadow: 0 0 0 1px #ec4899;
+  }
+}

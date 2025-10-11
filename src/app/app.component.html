@@ -1,97 +1,121 @@
-<!-- Toolbar -->
-<!-- Toolbar -->
+<!-- 🔹 TOOLBAR -->
 <div
   [ngClass]="collapsed && !isMobile ? 'ml-20' : (!isMobile ? 'ml-72' : '')"
-  class="sticky top-0 z-40 h-16 px-4 border-b shadow-sm flex items-center justify-between transition-all duration-300"
+  class="sticky top-0 z-40 h-16 px-6 flex items-center justify-between transition-all duration-300
+         border-b shadow-sm backdrop-blur-md"
   [ngStyle]="{
-    backgroundColor: store?.background_color === 'dark' ? '#202123' : '#ffffff',
-    color: store?.background_color === 'dark' ? '#f5f5f5' : '#111827',
-    borderColor: store?.background_color === 'dark' ? '#2a2b32' : '#e5e7eb'
+    backgroundColor: mode === 'buyer'
+      ? 'var(--bg)'
+      : 'rgba(255,255,255,0.9)',
+    color: mode === 'buyer' ? 'var(--text)' : '#111827'
   }"
 >
+  <!-- Izquierda -->
   <div class="flex items-center gap-4">
-    <!-- Botón hamburguesa -->
     <button
       pButton
       icon="pi pi-bars"
-      class="p-button-rounded p-button-text transition"
-      [ngStyle]="{
-        color: store?.secondary_color || '#00bfa5'
-      }"
+      class="p-button-rounded p-button-text hover:scale-105 transition-transform duration-200"
+      [ngStyle]="{ color: 'var(--secondary)' }"
       (click)="toggleSidebar()"
     ></button>
 
-    <img class="w-10 h-10 rounded-xl shadow-sm" src="assets/logo-app.png" alt="Pedi App" />
-
-    <span
-      *ngIf="!collapsed && mode === 'seller' && !isMobile"
-      class="font-semibold tracking-tight text-lg"
-      [ngStyle]="{ color: store?.secondary_color || '#00bfa5' }"
-    >
-      Panel de Control
-    </span>
-    <span
-      *ngIf="!collapsed && mode === 'buyer' && !isMobile"
-      class="font-semibold tracking-tight text-lg"
-      [ngStyle]="{ color: store?.secondary_color || '#00bfa5' }"
-    >
-      Tienda
-    </span>
+    <div class="flex items-center gap-2 cursor-pointer group transition">
+      <img
+        class="w-10 h-10 rounded-xl shadow-md transition-transform duration-200 group-hover:scale-105"
+        src="assets/logo-app.png"
+        alt="Pedi App"
+      />
+      <span
+        *ngIf="!collapsed && !isMobile"
+        class="font-bold text-base tracking-tight transition-colors"
+        [ngStyle]="{
+          color: mode === 'buyer' ? 'var(--secondary)' : '#7e22ce'
+        }"
+      >
+        {{ mode === 'seller' ? 'Panel de Control' : store?.nombre_tienda || 'Tienda' }}
+      </span>
+    </div>
   </div>
 
-  <!-- Acciones -->
-  <div class="flex items-center gap-3" *ngIf="mode === 'seller'">
+  <!-- Derecha -->
+  <div class="flex items-center gap-3" *ngIf="mode === 'seller' && isLoggedIn">
     <button
       pButton
       icon="pi pi-bell"
-      class="relative p-button-rounded p-button-text"
-      [ngStyle]="{
-        color: store?.secondary_color || '#00bfa5'
-      }"
+      class="relative p-button-rounded p-button-text hover:scale-110 transition-transform duration-200"
+      [ngStyle]="{ color: 'var(--secondary)' }"
     >
-      <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-pink-500 animate-pulse"></span>
+      <span
+        class="absolute top-0 right-0 h-2 w-2 rounded-full bg-[var(--secondary)] animate-pulse"
+      ></span>
     </button>
+
     <button
       pButton
       icon="pi pi-user"
-      class="p-button-rounded p-button-text"
-      [ngStyle]="{
-        color: store?.secondary_color || '#00bfa5'
-      }"
+      class="p-button-rounded p-button-text hover:scale-110 transition-transform duration-200"
+      [ngStyle]="{ color: 'var(--secondary)' }"
     ></button>
   </div>
 </div>
 
-<!-- Sidebar fijo (solo desktop) -->
+<!-- 🖥️ Sidebar fijo (desktop) -->
 <app-sidebar
-  *ngIf="!isMobile"
+  *ngIf="!isMobile && ((mode === 'seller' && isLoggedIn) || mode === 'buyer')"
   [(collapsed)]="collapsed"
   [mode]="mode"
   [store]="store"
+  [ngStyle]="{
+    background: mode === 'buyer'
+      ? (store?.background_color === 'dark'
+          ? '#202123'
+          : store?.background_color || '#ffffff')
+      : ''
+  }"
 ></app-sidebar>
 
-<!-- Sidebar overlay (mobile) -->
+<!-- 📱 Sidebar overlay (mobile) -->
 <p-sidebar
+  *ngIf="isMobile && ((mode === 'seller' && isLoggedIn) || mode === 'buyer')"
   [(visible)]="sidebarVisible"
   [modal]="true"
   position="left"
   [blockScroll]="true"
   [baseZIndex]="10000"
-  [style]="{ width: '16rem' }"
-  class="md:hidden"
+  [style]="{ width: '17rem', padding: '0' }"
+  class="md:hidden bg-transparent border-none shadow-none p-0
+         [&_.p-sidebar-content]:!bg-transparent
+         [&_.p-sidebar-content]:!p-0
+         [&_.p-sidebar-content]:!overflow-visible"
 >
   <app-sidebar
     [collapsed]="false"
     [mode]="mode"
     [store]="store"
+    [ngStyle]="{
+      background: mode === 'buyer'
+        ? (store?.background_color === 'dark'
+            ? '#202123'
+            : store?.background_color || '#ffffff')
+        : ''
+    }"
     (collapsedChange)="sidebarVisible = false"
   ></app-sidebar>
 </p-sidebar>
 
-<!-- Contenido -->
+<!-- 🔹 CONTENIDO -->
 <div
-  [ngClass]="isMobile ? 'ml-0' : (collapsed ? 'ml-20' : 'ml-72')"
-  class="transition-all duration-300  bg-neutral-50 min-h-screen"
+  [ngClass]="{
+    'ml-0': isMobile || !isLoggedIn || mode !== 'seller',
+    'ml-20': !isMobile && isLoggedIn && mode === 'seller' && collapsed,
+    'ml-72': !isMobile && isLoggedIn && mode === 'seller' && !collapsed
+  }"
+  class="transition-all duration-300 min-h-screen"
+  [ngStyle]="{
+    backgroundColor: mode === 'buyer' ? 'var(--bg)' : '#f9fafb',
+    color: mode === 'buyer' ? 'var(--text)' : '#111827'
+  }"
 >
   <router-outlet></router-outlet>
 </div>

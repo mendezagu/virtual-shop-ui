@@ -1,139 +1,235 @@
-<div class="mt-5 px-4 sm:px-8 w-full">
-  <div class="mb-5">
-    <p class="text-sm text-slate-500 mt-1">
-      Agrega tus horarios y la ubicación de tu tienda fisica si tenes local a la
-      calle
-    </p>
-  </div>
+<div class="mt-5 px-4 sm:px-6 md:px-8 w-full">
+  <!-- ===== CONTENIDO PRINCIPAL ===== -->
+  <div class="flex flex-col lg:grid lg:grid-cols-5 gap-8 items-start w-full">
 
-  <div>
-    <ng-container *ngIf="isLoading; else formTpl">
-      <div class="p-6 sm:p-10 space-y-4 animate-pulse">
-        <div class="h-5 w-1/3 bg-slate-200 rounded"></div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="h-12 bg-slate-200 rounded"></div>
-          <div class="h-12 bg-slate-200 rounded"></div>
+    <!-- ===== FORMULARIO ===== -->
+    <div class="lg:col-span-3 flex flex-col w-full">
+      <!-- Encabezado -->
+      <div class="flex gap-3 font-semibold items-center mb-3">
+        <i class="pi pi-question-circle text-gray-600 text-lg"></i>
+        <span class="text-gray-700 text-sm md:text-base">Ubicación y horarios</span>
+      </div>
+
+      <!-- Card informativa -->
+      <div class="rounded-2xl border border-gray-200 bg-white shadow-md p-4 sm:p-5 transition-shadow duration-300 hover:shadow-lg">
+        <div class="flex gap-1">
+          <i class="pi pi-map-marker text-gray-500 mt-1"></i>
+          <small class="block text-gray-500 leading-relaxed font-medium text-xs md:text-sm">
+            Ingresá la dirección de tu tienda y los horarios en los que tus clientes podrán visitarte o contactarte.
+          </small>
+        </div>
+
+          <div class="flex gap-1 mt-3">
+            <i class="pi pi-mobile text-gray-500 mt-1"></i>
+            <small class="block text-gray-500 leading-relaxed font-medium">
+              Podes previsualizar en tiempo real los datos ingresados con el simulador de tu tienda que se encuentra en la seccion final de la pagina.
+            </small>
         </div>
       </div>
-    </ng-container>
 
-    <ng-template #formTpl>
-      <form [formGroup]="form" class="p-6 sm:p-10">
-        <!-- Fila 1: Dirección y Ciudad -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-          <!-- Dirección -->
-          <div class="flex flex-col">
-            <label for="direccion" class="mb-1">Dirección</label>
-            <input
-              pInputText
-              formControlName="direccion"
-              type="text"
-              class="w-full"
-            />
+      <!-- Descripción -->
+      <div class="mb-5 mt-6">
+        <p class="text-xs md:text-sm text-slate-500">
+          Completá tu ubicación y horario para que tus clientes sepan dónde y cuándo encontrarte.
+        </p>
+      </div>
+
+      <!-- Formulario -->
+      <ng-container *ngIf="!isLoading; else loadingTpl">
+        <form [formGroup]="form" (ngSubmit)="save()" class="space-y-6 w-full">
+          <!-- Dirección + Ciudad -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div class="flex flex-col w-full">
+              <label class="mb-1 text-sm font-medium text-slate-700">Dirección</label>
+              <input
+                pInputText
+                formControlName="direccion"
+                placeholder="Ej: Calle 123"
+                class="w-full"
+              />
+            </div>
+
+            <div class="flex flex-col w-full">
+              <label class="mb-1 text-sm font-medium text-slate-700">Ciudad</label>
+              <p-dropdown
+                [options]="cities"
+                formControlName="ciudad"
+                optionLabel="name"
+                placeholder="Seleccioná una ciudad"
+                class="w-full"
+              ></p-dropdown>
+            </div>
           </div>
 
-          <!-- Ciudad -->
-          <div class="flex flex-col">
-            <label for="ciudad" class="mb-1">Ciudad</label>
-            <p-dropdown
-              [options]="cities"
-              formControlName="ciudad"
-              optionLabel="name"
-              placeholder="Selecciona una ciudad"
-              [style]="{ width: '100%' }"
-              styleClass="w-full"
-            ></p-dropdown>
+          <!-- Horarios -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div class="flex flex-col w-full">
+              <label class="mb-1 text-sm font-medium text-slate-700">Horario de apertura</label>
+              <p-calendar
+                formControlName="horario_apertura"
+                [iconDisplay]="'input'"
+                [showIcon]="true"
+                [timeOnly]="true"
+                inputId="horario_apertura"
+                class="w-full"
+              >
+                <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                  <i class="pi pi-clock pointer-events-none" (click)="clickCallBack($event)"></i>
+                </ng-template>
+              </p-calendar>
+            </div>
+
+            <div class="flex flex-col w-full">
+              <label class="mb-1 text-sm font-medium text-slate-700">Horario de cierre</label>
+              <p-calendar
+                formControlName="horario_cierre"
+                [iconDisplay]="'input'"
+                [showIcon]="true"
+                [timeOnly]="true"
+                inputId="horario_cierre"
+                class="w-full"
+              >
+                <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                  <i class="pi pi-clock pointer-events-none" (click)="clickCallBack($event)"></i>
+                </ng-template>
+              </p-calendar>
+            </div>
+          </div>
+        </form>
+      </ng-container>
+
+      <!-- Loading -->
+      <ng-template #loadingTpl>
+        <div class="p-6 space-y-4 animate-pulse">
+          <div class="h-5 w-1/3 bg-slate-200 rounded"></div>
+          <div class="h-12 bg-slate-200 rounded"></div>
+          <div class="h-12 bg-slate-200 rounded"></div>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- ===== VISTA PREVIA (desktop estilo celular con sidebar 80/20) ===== -->
+    <div class="lg:col-span-2 flex justify-center lg:justify-end w-full">
+      <div
+        class="relative w-[320px] aspect-[9/16] bg-black rounded-[2.4rem] shadow-2xl border-[10px] border-black overflow-hidden transform scale-95 lg:scale-100 transition-transform duration-300"
+      >
+        <!-- Pantalla -->
+        <div class="absolute inset-0 bg-white rounded-[2rem] overflow-hidden flex flex-row">
+          <!-- Sidebar -->
+          <div
+            class="w-[80%] bg-white border-r border-slate-200 shadow-lg z-10 flex flex-col justify-between"
+          >
+            <div class="p-4 flex flex-col gap-4 text-[13px]">
+              <!-- Header -->
+              <div>
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-9 h-9 bg-slate-700 rounded-md flex items-center justify-center text-[10px] font-bold text-white"
+                  >
+                    LOGO
+                  </div>
+                  <span class="font-semibold text-[14px] text-slate-900 truncate">{{
+                    storeData?.nombre_tienda || "Mi tienda"
+                  }}</span>
+                </div>
+              </div>
+
+              <!-- Dirección -->
+              <div class="flex items-start gap-2">
+                <i class="pi pi-map-marker text-rose-500 text-[14px] mt-[2px]"></i>
+                <div>
+                  <p class="font-medium text-slate-700 text-[12px] mb-[1px]">Dirección</p>
+                  <p class="text-slate-500 text-[12px]">
+                    {{ form.value.direccion || "Sin dirección asignada" }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Ciudad -->
+              <div class="flex items-start gap-2">
+                <i class="pi pi-building text-blue-500 text-[14px] mt-[2px]"></i>
+                <div>
+                  <p class="font-medium text-slate-700 text-[12px] mb-[1px]">Ciudad</p>
+                  <p class="text-slate-500 text-[12px]">
+                    {{ form.value.ciudad?.name || "Sin ciudad seleccionada" }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Horarios -->
+              <div class="flex items-start gap-2">
+                <i class="pi pi-clock text-amber-500 text-[14px] mt-[2px]"></i>
+                <div>
+                  <p class="font-medium text-slate-700 text-[12px] mb-[1px]">Horarios</p>
+                  <p class="text-slate-500 text-[12px]">
+                    {{
+                      form.value.horario_apertura
+                        ? (form.value.horario_apertura | date: "shortTime")
+                        : "Sin horario de apertura"
+                    }}
+                    –
+                    {{
+                      form.value.horario_cierre
+                        ? (form.value.horario_cierre | date: "shortTime")
+                        : "Sin horario de cierre"
+                    }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Mapa simulado -->
+              <small class="text-gray-600 font-medium">Mapa simulado</small>
+              <p-skeleton styleClass="mb-2" />
+              <p-skeleton width="10rem" styleClass="mb-2" />
+              <p-skeleton width="5rem" styleClass="mb-2" />
+            </div>
+
+            <!-- Footer -->
+            <div class="px-4 py-2 border-t border-slate-200 text-[11px] text-slate-400">
+              <p>© Tu tienda</p>
+            </div>
+          </div>
+
+          <!-- Zona blanca -->
+          <div class="w-[20%] bg-white flex items-center justify-center relative">
+            <div class="absolute top-0 left-0 w-full h-full bg-white shadow-inner"></div>
+            <i class="pi pi-angle-left text-slate-300 text-lg"></i>
           </div>
         </div>
 
-        <!-- Fila 2: Horarios -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-          <!-- Horario apertura -->
-          <div class="flex flex-col">
-            <label for="horario_apertura" class="mb-1"
-              >Horario de apertura</label
-            >
-            <p-calendar
-              formControlName="horario_apertura"
-              [iconDisplay]="'input'"
-              [showIcon]="true"
-              [timeOnly]="true"
-              inputId="horario_apertura"
-              [style]="{ width: '100%' }"
-              styleClass="w-full"
-            >
-              <ng-template
-                pTemplate="inputicon"
-                let-clickCallBack="clickCallBack"
-              >
-                <i
-                  class="pi pi-clock pointer-events-none"
-                  (click)="clickCallBack($event)"
-                ></i>
-              </ng-template>
-            </p-calendar>
-          </div>
-
-          <!-- Horario cierre -->
-          <div class="flex flex-col">
-            <label for="horario_cierre" class="mb-1">Horario de cierre</label>
-            <p-calendar
-              formControlName="horario_cierre"
-              [iconDisplay]="'input'"
-              [showIcon]="true"
-              [timeOnly]="true"
-              inputId="horario_cierre"
-              [style]="{ width: '100%' }"
-              styleClass="w-full"
-            >
-              <ng-template
-                pTemplate="inputicon"
-                let-clickCallBack="clickCallBack"
-              >
-                <i
-                  class="pi pi-clock pointer-events-none"
-                  (click)="clickCallBack($event)"
-                ></i>
-              </ng-template>
-            </p-calendar>
-          </div>
-
-          <div class="card w-full">
-            <p-messages
-              [(value)]="messages"
-              [enableService]="false"
-              [closable]="false"
-            />
-          </div>
-        </div>
-
-        <!-- Divider -->
+        <!-- Notch -->
         <div
-          class="my-4 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"
+          class="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-4 bg-black rounded-b-2xl"
         ></div>
-
-        <!-- Botón guardar -->
-        <div class="flex justify-end gap-4">
-          <p-button
-            type="button"
-            severity="secondary"
-            label="Cancelar"
-            [outlined]="true"
-            [rounded]="true"
-            size="small"
-          />
-
-          <p-button
-            [disabled]="form.pristine"
-            type="submit"
-            label="Guardar cambios"
-            [rounded]="true"
-            severity="success"
-            size="small"
-            (click)="save()"
-          />
-        </div>
-      </form>
-    </ng-template>
+      </div>
+    </div>
   </div>
+
+  <!-- ===== BOTONES FINALES (debajo de la vista previa) ===== -->
+ <div
+  class="flex flex-row justify-end items-center gap-3 mt-8 w-full flex-wrap lg:max-w-5xl mx-auto"
+>
+  <p-button
+    type="button"
+    label="Atrás"
+    severity="secondary"
+    [outlined]="true"
+    [rounded]="true"
+    size="small"
+    class="flex-1 sm:flex-none min-w-[120px]"
+  ></p-button>
+
+<p-button
+  type="button"
+  (click)="save()"
+  [disabled]="form.invalid || isLoading"
+  label="Siguiente paso"
+  severity="success"
+  [rounded]="true"
+  size="small"
+  class="flex-1 sm:flex-none min-w-[120px]"
+></p-button>
+
+</div>
+
 </div>

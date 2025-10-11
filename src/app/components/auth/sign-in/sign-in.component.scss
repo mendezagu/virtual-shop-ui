@@ -1,8 +1,23 @@
-::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline-start,
-::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline-end {
-  display: none;
+:host {
+  display: block;
 }
 
-::ng-deep .mat-raised-button {
-  border-radius: 9999px; // redondeado completo
+p-card {
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  }
+}
+
+button.p-button-primary {
+  background: linear-gradient(135deg, #ec4899, #7e22ce);
+  border: none;
+}
+
+section {
+  scroll-margin-top: 80px;
 }

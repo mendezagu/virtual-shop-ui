@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -14,6 +14,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ButtonModule } from 'primeng/button';
 import { InputMaskModule } from 'primeng/inputmask';
+import { DialogModule } from 'primeng/dialog';
+import { SkeletonModule } from "primeng/skeleton";
 
 @Component({
   selector: 'app-store-contact',
@@ -25,8 +27,10 @@ import { InputMaskModule } from 'primeng/inputmask';
     InputTextModule,
     InputNumberModule,
     ButtonModule,
-    InputMaskModule 
-  ],
+    InputMaskModule,
+    DialogModule,
+    SkeletonModule
+],
   templateUrl: './store-contact.component.html',
   styleUrl: './store-contact.component.scss',
 })
@@ -34,8 +38,9 @@ export class StoreContactComponent implements OnInit {
   @Output() saved = new EventEmitter<void>();
 
   form!: FormGroup;
-  storeData!: Store | null;
+ @Input() storeData: any;
   isLoading = true;
+  showPreview = false;
 
   constructor(private storeService: StoreService, private fb: FormBuilder) {}
 
@@ -95,29 +100,38 @@ export class StoreContactComponent implements OnInit {
     }
   }
 
-  save() {
-    if (!this.storeData) return;
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
+save() {
+  if (!this.storeData || !this.storeData.id_tienda) {
+  alert('Primero debes completar la información básica de la tienda.');
+  return;
+}
 
-    const v = this.form.value;
-    const payload = {
-      telefono_contacto: v.telefono_contacto || undefined,
-      email_contacto: v.email_contacto || undefined,
-      redes_sociales: (v.redes_sociales || [])
-        .map((x: string) => x?.trim())
-        .filter(Boolean),
-    };
-
-    this.storeService.updateStore(this.storeData.id_tienda, payload).subscribe({
-      next: () => {
-        alert('Contacto actualizado');
-        this.form.markAsPristine();
-        this.saved.emit();
-      },
-      error: () => alert('Error al guardar contacto'),
-    });
+  if (this.form.invalid) {
+    this.form.markAllAsTouched();
+    return;
   }
+
+  this.isLoading = true;
+
+  const v = this.form.value;
+  const payload = {
+    telefono_contacto: v.telefono_contacto || undefined,
+    email_contacto: v.email_contacto || undefined,
+    redes_sociales: (v.redes_sociales || [])
+      .map((x: string) => x?.trim())
+      .filter(Boolean),
+  };
+
+  this.storeService.updateStore(this.storeData.id_tienda, payload).subscribe({
+    next: () => {
+      this.isLoading = false;
+      this.form.markAsPristine();
+      this.saved.emit(); // 🔥 Avanza al siguiente paso del stepper
+    },
+    error: () => {
+      this.isLoading = false;
+      alert('Error al guardar los datos de contacto');
+    },
+  });
+}
 }
