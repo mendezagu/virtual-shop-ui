@@ -67,6 +67,12 @@ export class SidebarComponent {
       text: 'Categorías',
       action: () => this.redirectToMyCategories(),
     },
+    {
+      id: 'orders',
+      icon: 'pi pi-tags',
+      text: 'Lista de pedidos',
+      action: () => this.redirectToMyOrders(),
+    },
   ];
 
   constructor(
@@ -163,4 +169,5 @@ export class SidebarComponent {
   redirectToMyStore() { this.router.navigate(['/my-store']); }
   redirectToMyProducts() { this.router.navigate(['/my-products']); }
   redirectToMyCategories() { this.router.navigate(['/mis-categorias']); }
+  redirectToMyOrders() { this.router.navigate(['/mis-pedidos']); }
 }

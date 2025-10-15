@@ -10,6 +10,7 @@ import { MyStoreComponent } from '../../../components/stores/store-basic-info/st
 import { StoreContactComponent } from '../../../components/stores/store-contact/store-contact.component';
 import { StoreUbicationScheduleComponent } from '../../../components/stores/store-ubication-schedule/store-ubication-schedule.component';
 import { StorePersonalizationComponent } from '../../../components/stores/store-personalization/store-personalization.component';
+import { PageHeaderComponent } from "../page-header/page-header.component";
 
 @Component({
   selector: 'app-stepper',
@@ -24,7 +25,8 @@ import { StorePersonalizationComponent } from '../../../components/stores/store-
     StoreContactComponent,
     StoreUbicationScheduleComponent,
     StorePersonalizationComponent,
-  ],
+    PageHeaderComponent
+],
   templateUrl: './stepper.component.html',
   styleUrls: ['./stepper.component.scss'],
 })

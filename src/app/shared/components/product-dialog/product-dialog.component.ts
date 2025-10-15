@@ -416,86 +416,109 @@ export class ProductDialogComponent implements OnInit, OnChanges {
   }
 
   // CREAR o EDITAR
-  submit() {
-    if (this.productForm.invalid) return;
+submit() {
+  if (this.productForm.invalid) return;
 
-    const { categoriaSelect, categoria, ...payload } =
-      this.productForm.getRawValue();
+  const { categoriaSelect, categoria, ...payload } = this.productForm.getRawValue();
 
-    // 🖼️ Unimos imágenes existentes + nuevas
-    const images = this.preview.filter((u): u is string => !!u);
-    if (images.length) payload.imagen_url = images;
-    else delete payload.imagen_url;
+  // 🖼️ Unimos imágenes existentes + nuevas
+  const images = this.preview.filter((u): u is string => !!u);
+  if (images.length) payload.imagen_url = images;
+  else delete payload.imagen_url;
 
-    if (this.showNewCategory) {
-      payload.categoria = categoria?.trim();
-      delete payload.categoryId;
-    } else {
-      payload.categoryId = categoriaSelect;
-    }
-
-    if (payload.vencimiento) {
-      payload.vencimiento = new Date(payload.vencimiento).toISOString();
-    } else {
-      delete payload.vencimiento;
-    }
-    if (payload.presentacion_multiple) {
-      delete payload.stock;
-      delete payload.precio;
-    } else {
-      delete payload.variants;
-    }
-
-    /*if (this.files.length > 0) {
-      payload.files = this.files;
-    }*/
-
-    if (this.product) {
-      // EDITAR
-      this.productService
-        .updateProduct(this.product.id_producto, payload)
-        .subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'Producto actualizado correctamente',
-            });
-            this.visible = false;
-            this.visibleChange.emit(this.visible);
-          },
-          error: (err) => {
-            console.error(err);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo actualizar el producto',
-            });
-          },
-        });
-    } else {
-      // CREAR
-      this.productService
-        .createProduct(this.selectedStoreId, payload)
-        .subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'Producto creado correctamente',
-            });
-            this.visible = false;
-            this.visibleChange.emit(this.visible);
-          },
-          error: (err) => {
-            console.error(err);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo crear el producto',
-            });
-          },
-        });
-    }
+  // 🏷️ Categoría
+  if (this.showNewCategory) {
+    payload.categoria = categoria?.trim();
+    delete payload.categoryId;
+  } else {
+    payload.categoryId = categoriaSelect;
   }
+
+  // 🗓️ Fecha
+  if (payload.vencimiento) {
+    payload.vencimiento = new Date(payload.vencimiento).toISOString();
+  } else {
+    delete payload.vencimiento;
+  }
+
+  // 📦 Variantes vs simple
+  if (payload.presentacion_multiple) {
+    delete payload.stock;
+    delete payload.precio;
+  } else {
+    delete payload.variants;
+  }
+
+  // ⚙️ Obtener la tienda activa desde el estado global
+  const storeId = (this as any).productState['storeId'];
+  console.log('🟢 ID de tienda usada para crear producto:', storeId);
+
+  if (!storeId) {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'No se encontró la tienda activa. Vuelve a cargar tu panel.',
+    });
+    return;
+  }
+
+  // 🔹 Limpiar valores numéricos vacíos o inválidos
+  ['descuento', 'precio_mayorista', 'costo', 'ganancia', 'precio_final'].forEach((campo) => {
+    if (
+      payload[campo] === '' ||
+      payload[campo] === null ||
+      payload[campo] === undefined ||
+      isNaN(Number(payload[campo]))
+    ) {
+      delete payload[campo];
+    } else {
+      payload[campo] = Number(payload[campo]);
+    }
+  });
+
+  // ✳️ Si es edición
+  if (this.product) {
+    this.productService.updateProduct(this.product.id_producto, payload).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Éxito',
+          detail: 'Producto actualizado correctamente',
+        });
+        this.visible = false;
+        this.visibleChange.emit(this.visible);
+      },
+      error: (err) => {
+        console.error(err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: err?.error?.message || 'No se pudo actualizar el producto',
+        });
+      },
+    });
+  } else {
+    // ✳️ CREACIÓN
+    this.productService.createProduct(storeId, payload).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Éxito',
+          detail: 'Producto creado correctamente',
+        });
+        this.visible = false;
+        this.visibleChange.emit(this.visible);
+      },
+      error: (err) => {
+        console.error('❌ Error al crear producto:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: err?.error?.message || 'No se pudo crear el producto',
+        });
+      },
+    });
+  }
+}
+
 }

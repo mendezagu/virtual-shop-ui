@@ -1,6 +1,6 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, map, Observable, tap } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { JwtPayload } from '../../../shared/models/jwt-payload.model';
 import jwtDecode from 'jwt-decode';
@@ -33,9 +33,11 @@ export class AuthService {
   ) {}
 
   // 👉 Registro
-  register(data: RegisterData): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, data);
-  }
+register(data: RegisterData): Observable<any> {
+  return this.http.post(`${this.apiUrl}/register`, data).pipe(
+    map((res: any) => res.user) // 👈 devolvés solo el usuario
+  );
+}
 
   // 👉 Login (pide al backend y guarda token en localStorage)
   login(email: string, password: string): Observable<LoginResponse> {

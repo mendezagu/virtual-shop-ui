@@ -106,10 +106,12 @@
 
 <!-- 🔹 CONTENIDO -->
 <div
-  [ngClass]="{
-    'ml-0': isMobile || !isLoggedIn || mode !== 'seller',
-    'ml-20': !isMobile && isLoggedIn && mode === 'seller' && collapsed,
-    'ml-72': !isMobile && isLoggedIn && mode === 'seller' && !collapsed
+ [ngClass]="{
+    'ml-0': isMobile || (!isLoggedIn && mode !== 'buyer'),
+
+
+    'ml-20': !isMobile && (isLoggedIn || mode === 'buyer') && collapsed,
+    'ml-72': !isMobile && (isLoggedIn || mode === 'buyer') && !collapsed
   }"
   class="transition-all duration-300 min-h-screen"
   [ngStyle]="{

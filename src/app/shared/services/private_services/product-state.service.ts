@@ -70,16 +70,21 @@ loadCategories(forceRefresh = false) {
 
 
   /** Cambiar página */
-  setPage(page: number) {
+setPage(page: number) {
+  if (page !== this.page) {
     this.page = page;
-    this.loadProducts();
+    this.loadProducts(true); // fuerza recarga solo si cambia
   }
+}
 
   /** Cambiar límite */
-  setLimit(limit: number) {
+setLimit(limit: number) {
+  if (limit !== this.limit) {
     this.limit = limit;
-    this.loadProducts();
+    this.page = 1; // reset a la primera página
+    this.loadProducts(true);
   }
+}
 
   /** Buscar */
   setSearch(term: string) {

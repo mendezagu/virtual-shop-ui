@@ -1,36 +1,45 @@
 <div class="mt-5 px-4 sm:px-6 md:px-8 w-full">
   <!-- ===== CONTENIDO PRINCIPAL ===== -->
   <div class="flex flex-col lg:grid lg:grid-cols-5 gap-8 items-start w-full">
-
     <!-- ===== FORMULARIO ===== -->
     <div class="lg:col-span-3 flex flex-col w-full">
       <!-- Encabezado -->
       <div class="flex gap-3 font-semibold items-center mb-3">
         <i class="pi pi-question-circle text-gray-600 text-lg"></i>
-        <span class="text-gray-700 text-sm md:text-base">Ubicación y horarios</span>
+        <span class="text-gray-700 text-sm md:text-base"
+          >Ubicación y horarios</span
+        >
       </div>
 
       <!-- Card informativa -->
-      <div class="rounded-2xl border border-gray-200 bg-white shadow-md p-4 sm:p-5 transition-shadow duration-300 hover:shadow-lg">
+      <div
+        class="rounded-2xl border border-gray-200 bg-white shadow-md p-4 sm:p-5 transition-shadow duration-300 hover:shadow-lg"
+      >
         <div class="flex gap-1">
           <i class="pi pi-map-marker text-gray-500 mt-1"></i>
-          <small class="block text-gray-500 leading-relaxed font-medium text-xs md:text-sm">
-            Ingresá la dirección de tu tienda y los horarios en los que tus clientes podrán visitarte o contactarte.
+          <small
+            class="block text-gray-500 leading-relaxed font-medium text-xs md:text-sm"
+          >
+            Ingresá la dirección de tu tienda y los horarios en los que tus
+            clientes podrán visitarte o contactarte.
           </small>
         </div>
 
-          <div class="flex gap-1 mt-3">
-            <i class="pi pi-mobile text-gray-500 mt-1"></i>
-            <small class="block text-gray-500 leading-relaxed font-medium">
-              Podes previsualizar en tiempo real los datos ingresados con el simulador de tu tienda que se encuentra en la seccion final de la pagina.
-            </small>
+        <div class="flex gap-1 mt-3">
+          <i class="pi pi-mobile text-gray-500 mt-1"></i>
+          <small class="block text-gray-500 leading-relaxed font-medium">
+            Podes previsualizar en tiempo real los datos ingresados con el
+            simulador de tu tienda que se encuentra en la seccion final de la
+            pagina.
+          </small>
         </div>
       </div>
 
       <!-- Descripción -->
       <div class="mb-5 mt-6">
         <p class="text-xs md:text-sm text-slate-500">
-          Completá tu ubicación y horario para que tus clientes sepan dónde y cuándo encontrarte.
+          Completá tu ubicación y horario para que tus clientes sepan dónde y
+          cuándo encontrarte.
         </p>
       </div>
 
@@ -40,7 +49,9 @@
           <!-- Dirección + Ciudad -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div class="flex flex-col w-full">
-              <label class="mb-1 text-sm font-medium text-slate-700">Dirección</label>
+              <label class="mb-1 text-sm font-medium text-slate-700"
+                >Dirección</label
+              >
               <input
                 pInputText
                 formControlName="direccion"
@@ -50,7 +61,9 @@
             </div>
 
             <div class="flex flex-col w-full">
-              <label class="mb-1 text-sm font-medium text-slate-700">Ciudad</label>
+              <label class="mb-1 text-sm font-medium text-slate-700"
+                >Ciudad</label
+              >
               <p-dropdown
                 [options]="cities"
                 formControlName="ciudad"
@@ -64,7 +77,9 @@
           <!-- Horarios -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div class="flex flex-col w-full">
-              <label class="mb-1 text-sm font-medium text-slate-700">Horario de apertura</label>
+              <label class="mb-1 text-sm font-medium text-slate-700"
+                >Horario de apertura</label
+              >
               <p-calendar
                 formControlName="horario_apertura"
                 [iconDisplay]="'input'"
@@ -73,14 +88,22 @@
                 inputId="horario_apertura"
                 class="w-full"
               >
-                <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
-                  <i class="pi pi-clock pointer-events-none" (click)="clickCallBack($event)"></i>
+                <ng-template
+                  pTemplate="inputicon"
+                  let-clickCallBack="clickCallBack"
+                >
+                  <i
+                    class="pi pi-clock pointer-events-none"
+                    (click)="clickCallBack($event)"
+                  ></i>
                 </ng-template>
               </p-calendar>
             </div>
 
             <div class="flex flex-col w-full">
-              <label class="mb-1 text-sm font-medium text-slate-700">Horario de cierre</label>
+              <label class="mb-1 text-sm font-medium text-slate-700"
+                >Horario de cierre</label
+              >
               <p-calendar
                 formControlName="horario_cierre"
                 [iconDisplay]="'input'"
@@ -89,8 +112,14 @@
                 inputId="horario_cierre"
                 class="w-full"
               >
-                <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
-                  <i class="pi pi-clock pointer-events-none" (click)="clickCallBack($event)"></i>
+                <ng-template
+                  pTemplate="inputicon"
+                  let-clickCallBack="clickCallBack"
+                >
+                  <i
+                    class="pi pi-clock pointer-events-none"
+                    (click)="clickCallBack($event)"
+                  ></i>
                 </ng-template>
               </p-calendar>
             </div>
@@ -114,7 +143,9 @@
         class="relative w-[320px] aspect-[9/16] bg-black rounded-[2.4rem] shadow-2xl border-[10px] border-black overflow-hidden transform scale-95 lg:scale-100 transition-transform duration-300"
       >
         <!-- Pantalla -->
-        <div class="absolute inset-0 bg-white rounded-[2rem] overflow-hidden flex flex-row">
+        <div
+          class="absolute inset-0 bg-white rounded-[2rem] overflow-hidden flex flex-row"
+        >
           <!-- Sidebar -->
           <div
             class="w-[80%] bg-white border-r border-slate-200 shadow-lg z-10 flex flex-col justify-between"
@@ -128,17 +159,22 @@
                   >
                     LOGO
                   </div>
-                  <span class="font-semibold text-[14px] text-slate-900 truncate">{{
-                    storeData?.nombre_tienda || "Mi tienda"
-                  }}</span>
+                  <span
+                    class="font-semibold text-[14px] text-slate-900 truncate"
+                    >{{ storeData?.nombre_tienda || "Mi tienda" }}</span
+                  >
                 </div>
               </div>
 
               <!-- Dirección -->
               <div class="flex items-start gap-2">
-                <i class="pi pi-map-marker text-rose-500 text-[14px] mt-[2px]"></i>
+                <i
+                  class="pi pi-map-marker text-rose-500 text-[14px] mt-[2px]"
+                ></i>
                 <div>
-                  <p class="font-medium text-slate-700 text-[12px] mb-[1px]">Dirección</p>
+                  <p class="font-medium text-slate-700 text-[12px] mb-[1px]">
+                    Dirección
+                  </p>
                   <p class="text-slate-500 text-[12px]">
                     {{ form.value.direccion || "Sin dirección asignada" }}
                   </p>
@@ -147,9 +183,13 @@
 
               <!-- Ciudad -->
               <div class="flex items-start gap-2">
-                <i class="pi pi-building text-blue-500 text-[14px] mt-[2px]"></i>
+                <i
+                  class="pi pi-building text-blue-500 text-[14px] mt-[2px]"
+                ></i>
                 <div>
-                  <p class="font-medium text-slate-700 text-[12px] mb-[1px]">Ciudad</p>
+                  <p class="font-medium text-slate-700 text-[12px] mb-[1px]">
+                    Ciudad
+                  </p>
                   <p class="text-slate-500 text-[12px]">
                     {{ form.value.ciudad?.name || "Sin ciudad seleccionada" }}
                   </p>
@@ -160,17 +200,19 @@
               <div class="flex items-start gap-2">
                 <i class="pi pi-clock text-amber-500 text-[14px] mt-[2px]"></i>
                 <div>
-                  <p class="font-medium text-slate-700 text-[12px] mb-[1px]">Horarios</p>
+                  <p class="font-medium text-slate-700 text-[12px] mb-[1px]">
+                    Horarios
+                  </p>
                   <p class="text-slate-500 text-[12px]">
                     {{
                       form.value.horario_apertura
-                        ? (form.value.horario_apertura | date: "shortTime")
+                        ? (form.value.horario_apertura | date : "shortTime")
                         : "Sin horario de apertura"
                     }}
                     –
                     {{
                       form.value.horario_cierre
-                        ? (form.value.horario_cierre | date: "shortTime")
+                        ? (form.value.horario_cierre | date : "shortTime")
                         : "Sin horario de cierre"
                     }}
                   </p>
@@ -185,14 +227,20 @@
             </div>
 
             <!-- Footer -->
-            <div class="px-4 py-2 border-t border-slate-200 text-[11px] text-slate-400">
+            <div
+              class="px-4 py-2 border-t border-slate-200 text-[11px] text-slate-400"
+            >
               <p>© Tu tienda</p>
             </div>
           </div>
 
           <!-- Zona blanca -->
-          <div class="w-[20%] bg-white flex items-center justify-center relative">
-            <div class="absolute top-0 left-0 w-full h-full bg-white shadow-inner"></div>
+          <div
+            class="w-[20%] bg-white flex items-center justify-center relative"
+          >
+            <div
+              class="absolute top-0 left-0 w-full h-full bg-white shadow-inner"
+            ></div>
             <i class="pi pi-angle-left text-slate-300 text-lg"></i>
           </div>
         </div>
@@ -206,30 +254,31 @@
   </div>
 
   <!-- ===== BOTONES FINALES (debajo de la vista previa) ===== -->
- <div
-  class="flex flex-row justify-end items-center gap-3 mt-8 w-full flex-wrap lg:max-w-5xl mx-auto"
->
-  <p-button
-    type="button"
-    label="Atrás"
-    severity="secondary"
-    [outlined]="true"
-    [rounded]="true"
-    size="small"
-    class="flex-1 sm:flex-none min-w-[120px]"
-  ></p-button>
+  <div
+    class="flex flex-row justify-end items-center gap-3 mt-8 w-full flex-wrap lg:max-w-5xl mx-auto"
+  >
+    <p-button
+      type="button"
+      label="Atrás"
+      severity="secondary"
+      [outlined]="true"
+      [rounded]="true"
+      size="small"
+      class="flex-1 sm:flex-none min-w-[120px]"
+    ></p-button>
 
-<p-button
-  type="button"
-  (click)="save()"
-  [disabled]="form.invalid || isLoading"
-  label="Siguiente paso"
-  severity="success"
-  [rounded]="true"
-  size="small"
-  class="flex-1 sm:flex-none min-w-[120px]"
-></p-button>
-
-</div>
-
+    <p-button
+      type="button"
+      (click)="save()"
+      [disabled]="form.invalid || isLoading"
+      [label]="actionLabel"
+      [icon]="
+        actionLabel === 'Actualizar datos' ? 'pi pi-sync' : 'pi pi-arrow-right'
+      "
+      severity="success"
+      [rounded]="true"
+      size="small"
+      class="flex-1 sm:flex-none min-w-[120px]"
+    ></p-button>
+  </div>
 </div>

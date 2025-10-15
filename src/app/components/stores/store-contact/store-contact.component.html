@@ -225,11 +225,12 @@
       class="flex-1 sm:flex-none min-w-[120px]"
     ></p-button>
 
-  <p-button
+<p-button
   type="button"
   (click)="save()"
   [disabled]="form.invalid || isLoading"
-  label="Siguiente paso"
+  [label]="actionLabel"
+  [icon]="actionLabel === 'Actualizar datos' ? 'pi pi-sync' : 'pi pi-arrow-right'"
   severity="success"
   [rounded]="true"
   size="small"

@@ -106,6 +106,15 @@ ngOnInit(): void {
         this.productState.init(store.id_tienda, store.link_tienda);
         this.isLoading = false;
       }
+
+      // 🟢 Suscripción para actualizar los valores del paginador
+      this.products$.subscribe((res) => {
+        if (res?.meta) {
+          this.totalItems = res.meta.total;
+          this.pageSize = res.meta.limit;
+          this.currentPage = res.meta.page - 1; // el paginator usa base 0
+        }
+      });
     });
 
     /** 🔹 Búsqueda reactiva */
@@ -169,7 +178,8 @@ ngOnInit(): void {
   onPageChange(event: any) {
     this.pageSize = event.rows;
     this.currentPage = event.page;
-    this.productState.setPage(event.page + 1);
+    this.productState.setLimit(this.pageSize);
+    this.productState.setPage(this.currentPage + 1);
   }
 
   /** ========================

@@ -271,13 +271,14 @@
     ></p-button>
 
    <p-button
-  size="small"
-  label="Crear tienda"
-  type="button"
-  [rounded]="true"
-  severity="success"
-  class="flex-1 sm:flex-none min-w-[120px]"
-  (click)="onSubmit()"
+      size="small"
+      [label]="actionLabel"
+      type="button"
+      [rounded]="true"
+       [icon]="actionLabel === 'Actualizar datos' ? 'pi pi-sync' : 'pi pi-arrow-right'"
+      severity="success"
+      class="flex-1 sm:flex-none min-w-[120px]"
+      (click)="onSubmit()"
 ></p-button>
   </div>
 </div>

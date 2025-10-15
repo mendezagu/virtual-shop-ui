@@ -354,6 +354,7 @@
     <p-paginator
       [rows]="pageSize"
       [totalRecords]="totalItems"
+      [first]="currentPage * pageSize"
       [rowsPerPageOptions]="[5, 10, 20]"
       (onPageChange)="onPageChange($event)"
     ></p-paginator>

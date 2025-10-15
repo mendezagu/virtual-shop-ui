@@ -39,6 +39,8 @@ export class StorePersonalizationComponent implements OnInit {
   logoPreview: string | null = null;
   bannerPreview: string | null = null;
 
+  actionLabel: string = 'Crear tienda';
+
   constructor(
     private fb: FormBuilder,
     private storeService: StoreService,
@@ -56,33 +58,35 @@ export class StorePersonalizationComponent implements OnInit {
     this.loadStoreData();
   }
 
-  private loadStoreData() {
-    this.storeService.getMyStores().subscribe({
-      next: (stores: Store[]) => {
-        if (stores.length > 0) {
-          const store = stores[0];
-          this.storeId = store.id_tienda;
+ private loadStoreData() {
+  this.storeService.getMyStores().subscribe({
+    next: (stores: Store[]) => {
+      if (stores.length > 0) {
+        const store = stores[0];
+        this.storeId = store.id_tienda;
+        this.actionLabel = 'Actualizar datos'; // 👈 cambia el texto del botón
 
-          this.storeForm.patchValue({
-            primary_color: store.primary_color || '#1E90FF',
-            secondary_color: store.secondary_color || '#FFD700',
-            background_color: store.background_color || 'white'
-          });
+        this.storeForm.patchValue({
+          primary_color: store.primary_color || '#1E90FF',
+          secondary_color: store.secondary_color || '#FFD700',
+          background_color: store.background_color || 'white',
+        });
 
-          this.logoPreview = store.logo_url || null;
-          this.bannerPreview = store.portada_url || null;
-        } else {
-          alert('⚠️ No tienes ninguna tienda creada aún.');
-        }
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Error cargando tiendas:', err);
-        alert('❌ No se pudieron cargar tus tiendas');
-        this.loading = false;
+        this.logoPreview = store.logo_url || null;
+        this.bannerPreview = store.portada_url || null;
+      } else {
+        this.actionLabel = 'Crear tienda'; // 👈 vuelve a “crear” si no hay tienda
       }
-    });
-  }
+      this.loading = false;
+    },
+    error: (err) => {
+      console.error('Error cargando tiendas:', err);
+      this.actionLabel = 'Crear tienda';
+      this.loading = false;
+    },
+  });
+}
+
 
   async onLogoSelect(event: any) {
     const file: File = event.files[0];
@@ -111,11 +115,6 @@ export class StorePersonalizationComponent implements OnInit {
   }
 
 onSubmit(): void {
-  if (!this.storeId) {
-    alert('Primero debes tener una tienda creada.');
-    return;
-  }
-
   if (this.storeForm.invalid) {
     this.storeForm.markAllAsTouched();
     return;
@@ -129,31 +128,50 @@ onSubmit(): void {
     portada_url: this.bannerPreview
   };
 
-  this.storeService.updateStore(this.storeId, formData).subscribe({
-    next: () => {
-      this.loading = false;
-      this.storeForm.markAsPristine();
-
-      // ✅ Emitimos evento al padre (Stepper)
-      this.saved.emit();
-
-      // ✅ Mostramos mensaje de éxito
-      this.showSuccessToast();
-
-      // 🎉 Confeti local (también podés usar el global)
-     this.launchLocalConfetti();
-
-      // ⏳ Esperamos unos segundos y redirigimos
-      setTimeout(() => {
-        this.router.navigate(['/mis-categorias']);
-      }, 7000); // ⏰ Espera 3.5 segundos para que el usuario vea el efecto
+ if (!this.storeId) {
+  console.warn('⚠️ No se encontró storeId, intentando cargar tienda existente...');
+  this.storeService.getMyStores().subscribe({
+    next: (stores) => {
+      if (stores.length > 0) {
+        this.storeId = stores[0].id_tienda;
+        console.log('✅ Se usará la tienda existente:', this.storeId);
+        this.onSubmit(); // vuelve a ejecutar el submit, ahora con storeId
+      } else {
+        alert('❌ No se encontró ninguna tienda. Crea una primero.');
+        this.loading = false;
+      }
     },
-    error: () => {
+    error: (err) => {
+      console.error('❌ Error al buscar tiendas:', err);
       this.loading = false;
-      alert('❌ Hubo un error al guardar los cambios');
-    }
+    },
   });
+  return;
+} else {
+    // 🟡 Ya existe tienda -> actualizamos
+    this.storeService.updateStore(this.storeId, formData).subscribe({
+      next: () => {
+        console.log('✅ Tienda actualizada:', this.storeId);
+        this.loading = false;
+        this.storeForm.markAsPristine();
+
+        this.saved.emit();
+        this.showSuccessToast();
+        this.launchLocalConfetti();
+
+        setTimeout(() => {
+          this.router.navigate(['/mis-categorias']);
+        }, 4000);
+      },
+      error: (err) => {
+        console.error('❌ Error al actualizar tienda:', err);
+        this.loading = false;
+        alert('❌ Hubo un error al guardar los cambios');
+      },
+    });
+  }
 }
+
 
 private showSuccessToast() {
   const toast = document.createElement('div');

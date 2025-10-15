@@ -61,6 +61,8 @@ export class MyStoreComponent implements OnInit {
   showPreview = false;
   isMobile = false;
 
+  actionLabel: string = 'Siguiente paso';
+
   categories: Category[] = [
     { name: 'Tecnologia', code: 'Tech' },
     { name: 'Electronica', code: 'Elec' },

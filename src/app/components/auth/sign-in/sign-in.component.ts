@@ -11,9 +11,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AuthService } from '../../../shared/services/private_services/auth.service';
 import { Router } from '@angular/router';
-import { BrandingSideComponent } from "../../../shared/components/branding-side/branding-side.component";
+import { BrandingSideComponent } from '../../../shared/components/branding-side/branding-side.component';
 import { InputTextModule } from 'primeng/inputtext';
-import { CardModule } from "primeng/card";
+import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
 import { CommonModule } from '@angular/common';
@@ -34,18 +34,18 @@ import { SignUpDialogComponent } from '../signUp-dialog/sign-up-dialog.component
     MatCheckboxModule,
     InputTextModule,
     CardModule,
-    DynamicDialogModule
-],
+    DynamicDialogModule,
+  ],
   templateUrl: './sign-in.component.html',
   styleUrls: ['./sign-in.component.scss'],
-    providers: [DialogService],
+  providers: [DialogService],
 })
 export class SignInComponent {
   @Output() success = new EventEmitter<void>();
 
   form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-     password: ['', [Validators.required, Validators.minLength(6)]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
   });
 
   error: string | null = null;
@@ -57,7 +57,7 @@ export class SignInComponent {
     private dialogService: DialogService
   ) {}
 
- openLoginDialog() {
+  openLoginDialog() {
     this.dialogService.open(SignInDialogComponent, {
       header: 'Iniciar Sesión',
       width: '90%',
@@ -67,8 +67,9 @@ export class SignInComponent {
       closeOnEscape: true,
     });
   }
-  
-openSignUpDialog() {
+
+openSignUpDialog(plan: 'gratis' | 'emprendedor' | 'pro') {
+  localStorage.setItem('selectedPlan', plan);
   this.dialogService.open(SignUpDialogComponent, {
     header: 'Crear cuenta',
     width: '90%',
@@ -78,7 +79,15 @@ openSignUpDialog() {
     closeOnEscape: true,
   });
 }
- 
+
+  onSelectPlan(plan: 'gratis' | 'emprendedor' | 'pro') {
+    if (plan === 'gratis') {
+      // Guardar en localStorage (para usar en la creación de tienda)
+      localStorage.setItem('selectedPlan', 'gratis');
+      this.router.navigate(['/crear-tienda']); // o al paso de creación que ya tengas
+    }
+  }
+
   submit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();

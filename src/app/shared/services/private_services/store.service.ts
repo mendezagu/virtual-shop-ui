@@ -15,10 +15,25 @@ export class StoreService {
 
   /** Crea tienda y limpia cache para que la próxima lectura traiga datos frescos */
   createStore(data: CreateStoreDto): Observable<Store> {
-    return this.http.post<Store>(this.baseUrl, data).pipe(
-      tap(() => this.clearCache())
-    );
-  }
+  return this.http.post<Store>(this.baseUrl, data).pipe(
+    tap((store) => {
+      const selectedPlan = localStorage.getItem('selectedPlan');
+      if (selectedPlan === 'gratis') {
+        // Asignar plan gratuito automáticamente
+        this.http
+          .post('http://localhost:3000/api/subscriptions', {
+            storeId: store.id_tienda,
+            planId: 1, // id del plan gratuito
+          })
+          .subscribe({
+            next: (res) => console.log('✅ Plan Gratis asignado:', res),
+            error: (err) => console.error('❌ Error al asignar plan:', err),
+          });
+      }
+      this.clearCache();
+    })
+  );
+}
 
   /**
    * Devuelve las tiendas del usuario con cache en memoria.

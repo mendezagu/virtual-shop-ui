@@ -1,74 +1,104 @@
 <!-- ===== HEADER ===== -->
-<header class="flex justify-between items-center px-6 py-4 shadow-sm bg-white fixed w-full top-0 z-50">
+<header
+  class="flex justify-between items-center px-6 py-4 shadow-sm bg-white fixed w-full top-0 z-50"
+>
   <div class="flex items-center gap-2">
     <i class="pi pi-shopping-bag text-pink-500 text-2xl"></i>
     <span class="text-xl font-semibold text-slate-700">PEDIAPP</span>
   </div>
   <div class="flex gap-3">
-   <button
+    <button
       pButton
       label="Iniciar Sesión"
       class="p-button-text text-slate-600 hover:text-pink-500 transition"
       (click)="openLoginDialog()"
     ></button>
-<button
-  pButton
-  label="Crear Tienda Gratis"
-  icon="pi pi-arrow-right"
-  iconPos="right"
-  class="p-button-rounded p-button-primary font-semibold"
-  (click)="openSignUpDialog()"
-></button>
+    <button
+      pButton
+      label="Crear Tienda Gratis"
+      icon="pi pi-arrow-right"
+      iconPos="right"
+      class="p-button-rounded p-button-primary font-semibold"
+      (click)="openSignUpDialog('gratis')"
+    ></button>
   </div>
 </header>
 
 <!-- ===== HERO ===== -->
-<section class="flex flex-col md:flex-row items-center justify-center text-center md:text-left min-h-[90vh] px-8 md:px-20 mt-20">
+<section
+  class="flex flex-col md:flex-row items-center justify-center text-center md:text-left min-h-[90vh] px-8 md:px-20 mt-20"
+>
   <div class="md:w-1/2 space-y-6">
-    <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 leading-tight">
+    <h1
+      class="text-4xl md:text-5xl font-extrabold text-slate-800 leading-tight"
+    >
       Creá tu <span class="text-pink-500">tienda digital</span> en minutos 🚀
     </h1>
     <p class="text-lg text-slate-600">
-      Con <strong>PEDIAPP</strong> podés vender desde tu WhatsApp, gestionar pedidos y mostrar tus productos fácilmente.
+      Con <strong>PEDIAPP</strong> podés vender desde tu WhatsApp, gestionar
+      pedidos y mostrar tus productos fácilmente.
     </p>
     <div class="flex flex-wrap gap-3 justify-center md:justify-start">
-      <button pButton label="Comenzar Ahora" class="p-button-lg p-button-primary font-semibold"></button>
-      <button pButton label="Ver Demo" class="p-button-lg p-button-outlined"></button>
+      <button
+        pButton
+        label="Comenzar Ahora"
+        class="p-button-lg p-button-primary font-semibold"
+      ></button>
+      <button
+        pButton
+        label="Ver Demo"
+        class="p-button-lg p-button-outlined"
+      ></button>
     </div>
   </div>
 
   <div class="md:w-1/2 flex justify-center mt-10 md:mt-0">
-    <img src="assets/mockup-store.png" alt="Mockup de tienda" class="w-[320px] md:w-[450px] rounded-3xl shadow-lg" />
+    <img
+      src="assets/mockup-store.png"
+      alt="Mockup de tienda"
+      class="w-[320px] md:w-[450px] rounded-3xl shadow-lg"
+    />
   </div>
 </section>
 
 <!-- ===== CARACTERÍSTICAS ===== -->
 <section class="px-6 md:px-20 py-24 bg-gray-50 text-center">
-  <h2 class="text-3xl font-bold mb-12 text-slate-800">Todo lo que tu tienda necesita</h2>
+  <h2 class="text-3xl font-bold mb-12 text-slate-800">
+    Todo lo que tu tienda necesita
+  </h2>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
     <p-card>
       <i class="pi pi-whatsapp text-green-500 text-3xl mb-4"></i>
       <h3 class="font-semibold text-lg mb-2">Pedidos por WhatsApp</h3>
-      <p class="text-slate-500 text-sm">Tus clientes envían sus pedidos directo a tu WhatsApp sin complicaciones.</p>
+      <p class="text-slate-500 text-sm">
+        Tus clientes envían sus pedidos directo a tu WhatsApp sin
+        complicaciones.
+      </p>
     </p-card>
 
     <p-card>
       <i class="pi pi-images text-pink-500 text-3xl mb-4"></i>
       <h3 class="font-semibold text-lg mb-2">Catálogo Visual</h3>
-      <p class="text-slate-500 text-sm">Subí tus productos con fotos, precios y descripciones atractivas.</p>
+      <p class="text-slate-500 text-sm">
+        Subí tus productos con fotos, precios y descripciones atractivas.
+      </p>
     </p-card>
 
     <p-card>
       <i class="pi pi-chart-line text-blue-500 text-3xl mb-4"></i>
       <h3 class="font-semibold text-lg mb-2">Gestión Simple</h3>
-      <p class="text-slate-500 text-sm">Controlá tus ventas y productos desde un panel intuitivo y rápido.</p>
+      <p class="text-slate-500 text-sm">
+        Controlá tus ventas y productos desde un panel intuitivo y rápido.
+      </p>
     </p-card>
   </div>
 </section>
 
 <!-- ===== PLANES ===== -->
 <section class="px-6 md:px-20 py-24 text-center">
-  <h2 class="text-3xl font-bold mb-12 text-slate-800">Planes para todos los negocios</h2>
+  <h2 class="text-3xl font-bold mb-12 text-slate-800">
+    Planes para todos los negocios
+  </h2>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
     <p-card header="Gratis" subheader="Ideal para comenzar">
       <p class="text-4xl font-bold mb-3 text-slate-700">$0</p>
@@ -77,7 +107,7 @@
         <li>Link personalizado</li>
         <li>Pedidos por WhatsApp</li>
       </ul>
-      <button pButton label="Comenzar" class="p-button-primary"></button>
+      <button (click)="openSignUpDialog('gratis')" pButton label="Comenzar" class="p-button-primary"></button>
     </p-card>
 
     <p-card header="Emprendedor" subheader="Más herramientas">
@@ -87,7 +117,7 @@
         <li>Panel de estadísticas</li>
         <li>Diseños personalizados</li>
       </ul>
-      <button pButton label="Probar 7 días" class="p-button-primary"></button>
+      <button (click)="openSignUpDialog('emprendedor')" pButton label="Probar 7 días" class="p-button-primary"></button>
     </p-card>
 
     <p-card header="Pro" subheader="Todo incluido">
@@ -97,7 +127,7 @@
         <li>Integración de pagos</li>
         <li>Soporte prioritario</li>
       </ul>
-      <button pButton label="Suscribirse" class="p-button-primary"></button>
+      <button (click)="openSignUpDialog('pro')" pButton label="Suscribirse" class="p-button-primary"></button>
     </p-card>
   </div>
 </section>
@@ -111,4 +141,3 @@
     <i class="pi pi-globe hover:text-white cursor-pointer"></i>
   </div>
 </footer>
-

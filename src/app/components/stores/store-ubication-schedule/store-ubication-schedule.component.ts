@@ -16,8 +16,8 @@ import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
 import { Message } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
-import { SkeletonModule } from "primeng/skeleton";
-import { DialogModule } from "primeng/dialog";
+import { SkeletonModule } from 'primeng/skeleton';
+import { DialogModule } from 'primeng/dialog';
 
 interface City {
   name: string;
@@ -38,8 +38,8 @@ interface City {
     AvatarModule,
     MessagesModule,
     SkeletonModule,
-    DialogModule
-],
+    DialogModule,
+  ],
   templateUrl: './store-ubication-schedule.component.html',
   styleUrl: './store-ubication-schedule.component.scss',
 })
@@ -55,6 +55,8 @@ export class StoreUbicationScheduleComponent {
   @Input() storeData: any;
   isLoading = true;
   showPreview = false;
+
+  actionLabel: string = 'Siguiente paso';
 
   constructor(private storeService: StoreService, private fb: FormBuilder) {}
 
@@ -79,36 +81,60 @@ export class StoreUbicationScheduleComponent {
       { validators: this.horarioValidator }
     );
 
-    // Escuchar cambios para mostrar/ocultar mensajes de error
-    this.form.get('horario_apertura')?.valueChanges.subscribe(() => {
-      this.checkHorario();
-    });
-    this.form.get('horario_cierre')?.valueChanges.subscribe(() => {
-      this.checkHorario();
-    });
+    // 🔹 Escuchar cambios de hora y mostrar mensaje si hay error
+    this.form
+      .get('horario_apertura')
+      ?.valueChanges.subscribe(() => this.checkHorario());
+    this.form
+      .get('horario_cierre')
+      ?.valueChanges.subscribe(() => this.checkHorario());
 
+    // 🔹 Cargar tienda existente
     this.storeService.getMyStores().subscribe({
       next: (stores) => {
         if (stores?.length) {
           this.storeData = stores[0];
           this.form.patchValue({
-            direccion: (this.storeData as any).direccion ?? '',
-            ciudad: (this.storeData as any).ciudad ?? '',
-            latitud: (this.storeData as any).latitud ?? null,
-            longitud: (this.storeData as any).longitud ?? null,
-            horario_apertura: this.parseTime(
-              (this.storeData as any).horario_apertura
-            ),
-            horario_cierre: this.parseTime(
-              (this.storeData as any).horario_cierre
-            ),
+            direccion: this.storeData.direccion ?? '',
+            ciudad: this.storeData.ciudad ?? '',
+            latitud: this.storeData.latitud ?? null,
+            longitud: this.storeData.longitud ?? null,
+            horario_apertura: this.parseTime(this.storeData.horario_apertura),
+            horario_cierre: this.parseTime(this.storeData.horario_cierre),
           });
+
+          // ✅ Cambiar texto del botón si hay datos previos
+          if (
+            this.storeData.direccion ||
+            this.storeData.ciudad ||
+            this.storeData.horario_apertura ||
+            this.storeData.horario_cierre
+          ) {
+            this.actionLabel = 'Actualizar datos';
+          }
         } else {
           this.storeData = null;
+          this.actionLabel = 'Siguiente paso';
         }
+
         this.isLoading = false;
       },
       error: () => (this.isLoading = false),
+    });
+
+    // 🔹 Cambiar texto del botón dinámicamente si el usuario edita algo
+    this.form.valueChanges.subscribe(() => {
+      const v = this.form.value;
+      if (
+        v.direccion?.trim() ||
+        v.ciudad ||
+        v.horario_apertura ||
+        v.horario_cierre
+      ) {
+        this.actionLabel = 'Actualizar datos';
+      } else {
+        this.actionLabel = 'Siguiente paso';
+      }
     });
   }
 
@@ -140,14 +166,14 @@ export class StoreUbicationScheduleComponent {
   }
 
   /** Convierte "HH:mm" en un Date para el calendario */
-private parseTime(value: string | null): Date | null {
-  if (!value) return null;
-  const [hours, minutes] = value.split(':').map(Number);
-  if (isNaN(hours) || isNaN(minutes)) return null; // 🔥 evita NaN
-  const d = new Date();
-  d.setHours(hours, minutes, 0, 0);
-  return d;
-}
+  private parseTime(value: string | null): Date | null {
+    if (!value) return null;
+    const [hours, minutes] = value.split(':').map(Number);
+    if (isNaN(hours) || isNaN(minutes)) return null; // 🔥 evita NaN
+    const d = new Date();
+    d.setHours(hours, minutes, 0, 0);
+    return d;
+  }
 
   /** Convierte un Date en "HH:mm" para enviar al backend */
   private formatTime(date: Date | null): string | undefined {
@@ -157,40 +183,39 @@ private parseTime(value: string | null): Date | null {
     return `${hours}:${minutes}`;
   }
 
-save() {
-  if (!this.storeData) {
-    alert('Primero debes crear la información básica de la tienda.');
-    return;
+  save() {
+    if (!this.storeData) {
+      alert('Primero debes crear la información básica de la tienda.');
+      return;
+    }
+
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    this.isLoading = true;
+
+    const v = this.form.value;
+    const payload = {
+      direccion: v.direccion || undefined,
+      ciudad: v.ciudad || undefined,
+      latitud: v.latitud != null ? Number(v.latitud) : undefined,
+      longitud: v.longitud != null ? Number(v.longitud) : undefined,
+      horario_apertura: this.formatTime(v.horario_apertura),
+      horario_cierre: this.formatTime(v.horario_cierre),
+    };
+
+    this.storeService.updateStore(this.storeData.id_tienda, payload).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.form.markAsPristine();
+        this.saved.emit(); // 🔥 Hace avanzar el stepper automáticamente
+      },
+      error: () => {
+        this.isLoading = false;
+        alert('Error al guardar la ubicación');
+      },
+    });
   }
-
-  if (this.form.invalid) {
-    this.form.markAllAsTouched();
-    return;
-  }
-
-  this.isLoading = true;
-
-  const v = this.form.value;
-  const payload = {
-    direccion: v.direccion || undefined,
-    ciudad: v.ciudad || undefined,
-    latitud: v.latitud != null ? Number(v.latitud) : undefined,
-    longitud: v.longitud != null ? Number(v.longitud) : undefined,
-    horario_apertura: this.formatTime(v.horario_apertura),
-    horario_cierre: this.formatTime(v.horario_cierre),
-  };
-
-  this.storeService.updateStore(this.storeData.id_tienda, payload).subscribe({
-    next: () => {
-      this.isLoading = false;
-      this.form.markAsPristine();
-      this.saved.emit(); // 🔥 Hace avanzar el stepper automáticamente
-    },
-    error: () => {
-      this.isLoading = false;
-      alert('Error al guardar la ubicación');
-    },
-  });
-}
-
 }
