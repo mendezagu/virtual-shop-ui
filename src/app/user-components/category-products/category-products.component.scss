@@ -20,3 +20,15 @@
   flex: 0 0 auto !important;
   min-width: 150px !important; /* asegura espacio consistente */
 }
+
+::ng-deep .p-badge {
+  --p-badge-bg: var(--secondary) !important;
+  --p-badge-color: #fff !important;
+  background-color: var(--secondary) !important;
+  color: #fff !important;
+  border-radius: 9999px !important;
+  font-weight: 600;
+  font-size: 0.75rem !important;
+  padding: 0.25rem 0.6rem !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}

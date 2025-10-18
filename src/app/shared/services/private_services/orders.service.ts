@@ -22,13 +22,12 @@ export interface OrderItem {
 export interface Order {
   id: string;
   fecha: string;
-  estado: OrderStatus;
-  paymentStatus: 'PENDING' | 'PAID' | 'FAILED';
-  paymentMethod: 'EFECTIVO' | 'MERCADOPAGO';
-  total: number;
   customerName: string;
   customerPhone: string;
-  items: OrderItem[];
+  total: number;
+  paymentMethod: string;
+  paymentStatus: string;
+  estado: OrderStatus;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -54,6 +53,7 @@ export class OrdersService {
       headers: this.headers(),
     });
   }
+  
 
   // 🔹 Obtener pedidos por tienda (para vendedor)
   getOrdersByStore(storeId: string): Observable<Order[]> {
@@ -62,13 +62,14 @@ export class OrdersService {
   });
 }
 
-updateOrderStatus(orderId: string, estado: OrderStatus): Observable<Order> {
-  return this.http.patch<Order>(
-    `${this.base}/${orderId}/status`,
-    { estado },
-    { headers: this.headers() }
-  );
-}
+// 🔹 🔥 NUEVO: obtener estados desde el backend
+  getOrderStatuses(): Observable<{ value: string; label: string }[]> {
+    return this.http.get<{ value: string; label: string }[]>(`${this.base}/statuses`);
+  }
+
+  updateOrderStatus(orderId: string, estado: string): Observable<Order> {
+    return this.http.patch<Order>(`${this.base}/${orderId}/status`, { estado });
+  }
 
 updatePayment(orderId: string, paymentStatus: string): Observable<Order> {
   return this.http.patch<Order>(
@@ -78,9 +79,10 @@ updatePayment(orderId: string, paymentStatus: string): Observable<Order> {
   );
 }
 
-getMyOrders(): Observable<Order[]> {
-  return this.http.get<Order[]>(`${this.base}/mine`, {
-    headers: this.headers(),
-  });
-}
+
+  // 🔹 Trae todos los pedidos del vendedor
+  getMyOrders(): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.base}/mine`);
+  }
+
 }

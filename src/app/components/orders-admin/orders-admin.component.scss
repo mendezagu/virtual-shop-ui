@@ -1,0 +1,20 @@
+/* === Corrige el dropdown cortado dentro del p-table === */
+:host ::ng-deep .p-datatable-wrapper {
+  overflow: visible !important;
+}
+
+:host ::ng-deep .p-datatable-scrollable-body {
+  overflow: visible !important;
+}
+
+:host ::ng-deep .p-dropdown-panel {
+  z-index: 9999 !important;
+}
+
+:host ::ng-deep .p-paginator {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  border-top: 1px solid #e5e7eb; /* gris suave */
+  z-index: 50;
+}

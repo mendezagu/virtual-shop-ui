@@ -1,12 +1,10 @@
 <!-- 🔹 TOOLBAR -->
 <div
-  [ngClass]="collapsed && !isMobile ? 'ml-20' : (!isMobile ? 'ml-72' : '')"
-  class="sticky top-0 z-40 h-16 px-6 flex items-center justify-between transition-all duration-300
-         border-b shadow-sm backdrop-blur-md"
+  class="fixed top-0 left-0 right-0 z-40 h-16 px-6 flex items-center justify-between
+         transition-all duration-300 border-b shadow-sm backdrop-blur-md"
+  [ngClass]="collapsed && !isMobile ? 'ml-20' : !isMobile ? 'ml-72' : ''"
   [ngStyle]="{
-    backgroundColor: mode === 'buyer'
-      ? 'var(--bg)'
-      : 'rgba(255,255,255,0.9)',
+    backgroundColor: mode === 'buyer' ? 'var(--bg)' : 'rgba(255,255,255,0.9)',
     color: mode === 'buyer' ? 'var(--text)' : '#111827'
   }"
 >
@@ -33,30 +31,55 @@
           color: mode === 'buyer' ? 'var(--secondary)' : '#7e22ce'
         }"
       >
-        {{ mode === 'seller' ? 'Panel de Control' : store?.nombre_tienda || 'Tienda' }}
+        {{
+          mode === "seller"
+            ? "Panel de Control"
+            : store?.nombre_tienda || "Tienda"
+        }}
       </span>
     </div>
   </div>
 
   <!-- Derecha -->
-  <div class="flex items-center gap-3" *ngIf="mode === 'seller' && isLoggedIn">
-    <button
-      pButton
-      icon="pi pi-bell"
-      class="relative p-button-rounded p-button-text hover:scale-110 transition-transform duration-200"
-      [ngStyle]="{ color: 'var(--secondary)' }"
-    >
-      <span
-        class="absolute top-0 right-0 h-2 w-2 rounded-full bg-[var(--secondary)] animate-pulse"
-      ></span>
-    </button>
+  <div class="flex items-center gap-3">
+    <!-- 🛒 Botón del carrito solo para comprador -->
+    <ng-container *ngIf="mode === 'buyer'">
+      <button
+        pButton
+        icon="pi pi-shopping-cart"
+        class="relative p-button-rounded p-button-text hover:scale-110 transition-transform duration-200"
+        [ngStyle]="{ color: 'var(--secondary)' }"
+        (click)="toggleCartDrawer()"
+      >
+        <span
+          *ngIf="cartItems.length > 0"
+          class="absolute -top-1 -right-1 text-[10px] font-bold rounded-full px-1.5 py-[1px]"
+          [ngStyle]="{
+            backgroundColor: 'var(--secondary)',
+            color: '#fff'
+          }"
+        >
+          {{ cartItems.length }}
+        </span>
+      </button>
+    </ng-container>
 
-    <button
-      pButton
-      icon="pi pi-user"
-      class="p-button-rounded p-button-text hover:scale-110 transition-transform duration-200"
-      [ngStyle]="{ color: 'var(--secondary)' }"
-    ></button>
+    <!-- 👤 Icono usuario solo modo vendedor -->
+    <ng-container *ngIf="mode === 'seller' && isLoggedIn">
+      <button
+        pButton
+        icon="pi pi-bell"
+        class="relative p-button-rounded p-button-text hover:scale-110 transition-transform duration-200"
+        [ngStyle]="{ color: 'var(--secondary)' }"
+      ></button>
+
+      <button
+        pButton
+        icon="pi pi-user"
+        class="p-button-rounded p-button-text hover:scale-110 transition-transform duration-200"
+        [ngStyle]="{ color: 'var(--secondary)' }"
+      ></button>
+    </ng-container>
   </div>
 </div>
 
@@ -67,11 +90,12 @@
   [mode]="mode"
   [store]="store"
   [ngStyle]="{
-    background: mode === 'buyer'
-      ? (store?.background_color === 'dark'
+    background:
+      mode === 'buyer'
+        ? store?.background_color === 'dark'
           ? '#202123'
-          : store?.background_color || '#ffffff')
-      : ''
+          : store?.background_color || '#ffffff'
+        : ''
   }"
 ></app-sidebar>
 
@@ -84,21 +108,19 @@
   [blockScroll]="true"
   [baseZIndex]="10000"
   [style]="{ width: '17rem', padding: '0' }"
-  class="md:hidden bg-transparent border-none shadow-none p-0
-         [&_.p-sidebar-content]:!bg-transparent
-         [&_.p-sidebar-content]:!p-0
-         [&_.p-sidebar-content]:!overflow-visible"
+  class="md:hidden bg-transparent border-none shadow-none p-0 [&_.p-sidebar-content]:!bg-transparent [&_.p-sidebar-content]:!p-0 [&_.p-sidebar-content]:!overflow-visible"
 >
   <app-sidebar
     [collapsed]="false"
     [mode]="mode"
     [store]="store"
     [ngStyle]="{
-      background: mode === 'buyer'
-        ? (store?.background_color === 'dark'
+      background:
+        mode === 'buyer'
+          ? store?.background_color === 'dark'
             ? '#202123'
-            : store?.background_color || '#ffffff')
-        : ''
+            : store?.background_color || '#ffffff'
+          : ''
     }"
     (collapsedChange)="sidebarVisible = false"
   ></app-sidebar>
@@ -106,18 +128,29 @@
 
 <!-- 🔹 CONTENIDO -->
 <div
- [ngClass]="{
+  class="transition-all duration-300 min-h-screen pt-16"
+  [ngClass]="{
     'ml-0': isMobile || (!isLoggedIn && mode !== 'buyer'),
-
-
     'ml-20': !isMobile && (isLoggedIn || mode === 'buyer') && collapsed,
     'ml-72': !isMobile && (isLoggedIn || mode === 'buyer') && !collapsed
   }"
-  class="transition-all duration-300 min-h-screen"
   [ngStyle]="{
     backgroundColor: mode === 'buyer' ? 'var(--bg)' : '#f9fafb',
     color: mode === 'buyer' ? 'var(--text)' : '#111827'
   }"
 >
   <router-outlet></router-outlet>
+
+  <app-cart-drawer
+    *ngIf="mode === 'buyer'"
+    [open]="cartOpen"
+    [items]="cartItems"
+    [total]="cartTotal"
+    [slug]="store?.link_tienda || store?.slug"
+    [store]="store"
+    (close)="cartOpen = false"
+    (updateQty)="updateItem($event)"
+    (remove)="removeItem($event)"
+    (clear)="clearCart()"
+  ></app-cart-drawer>
 </div>

@@ -1,61 +1,116 @@
-<h2>Pedidos de la tienda</h2>
+<div class="p-4">
+    <!-- 🔹 Encabezado -->
+  <app-page-header
+    title="Mis pedidos"
+    subtitle="Visualizá y administrá el estado de tus pedidos."
+    icon="pi pi-objects-column"
+  ></app-page-header>
 
-<form [formGroup]="ordersForm">
-  <div formArrayName="orders">
-    <table mat-table [dataSource]="orders" class="mat-elevation-z8 full-width-table">
-      
-      <!-- Fecha -->
-      <ng-container matColumnDef="fecha">
-        <th mat-header-cell *matHeaderCellDef> Fecha </th>
-        <td mat-cell *matCellDef="let order"> {{ order.fecha | date:'short' }} </td>
-      </ng-container>
+  <p-table
+    #dt
+    [value]="ordersArray.controls"
+    dataKey="id"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [loading]="loading"
+    [globalFilterFields]="[
+      'customerName',
+      'customerPhone',
+      'paymentMethod',
+      'estado'
+    ]"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    responsiveLayout="scroll"
+  >
+    <!-- 🔍 Filtro global -->
+    <ng-template pTemplate="caption">
+      <div class="flex justify-between items-center">
+        <h3 class="m-0 text-base font-medium">Listado de pedidos</h3>
+        <p-iconField iconPosition="left">
+          <p-inputIcon><i class="pi pi-search"></i></p-inputIcon>
+          <input pInputText type="text" placeholder="Buscar pedido..." />
+        </p-iconField>
+      </div>
+    </ng-template>
 
-      <!-- Cliente -->
- <ng-container matColumnDef="cliente">
-  <th mat-header-cell *matHeaderCellDef> Cliente </th>
-  <td mat-cell *matCellDef="let order">
-    {{ order.customerName }} <br />
-    📱 {{ order.customerPhone }}
-  </td>
-</ng-container>
+    <!-- 🔹 Encabezados -->
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="fecha">Fecha <p-sortIcon field="fecha" /></th>
+        <th>Cliente</th>
+        <th>Total</th>
+        <th>Pago</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
 
-      <!-- Total -->
-      <ng-container matColumnDef="total">
-        <th mat-header-cell *matHeaderCellDef> Total </th>
-        <td mat-cell *matCellDef="let order"> {{ order.total | currency:'ARS' }} </td>
-      </ng-container>
+    <!-- 🔹 Filas -->
+    <ng-template pTemplate="body" let-row let-i="rowIndex">
+      <tr [formGroup]="row">
+        <!-- 📅 Fecha -->
+        <td>{{ orders[i]?.fecha | date : "short" }}</td>
 
-      <!-- Pago -->
- <ng-container matColumnDef="pago">
-  <th mat-header-cell *matHeaderCellDef> Pago </th>
-  <td mat-cell *matCellDef="let order">
-    {{ order.paymentMethod }} <br />
-    Estado: <b>{{ order.paymentStatus }}</b>
-  </td>
-</ng-container>
-
-      <!-- Estado logístico -->
-      <ng-container matColumnDef="estado">
-        <th mat-header-cell *matHeaderCellDef> Estado </th>
-        <td mat-cell *matCellDef="let order; let i = index" [formGroupName]="i">
-          <mat-select formControlName="estado" (selectionChange)="updateEstado(i)">
-            <mat-option *ngFor="let est of estados" [value]="est">{{ est }}</mat-option>
-          </mat-select>
+        <!-- 👤 Cliente -->
+        <td>
+          <div class="font-medium">{{ orders[i]?.customerName }}</div>
+          <small class="text-gray-500">📱 {{ orders[i]?.customerPhone }}</small>
         </td>
-      </ng-container>
 
-      <!-- Acciones -->
-      <ng-container matColumnDef="acciones">
-        <th mat-header-cell *matHeaderCellDef> Acciones </th>
-        <td mat-cell *matCellDef="let order; let i = index">
-          <button mat-button (click)="cancelarPedido(i)" color="warn">
-            Cancelar
-          </button>
+        <!-- 💰 Total -->
+        <td>{{ orders[i]?.total | currency : "ARS" }}</td>
+
+        <!-- 💳 Pago -->
+        <td>
+          {{ orders[i]?.paymentMethod }} <br />
+          <small class="text-gray-600"
+            >Estado: <b>{{ orders[i]?.paymentStatus }}</b></small
+          >
         </td>
-      </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-    </table>
-  </div>
-</form>
+        <!-- 🚚 Estado logístico -->
+        <td>
+          <p-dropdown
+            [options]="estados"
+            formControlName="estado"
+            (onChange)="updateEstado(i)"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Seleccionar estado"
+            styleClass="w-full"
+          >
+            <ng-template let-option pTemplate="item">
+              <p-tag
+                [value]="option.label"
+                [severity]="getSeverity(option.value)"
+              />
+            </ng-template>
+          </p-dropdown>
+        </td>
+
+        <!-- ⚙️ Acciones -->
+        <td>
+          <button
+            pButton
+            label="Cancelar"
+            icon="pi pi-times"
+            severity="danger"
+            size="small"
+            (click)="cancelarPedido(i)"
+            [disabled]="row.get('estado')?.value === 'CANCELADO'"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+
+    <!-- 🔹 Mensaje vacío -->
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6" class="text-center text-gray-400 py-6">
+          No hay pedidos registrados.
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

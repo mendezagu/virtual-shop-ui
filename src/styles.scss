@@ -71,7 +71,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 /* Header del paso (si hay título) */
 .shepherd-header {
-  background-color: var(--primary, #7e22ce);
+
   color: #fff !important;
   font-weight: 600;
   padding: 0.75rem 1rem;
@@ -155,4 +155,17 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .shepherd-element,
 .shepherd-modal-overlay-container {
   transition: all 0.3s ease-in-out;
+}
+
+
+::ng-deep .p-badge {
+  --p-badge-bg: var(--secondary) !important;
+  --p-badge-color: #fff !important;
+  background-color: var(--secondary) !important;
+  color: #fff !important;
+  border-radius: 9999px !important;
+  font-weight: 600;
+  font-size: 0.75rem !important;
+  padding: 0.25rem 0.6rem !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }

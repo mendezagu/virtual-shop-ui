@@ -1,85 +1,89 @@
 <div
-  class="min-h-screen w-full"
-  [style.--primary]="product?.store?.primary_color || '#ff4081'"
-  [style.--secondary]="product?.store?.secondary_color || '#00bfa5'"
+  class="min-h-screen w-full font-sans transition-colors duration-300"
+  [style.--primary]="product?.store?.primary_color || '#7e22ce'"
+  [style.--secondary]="product?.store?.secondary_color || '#ec4899'"
   [style.--bg]="
-    product?.store?.background_color === 'dark' ? '#202123' : '#ffffff'
+    product?.store?.background_color === 'dark' ? '#18181b' : '#ffffff'
   "
   [style.--surface]="
-    product?.store?.background_color === 'dark' ? '#2a2b32' : '#f9fafb'
+    product?.store?.background_color === 'dark' ? '#27272a' : '#f9fafb'
   "
   [style.--text]="
-    product?.store?.background_color === 'dark' ? '#f5f5f5' : '#111827'
+    product?.store?.background_color === 'dark' ? '#f4f4f5' : '#111827'
   "
   [ngStyle]="{
     backgroundColor: 'var(--bg)',
     color: 'var(--text)'
   }"
 >
-  <!-- Contenido centrado -->
-  <div class="relative max-w-3xl mx-auto max-h-[100dvh] overflow-y-auto p-6">
-    <!-- Imagen -->
-  <!-- Carrusel de imágenes -->
-<div class="flex justify-center mb-4">
-  <p-carousel
-    *ngIf="product?.imagen_url?.length > 0; else noImageTpl"
-    [value]="product.imagen_url"
-    [numVisible]="1"
-    [numScroll]="1"
-    [circular]="true"
-    [autoplayInterval]="4000"
-    styleClass="w-full max-w-md"
-  >
-    <ng-template pTemplate="item" let-img>
-      <div class="flex justify-center">
+  <!-- ===== CONTENEDOR PRINCIPAL ===== -->
+  <div class="relative max-w-3xl mx-auto p-6 space-y-6">
+    <!-- 🖼️ CARRUSEL DE IMÁGENES -->
+    <div class="flex justify-center">
+      <p-carousel
+        *ngIf="product?.imagen_url?.length > 0; else noImageTpl"
+        [value]="product.imagen_url"
+        [numVisible]="1"
+        [numScroll]="1"
+        [circular]="true"
+        [autoplayInterval]="4000"
+        styleClass="w-full max-w-md"
+      >
+        <ng-template pTemplate="item" let-img>
+          <div class="flex justify-center">
+            <img
+              [src]="img"
+              [alt]="product?.nombre_producto"
+              class="h-64 sm:h-72 object-contain rounded-2xl shadow-lg transition-transform duration-300 hover:scale-[1.02]"
+            />
+          </div>
+        </ng-template>
+      </p-carousel>
+
+      <ng-template #noImageTpl>
         <img
-          [src]="img"
+          src="https://placehold.co/400x400?text=Producto"
           [alt]="product?.nombre_producto"
-          class="h-60 object-contain rounded-lg"
+          class="h-64 sm:h-72 object-contain rounded-2xl shadow-md opacity-80"
         />
-      </div>
-    </ng-template>
-  </p-carousel>
+      </ng-template>
+    </div>
 
-  <!-- Si no hay imágenes -->
-  <ng-template #noImageTpl>
-    <img
-      src="https://placehold.co/400x400?text=Producto"
-      [alt]="product?.nombre_producto"
-      class="h-60 object-contain rounded-lg"
-    />
-  </ng-template>
-</div>
-
-    <!-- Nombre -->
-    <div class="flex flex-col items-start justify-start">
-      <span
-        class="text-xl font-bold text-center mb-1"
+    <!-- 🏷️ INFORMACIÓN -->
+    <div class="text-center space-y-2">
+      <h1
+        class="text-2xl font-bold tracking-tight"
         [ngStyle]="{ color: 'var(--primary)' }"
       >
         {{ product?.nombre_producto }}
-      </span>
-      <span class="text-sm opacity-80 text-center mb-4">
+      </h1>
+      <p class="text-sm opacity-80 leading-relaxed max-w-md mx-auto">
         {{ product?.descripcion }}
-      </span>
+      </p>
     </div>
 
-    <!-- Variantes -->
-    <div *ngIf="product?.presentacion_multiple && product?.variants?.length">
-      <h3
-        class="text-lg font-semibold mb-2"
-        [ngStyle]="{ color: 'var(--primary)' }"
-      >
+    <!-- 🧩 VARIANTES -->
+    <div
+      *ngIf="product?.presentacion_multiple && product?.variants?.length"
+      class="space-y-3"
+    >
+      <h3 class="text-lg font-semibold" [ngStyle]="{ color: 'var(--primary)' }">
         Presentaciones
       </h3>
 
       <div
         *ngFor="let v of product.variants"
-        class="flex items-center justify-between border rounded-lg px-3 py-2 mb-2"
-        [ngStyle]="{ backgroundColor: 'var(--surface)', color: 'var(--text)' }"
+        class="flex items-center justify-between border rounded-xl px-4 py-3 transition-all hover:shadow-sm"
+        [ngStyle]="{
+          backgroundColor: 'var(--surface)',
+          color: 'var(--text)',
+          borderColor:
+            product?.store?.background_color === 'dark'
+              ? 'rgba(255,255,255,0.08)'
+              : '#e5e7eb'
+        }"
       >
-        <!-- Checkbox -->
-        <div class="flex items-center">
+        <div class="flex items-center gap-2">
           <p-checkbox
             [binary]="true"
             [ngModel]="selectedVariants.has(v.id_variant)"
@@ -88,43 +92,43 @@
           ></p-checkbox>
           <label
             for="variant-{{ v.id_variant }}"
-            class="ml-2 text-sm font-medium"
+            class="text-sm font-medium cursor-pointer"
             [ngStyle]="{ color: 'var(--primary)' }"
+            >{{ v.nombre }}</label
           >
-            {{ v.nombre }}
-          </label>
         </div>
 
-        <!-- Cantidad + precio -->
-        <div class="flex items-center gap-3" *ngIf="selectedVariants.has(v.id_variant)">
-          <div class="flex items-center border rounded-full">
+        <div
+          class="flex items-center gap-3"
+          *ngIf="selectedVariants.has(v.id_variant)"
+        >
+          <div
+            class="flex items-center border rounded-full shadow-inner overflow-hidden"
+          >
             <button
               pButton
               type="button"
               icon="pi pi-minus"
-              class="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
+              class="p-button-text text-slate-500 hover:text-slate-700"
               (click)="decrement(v.id_variant)"
             ></button>
-
             <input
               type="number"
               min="0"
               [(ngModel)]="qty[v.id_variant]"
-              class="w-10 text-center border-0 text-sm focus:ring-0 bg-transparent"
+              class="w-10 text-center text-sm bg-transparent border-0 focus:ring-0"
             />
-
             <button
               pButton
               type="button"
               icon="pi pi-plus"
-              class="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
+              class="p-button-text text-slate-500 hover:text-slate-700"
               (click)="increment(v.id_variant)"
             ></button>
           </div>
-
           <span
-            class="text-sm font-semibold whitespace-nowrap"
-            [ngStyle]="{ color: 'var(--primary)' }"
+            class="text-sm font-semibold"
+            [ngStyle]="{ color: 'var(--secondary)' }"
           >
             {{ v.precio | currency : "ARS" : "symbol-narrow" : "1.0-0" }}
           </span>
@@ -132,47 +136,42 @@
       </div>
     </div>
 
-    <!-- Si NO tiene variantes -->
-    <div *ngIf="!product?.presentacion_multiple" class="space-y-4">
-      <!-- Cantidad -->
+    <!-- 🧺 PRODUCTO SIMPLE -->
+    <div *ngIf="!product?.presentacion_multiple" class="space-y-5">
       <div
-        class="border rounded-lg p-3 flex items-center justify-between"
-        [ngStyle]="{ backgroundColor: 'var(--surface)', color: 'var(--text)' }"
+        class="border rounded-xl p-4 flex items-center justify-between"
+        [ngStyle]="{
+          backgroundColor: 'var(--surface)',
+          color: 'var(--text)'
+        }"
       >
-        <span
-          class="text-sm font-semibold"
-          [ngStyle]="{ color: 'var(--primary)' }"
+        <span class="font-medium" [ngStyle]="{ color: 'var(--primary)' }"
+          >Unidades</span
         >
-          Unidades
-        </span>
-
-        <div class="flex items-center border rounded-full">
+        <div class="flex items-center border rounded-full shadow-inner">
           <button
             pButton
             type="button"
             icon="pi pi-minus"
-            class="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
+            class="p-button-text text-slate-500 hover:text-slate-700"
             (click)="decrement('single')"
           ></button>
-
           <input
             type="number"
             min="1"
             [(ngModel)]="qty['single']"
-            class="w-10 text-center border-0 text-sm focus:ring-0 bg-transparent"
+            class="w-10 text-center text-sm bg-transparent border-0 focus:ring-0"
           />
-
           <button
             pButton
             type="button"
             icon="pi pi-plus"
-            class="p-button-text p-button-sm text-slate-600 hover:text-slate-800"
+            class="p-button-text text-slate-500 hover:text-slate-700"
             (click)="increment('single')"
           ></button>
         </div>
       </div>
 
-      <!-- Aclaraciones -->
       <div>
         <label
           class="block text-sm font-semibold mb-1"
@@ -185,38 +184,34 @@
           [(ngModel)]="observaciones"
           maxlength="250"
           rows="2"
-          placeholder="Notas al producto"
-          class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 bg-transparent"
+          placeholder="Notas al producto..."
+          class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 bg-transparent shadow-sm"
           [ngStyle]="{ '--tw-ring-color': 'var(--primary)' }"
         ></textarea>
-        <p class="text-xs opacity-70 text-right">
+        <p class="text-xs opacity-70 text-right mt-1">
           {{ observaciones.length }}/250
         </p>
       </div>
     </div>
 
-    <!-- Footer -->
-    <div
-      class="mt-6 sticky bottom-0 pt-4"
-      [ngStyle]="{ backgroundColor: 'var(--surface)' }"
-    >
+    <!-- 🧾 FOOTER / AGREGAR -->
+    <div class="sticky bottom-0 pt-4 pb-3 bg-transparent border-0 shadow-none">
       <button
         pButton
         type="button"
-        class="w-full rounded-full py-3 text-base font-semibold flex items-center justify-between px-5"
+        class="w-full rounded-full py-3 font-semibold text-base flex items-center justify-between px-6 shadow-md hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
         [ngStyle]="{
           backgroundColor: 'var(--secondary)',
-          borderColor: 'var(--secondary)',
           color: '#fff'
         }"
         (click)="addToCart()"
       >
-        <span>Agregar</span>
+        <span>Agregar al carrito</span>
         <span>{{ total | currency : "ARS" : "symbol-narrow" : "1.0-0" }}</span>
       </button>
     </div>
 
-    <!-- Drawer del carrito -->
+    <!-- 🛍️ DRAWER DEL CARRITO -->
     <app-cart-drawer
       [open]="cartOpen"
       [items]="cart?.items ?? []"

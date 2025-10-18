@@ -15,6 +15,8 @@ import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { CarouselModule } from 'primeng/carousel';
+import { StoreStateService } from '../../shared/services/private_services/store-state.service';
+import { AppComponent } from '../../app.component'; // ✅ Importamos AppComponent
 
 @Component({
   selector: 'app-product-detail-dialog',
@@ -27,8 +29,8 @@ import { CarouselModule } from 'primeng/carousel';
     ButtonModule,
     CheckboxModule,
     InputTextareaModule,
-    CarouselModule
-],
+    CarouselModule,
+  ],
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.scss',
 })
@@ -45,36 +47,70 @@ export class ProductDetailComponent {
     private route: ActivatedRoute,
     private publicStoreService: PublicStoreService,
     public cartService: CartService,
-     private elRef: ElementRef<HTMLElement>
+    private elRef: ElementRef<HTMLElement>,
+    private storeState: StoreStateService,
+    private appComponent: AppComponent // ✅ agregado
   ) {}
 
-ngOnInit() {
-  const id = this.route.snapshot.paramMap.get('id')!; // ✅ viene de /producto/:id
-  this.loadProduct(id);
-}
+  ngOnInit() {
+    const id = this.route.snapshot.paramMap.get('id')!;
+    this.loadProduct(id);
+  }
 
-loadProduct(id: string) {
-  this.publicStoreService.getProductById(id).subscribe({
-    next: (res) => {
-      this.product = res;
-      this.slug = res.store.link_tienda;
+  /** ===============================
+   * 🔹 Cargar producto y colores
+   * =============================== */
+  loadProduct(id: string) {
+    this.publicStoreService.getProductById(id).subscribe({
+      next: (res) => {
+        this.product = res;
+        this.slug = res.store.link_tienda;
 
-      // 🎨 Tomar los colores de la tienda (traídos desde el backend)
-      const secondary = res.store?.secondary_color || '#00bfa5';
-      const primary = res.store?.primary_color || '#ff4081';
+        // ✅ Guardar la tienda globalmente
+        this.storeState.setStore(res.store);
 
-      // Aplicar al wrapper
-      const host = this.elRef.nativeElement;
-      host.style.setProperty('--primary', primary);
-      host.style.setProperty('--secondary', secondary);
+        // ✅ Aplicar los colores globalmente (AppComponent controla sidebar y tema)
+        // Llamar de forma segura usando una type assertion a 'any' para evitar el error
+        // de acceso a un miembro privado en tiempo de compilación y verificar en tiempo de ejecución.
+        const appComp: any = this.appComponent as any;
+        if (typeof appComp.applyBuyerTheme === 'function') {
+          appComp.applyBuyerTheme(res.store);
+        }
 
-      console.log('Colores aplicados:', { primary, secondary });
-    },
-    error: (err) => console.error('Error cargando producto:', err),
-  });
-}
+        // 🎨 Aplicar también al host localmente (para fallback)
+        const store = res.store;
+        const secondary = store?.secondary_color || '#00bfa5';
+        const primary = store?.primary_color || '#ff4081';
+        const bg =
+          store?.background_color === 'dark'
+            ? '#202123'
+            : store?.background_color || '#ffffff';
+        const text =
+          store?.background_color === 'dark' ? '#f5f5f5' : '#111827';
+        const surface =
+          store?.background_color === 'dark' ? '#2a2b32' : '#f9fafb';
 
+        const host = this.elRef.nativeElement;
+        host.style.setProperty('--primary', primary);
+        host.style.setProperty('--secondary', secondary);
+        host.style.setProperty('--bg', bg);
+        host.style.setProperty('--text', text);
+        host.style.setProperty('--surface', surface);
 
+        console.log('🎨 Colores aplicados desde tienda:', {
+          primary,
+          secondary,
+          bg,
+          text,
+        });
+      },
+      error: (err) => console.error('Error cargando producto:', err),
+    });
+  }
+
+  /** ===============================
+   * 🔹 Variantes y cantidades
+   * =============================== */
   toggleVariant(id: string, checked: boolean) {
     if (checked) {
       this.selectedVariants.add(id);
@@ -104,48 +140,48 @@ loadProduct(id: string) {
     return (this.qty['single'] || 1) * (this.product.precio || 0);
   }
 
- addToCart() {
-  if (!this.product) return;
+  /** ===============================
+   * 🔹 Carrito
+   * =============================== */
+  addToCart() {
+    if (!this.product) return;
 
-  if (this.product.presentacion_multiple) {
-    // con variantes
-    [...this.selectedVariants].forEach((id) => {
-      const cantidad = this.qty[id] || 1;
+    if (this.product.presentacion_multiple) {
+      // con variantes
+      [...this.selectedVariants].forEach((id) => {
+        const cantidad = this.qty[id] || 1;
+        this.cartService
+          .add(this.slug, {
+            productId: this.product.id_producto,
+            variantId: id,
+            cantidad,
+          })
+          .subscribe({
+            next: (c) => {
+              this.cart = c;
+              this.cartOpen = true;
+            },
+            error: (err) => console.error('Error agregando variante:', err),
+          });
+      });
+    } else {
+      // sin variantes
+      const cantidad = this.qty['single'] || 1;
       this.cartService
         .add(this.slug, {
           productId: this.product.id_producto,
-          variantId: id,
           cantidad,
-          //observaciones: this.observaciones || null, // 👈 se envía la nota
         })
         .subscribe({
           next: (c) => {
             this.cart = c;
             this.cartOpen = true;
           },
-          error: (err) => console.error('Error agregando variante:', err),
+          error: (err) => console.error('Error agregando producto:', err),
         });
-    });
-  } else {
-    // sin variantes
-    const cantidad = this.qty['single'] || 1;
-    this.cartService
-      .add(this.slug, {
-        productId: this.product.id_producto,
-        cantidad,
-        //observaciones: this.observaciones || null, // 👈 se envía la nota
-      })
-      .subscribe({
-        next: (c) => {
-          this.cart = c;
-          this.cartOpen = true;
-        },
-        error: (err) => console.error('Error agregando producto:', err),
-      });
+    }
   }
-}
 
-  // 👇 helpers que usará el template
   onUpdateQty(ev: { itemId: string; cantidad: number }) {
     this.cartService
       .update(this.slug, ev.itemId, ev.cantidad)

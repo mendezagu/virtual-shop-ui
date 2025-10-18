@@ -1,14 +1,7 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-} from '@angular/core';
-
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AuthService } from '../../services/private_services/auth.service';
 import { Router } from '@angular/router';
 import { StoreService } from '../../services/private_services/store.service';
-
 import { CommonModule } from '@angular/common';
 import { SidebarModule } from 'primeng/sidebar';
 import { ButtonModule } from 'primeng/button';
@@ -16,7 +9,6 @@ import { RippleModule } from 'primeng/ripple';
 import { AvatarModule } from 'primeng/avatar';
 import { StyleClassModule } from 'primeng/styleclass';
 import Shepherd from 'shepherd.js';
-import confetti from 'canvas-confetti';
 
 @Component({
   selector: 'app-sidebar',
@@ -33,15 +25,24 @@ import confetti from 'canvas-confetti';
   styleUrl: './sidebar.component.scss',
 })
 export class SidebarComponent {
-  @Input() collapsed = false; // controla si está colapsado o no
+  @Input() collapsed = false;
   @Output() collapsedChange = new EventEmitter<boolean>();
 
-  @Input() mode: 'seller' | 'buyer' = 'seller'; // 👈 modo
-  @Input() store: any; // 👈 datos de la tienda (solo para buyer)
+  private _mode: 'seller' | 'buyer' = 'seller';
+  @Input() set mode(value: 'seller' | 'buyer') {
+    this._mode = value;
+    // ⚡ Si cambia a vendedor y aún no se mostró el tour, lanzarlo
+    if (value === 'seller') {
+      setTimeout(() => this.startSellerTourSafely(), 700);
+    }
+  }
+  get mode() {
+    return this._mode;
+  }
 
+  @Input() store: any;
   role: string | null = null;
 
-   // ✅ Lista de opciones del modo vendedor
   sellerItems = [
     {
       id: 'home',
@@ -82,16 +83,16 @@ export class SidebarComponent {
   ) {}
 
   ngAfterViewInit(): void {
-    // Arrancar el tour SOLO si es modo vendedor
-    if (this.mode === 'seller') {
-      setTimeout(() => this.startSellerTour(), 500);
-    }
+    // ⚠️ No iniciar nada acá: el setter maneja el modo
   }
 
   // ==============================
-  // 🔹 TOUR SELLER
+  // 🔹 TOUR SOLO PARA SELLER
   // ==============================
-  startSellerTour() {
+  private startSellerTourSafely() {
+    // 🛑 Si no es modo vendedor, salimos
+    if (this.mode !== 'seller') return;
+
     const tour = new Shepherd.Tour({
       useModalOverlay: true,
       defaultStepOptions: {
@@ -103,14 +104,26 @@ export class SidebarComponent {
 
     tour.addStep({
       id: 'home',
-      text: 'Este es el inicio de tu panel. Desde aquí podés volver a la pantalla principal.',
+      text: `
+        <div class="font-semibold text-lg mb-1 text-indigo-600">🏠 Inicio</div>
+        <div class="text-sm text-gray-700">
+          Este es el inicio de tu panel. Desde aquí podés volver a la pantalla principal.
+        </div>
+      `,
       attachTo: { element: '#tour-home', on: 'right' },
       buttons: [{ text: 'Siguiente', action: () => tour.next() }],
     });
 
     tour.addStep({
       id: 'store',
-      text: 'En "Mi tienda" podés personalizar tu tienda digital.',
+      text: `
+        <div class="font-semibold text-lg mb-1 text-indigo-600 flex items-center gap-2">
+          🏬 Mi tienda
+        </div>
+        <div class="text-sm text-gray-700">
+          Acá podés <b>personalizar tu tienda digital</b>: elegí colores, logo y estilo para reflejar tu marca.
+        </div>
+      `,
       attachTo: { element: '#tour-store', on: 'right' },
       buttons: [
         { text: 'Atrás', action: () => tour.back() },
@@ -120,7 +133,15 @@ export class SidebarComponent {
 
     tour.addStep({
       id: 'products',
-      text: 'Aquí gestionás tus productos: agregar, editar y eliminar.',
+      text: `
+        <div class="font-semibold text-lg mb-1 text-indigo-600 flex items-center gap-2">
+          🛒 Mis productos
+        </div>
+        <div class="text-sm text-gray-700">
+          Desde esta sección podés <b>agregar, editar o eliminar productos</b>.<br>
+          Cada uno puede tener su imagen, descripción y precio configurado.
+        </div>
+      `,
       attachTo: { element: '#tour-products', on: 'right' },
       buttons: [
         { text: 'Atrás', action: () => tour.back() },
@@ -130,8 +151,33 @@ export class SidebarComponent {
 
     tour.addStep({
       id: 'categories',
-      text: 'Y acá podés crear y organizar tus categorías de productos.',
+      text: `
+        <div class="font-semibold text-lg mb-1 text-indigo-600 flex items-center gap-2">
+          🏷️ Categorías
+        </div>
+        <div class="text-sm text-gray-700">
+          Organizá tus productos creando <b>categorías</b> como "Bebidas", "Ropa" u "Ofertas".<br>
+          Así tus clientes encontrarán todo más fácilmente.
+        </div>
+      `,
       attachTo: { element: '#tour-categories', on: 'right' },
+      buttons: [
+        { text: 'Atrás', action: () => tour.back() },
+         { text: 'Siguiente', action: () => tour.next() },
+      ],
+    });
+
+    tour.addStep({
+      id: 'orders',
+      text: `
+        <div class="font-semibold text-lg mb-1 text-indigo-600 flex items-center gap-2">
+          🏷️ Mis pedidos
+        </div>
+        <div class="text-sm text-gray-700">
+          Aquí podés revisar y gestionar todos los pedidos recibidos en tu tienda. Consultá el detalle, cambiá su estado o cancelalos si es necesario.
+        </div>
+      `,
+      attachTo: { element: '#tour-orders', on: 'right' },
       buttons: [
         { text: 'Atrás', action: () => tour.back() },
         { text: 'Finalizar', action: () => this.finishTour(tour) },
@@ -143,11 +189,6 @@ export class SidebarComponent {
 
   private finishTour(tour: Shepherd.Tour) {
     tour.complete();
-    confetti({
-      particleCount: 160,
-      spread: 80,
-      origin: { y: 0.6 },
-    });
   }
 
   // ==============================
@@ -158,16 +199,27 @@ export class SidebarComponent {
     this.collapsedChange.emit(this.collapsed);
   }
 
-  
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
 
-  redirectToHome() { this.router.navigate(['/landing-home']); }
-  redirectToStepper() { this.router.navigate(['/my-store']); }
-  redirectToMyStore() { this.router.navigate(['/my-store']); }
-  redirectToMyProducts() { this.router.navigate(['/my-products']); }
-  redirectToMyCategories() { this.router.navigate(['/mis-categorias']); }
-  redirectToMyOrders() { this.router.navigate(['/mis-pedidos']); }
+  redirectToHome() {
+    this.router.navigate(['/landing-home']);
+  }
+  redirectToStepper() {
+    this.router.navigate(['/my-store']);
+  }
+  redirectToMyStore() {
+    this.router.navigate(['/my-store']);
+  }
+  redirectToMyProducts() {
+    this.router.navigate(['/my-products']);
+  }
+  redirectToMyCategories() {
+    this.router.navigate(['/mis-categorias']);
+  }
+  redirectToMyOrders() {
+    this.router.navigate(['/mis-pedidos']);
+  }
 }

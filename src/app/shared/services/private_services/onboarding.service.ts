@@ -101,9 +101,9 @@ export class OnboardingService {
     id: 'crear-categoria',
     text: `
       <div class="font-semibold mb-1">Crear una categoría</div>
-      <div class="text-sm text-slate-600">
-        Mediante este boton podras agregar categorías para organizar tus productos.
-      </div>
+    <div class="text-sm text-slate-600">
+      Mediante este botón podrás agregar categorías para organizar tus productos.
+    </div>
     `,
     attachTo: { element: 'button[label="Nueva categoría"]', on: 'bottom' },
     buttons: [

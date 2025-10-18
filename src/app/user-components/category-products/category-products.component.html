@@ -98,85 +98,126 @@
   </form>
 
   <!-- Listado de productos -->
-   <div class="px-4">
-      <div
-    class="rounded-2xl border shadow-lg p-4 transition-colors"
-    [ngStyle]="{
-      backgroundColor: 'var(--surface)',
-      color: 'var(--text)',
-      borderColor:
-        products[0]?.store?.background_color === 'dark'
-          ? 'rgba(255,255,255,0.08)'
-          : '#e5e7eb'
-    }"
-  >
-    <h1
-      class="text-2xl font-semibold mb-4"
-      [ngStyle]="{ color: 'var(--primary)' }"
-    >
-      Categoría: {{ meta?.categoria || (categorySlug | titlecase) }}
-    </h1>
-
-    <div *ngIf="isLoading" class="opacity-80 mt-4">Cargando…</div>
-    <div *ngIf="!isLoading && hasError" class="text-rose-600 mt-4">
-      Error al cargar.
-    </div>
+  <div class="px-4">
     <div
-      *ngIf="!isLoading && !hasError && products.length === 0"
-      class="opacity-80 mt-4"
+      class="rounded-2xl border shadow-lg p-4 transition-colors"
+      [ngStyle]="{
+        backgroundColor: 'var(--surface)',
+        color: 'var(--text)',
+        borderColor:
+          products[0]?.store?.background_color === 'dark'
+            ? 'rgba(255,255,255,0.08)'
+            : '#e5e7eb'
+      }"
     >
-      No hay productos en esta categoría.
-    </div>
-
-    <div
-      *ngIf="!isLoading && !hasError && products.length"
-      class="flex flex-col gap-4 md:grid md:grid-cols-3 xl:grid-cols-4 md:gap-6"
-    >
-      <p-card
-        *ngFor="let p of products"
-        [routerLink]="['/producto', p.id_producto]"
-        [styleClass]="'!bg-transparent !rounded-xl !border shadow-lg'"
-        [ngStyle]="{
-          width: '100%',
-          color: 'var(--text)',
-          borderColor:
-            products[0]?.store?.background_color === 'dark'
-              ? 'rgba(255,255,255,0.08)'
-              : '#e5e7eb'
-        }"
+      <h1
+        class="text-2xl font-semibold mb-4"
+        [ngStyle]="{ color: 'var(--primary)' }"
       >
-        <ng-template pTemplate="header">
-          <img
-            [src]="
-              (p.imagen_url && p.imagen_url[0]) || '../../../assets/lomito.jpg'
-            "
-            [alt]="p.nombre_producto"
-            class="w-full h-40 object-cover rounded-t-lg"
-          />
-        </ng-template>
+        Categoría: {{ meta?.categoria || (categorySlug | titlecase) }}
+      </h1>
 
-        <h3
-          class="text-lg font-semibold line-clamp-1"
-          [ngStyle]="{ color: 'var(--primary)' }"
+      <div *ngIf="isLoading" class="opacity-80 mt-4">Cargando…</div>
+      <div *ngIf="!isLoading && hasError" class="text-rose-600 mt-4">
+        Error al cargar.
+      </div>
+      <div
+        *ngIf="!isLoading && !hasError && products.length === 0"
+        class="opacity-80 mt-4"
+      >
+        No hay productos en esta categoría.
+      </div>
+
+      <div
+        *ngIf="!isLoading && !hasError && products.length"
+        class="flex flex-col gap-4 md:grid md:grid-cols-3 xl:grid-cols-4 md:gap-6"
+      >
+        <p-card
+          *ngFor="let p of products"
+          [routerLink]="['/producto', p.id_producto]"
+          [styleClass]="'!bg-transparent !rounded-xl !border shadow-lg'"
+          [ngStyle]="{
+            width: '100%',
+            color: 'var(--text)',
+            borderColor:
+              products[0]?.store?.background_color === 'dark'
+                ? 'rgba(255,255,255,0.08)'
+                : '#e5e7eb'
+          }"
         >
-          {{ p.nombre_producto }}
-        </h3>
-        <p class="text-sm opacity-90 truncate">
-          {{ p.descripcion }}
-        </p>
-        <p
-          class="text-base font-bold mt-2"
-          [ngStyle]="{ color: 'var(--secondary)' }"
-        >
-          {{
+          <ng-template pTemplate="header">
+            <img
+              [src]="
+                (p.imagen_url && p.imagen_url[0]) ||
+                '../../../assets/lomito.jpg'
+              "
+              [alt]="p.nombre_producto"
+              class="w-full h-40 object-cover rounded-t-lg"
+            />
+          </ng-template>
+          <div class="flex justify-between items-center mb-1">
+            <h3
+              class="text-lg font-semibold line-clamp-1"
+              [ngStyle]="{ color: 'var(--primary)' }"
+            >
+              {{ p.nombre_producto }}
+            </h3>
+
+            <div class="flex items-center gap-1">
+              <small
+                class="text-xs font-medium"
+                [ngStyle]="{
+                  color:
+                    products[0]?.store?.background_color === 'dark'
+                      ? 'var(--text)'
+                      : 'var(--primary)'
+                }"
+              >
+                Stock:
+              </small>
+
+              <p-badge
+  [value]="p.stock"
+  [style]="{
+    '--p-badge-bg': p.stock === 0 ? '#ef4444' : 'var(--secondary)',
+    '--p-badge-color': '#fff'
+  }"
+></p-badge>
+            </div>
+          </div>
+
+          <p class="text-sm opacity-90 truncate">
+            {{ p.descripcion }}
+          </p>
+          <p
+            class="text-base font-bold mt-2"
+            [ngStyle]="{ color: 'var(--secondary)' }"
+          >
+            {{
       p.presentacion_multiple
         ? (p.variants?.[0]?.precio || p.precio)
         : (p.precio | currency:'ARS':'symbol-narrow':'1.0-0')
-          }}
-        </p>
-      </p-card>
+            }}
+          </p>
+
+          <div class="flex items-center justify-center mt-4">
+            <button
+              pButton
+              type="button"
+              class="w-max rounded-full font-medium flex items-center justify-between px-3 py-2 text-sm"
+              [ngStyle]="{
+                backgroundColor: 'var(--secondary)',
+                borderColor: 'var(--secondary)',
+                color: '#fff',
+                lineHeight: '1.1'
+              }"
+            >
+              <i class="pi pi-eye text-xs"></i>
+              <span>Ver detalles</span>
+            </button>
+          </div>
+        </p-card>
+      </div>
     </div>
   </div>
-   </div>
-
 </div>

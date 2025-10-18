@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { StoreStateService } from '../../shared/services/private_services/store-state.service';
 
-//primeng
+// primeng
 import { DataViewModule } from 'primeng/dataview';
 import { CarouselModule } from 'primeng/carousel';
 import { TagModule } from 'primeng/tag';
@@ -26,7 +26,7 @@ import { TagModule } from 'primeng/tag';
 })
 export class PublicStoreComponent {
   categories: any[] = [];
-  featuredCategories: any[] = []; // 👈 nuevas
+  featuredCategories: any[] = [];
   normalCategories: any[] = [];
   slug!: string;
   store: any;
@@ -42,24 +42,19 @@ export class PublicStoreComponent {
 
   ngOnInit(): void {
     this.slug = this.route.snapshot.paramMap.get('slug')!;
+
+    // 1️⃣ Cargar datos de la tienda
     this.publicStoreService.getStoreBySlug(this.slug).subscribe({
       next: (data) => {
         this.store = data;
-        this.storeState.setStore(data);
+        this.storeState.setStore(data); // ✅ Guardar globalmente
         this.isLoading = false;
 
-        // 🎨 Aplica variables de color a este componente (scope local)
+        // 🎨 Aplicar colores a nivel local (este componente)
         const el = document.querySelector('app-public-store') as HTMLElement;
         if (el) {
-          el.style.setProperty(
-            '--primary',
-            this.store.primary_color || '#ff4081'
-          );
-          el.style.setProperty(
-            '--secondary',
-            this.store.secondary_color || '#00bfa5'
-          );
-          // 🎨 fondo dinámico
+          el.style.setProperty('--primary', this.store.primary_color || '#ff4081');
+          el.style.setProperty('--secondary', this.store.secondary_color || '#00bfa5');
           el.style.setProperty(
             '--bg',
             this.store.background_color === 'dark' ? '#202123' : '#ffffff'
@@ -69,6 +64,23 @@ export class PublicStoreComponent {
             this.store.background_color === 'dark' ? '#f5f5f5' : '#111827'
           );
         }
+
+        // 🎨 Aplicar colores también a nivel global (document root)
+        const root = document.documentElement;
+        root.style.setProperty('--primary', this.store.primary_color || '#ff4081');
+        root.style.setProperty('--secondary', this.store.secondary_color || '#00bfa5');
+        root.style.setProperty(
+          '--bg',
+          this.store.background_color === 'dark' ? '#202123' : this.store.background_color || '#ffffff'
+        );
+        root.style.setProperty(
+          '--text',
+          this.store.background_color === 'dark' ? '#f5f5f5' : '#111827'
+        );
+
+        // ✅ Fondo general de la página
+        document.body.style.backgroundColor =
+          this.store.background_color === 'dark' ? '#202123' : '#ffffff';
       },
       error: () => {
         this.hasError = true;
@@ -117,6 +129,6 @@ export class PublicStoreComponent {
       bebidas: '/assets/categorias/bebidas.png',
     };
     const key = (c.slug || '').toLowerCase();
-    return map[key] ?? null; // si no hay imagen conocida, usa el fallback
+    return map[key] ?? null;
   }
 }

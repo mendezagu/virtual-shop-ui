@@ -1,183 +1,140 @@
 <div
-  class="min-h-[100dvh]"
-  [style.--primary]="store?.primary_color || '#ff4081'"
-  [style.--secondary]="store?.secondary_color || '#00bfa5'"
-  [style.--bg]="store?.background_color === 'dark' ? '#202123' : '#ffffff'"
-  [style.--text]="store?.background_color === 'dark' ? '#f5f5f5' : '#111827'"
-  [style.--surface]="store?.background_color === 'dark' ? '#2a2b32' : '#f9fafb'"
+  class="min-h-[100dvh] font-sans transition-colors duration-300"
+  [style.--primary]="store?.primary_color || '#7e22ce'"
+  [style.--secondary]="store?.secondary_color || '#ec4899'"
+  [style.--bg]="store?.background_color === 'dark' ? '#18181b' : '#ffffff'"
+  [style.--text]="store?.background_color === 'dark' ? '#f4f4f5' : '#111827'"
+  [style.--surface]="store?.background_color === 'dark' ? '#27272a' : '#f9fafb'"
   [ngStyle]="{ backgroundColor: 'var(--bg)', color: 'var(--text)' }"
 >
-  <!-- ===== Loading / Error mínimos ===== -->
-  <div *ngIf="isLoading" class="p-6 text-slate-500">Cargando tienda…</div>
-  <div *ngIf="!isLoading && hasError" class="p-6 text-rose-600">
-    No se pudo cargar la tienda.
+  <!-- === LOADING / ERROR === -->
+  <div *ngIf="isLoading" class="p-8 text-center text-slate-400 text-lg">
+    Cargando tienda…
+  </div>
+  <div
+    *ngIf="!isLoading && hasError"
+    class="p-8 text-center text-rose-600 text-lg"
+  >
+    No se pudo cargar la tienda 😢
   </div>
 
   <ng-container *ngIf="!isLoading && !hasError">
-    <!-- ===== HERO HEADER ===== -->
- <!-- ===== HERO HEADER ===== -->
-<div class="max-w-6xl mx-auto px-4 sm:px-8">
-  <header class="relative w-full h-48 sm:h-64 overflow-hidden rounded-2xl shadow-md">
-    <!-- Imagen -->
-    <img
-      [src]="
-        store?.banner_url ||
-        store?.portada_url ||
-        store?.imagen_portada ||
-        'https://placehold.co/1200x400?text=Tienda'
-      "
-      [alt]="'Portada ' + (store?.nombre_tienda || slug || 'Tienda')"
-      class="absolute inset-0 w-full h-full object-cover"
-    />
-
-    <!-- Gradiente -->
-    <div class="absolute inset-0 bg-gradient-to-b from-black/0 via-black/40 to-black/70"></div>
-
-    <!-- Contenido -->
-    <div
-      class="relative z-10 h-full flex flex-col justify-end pb-4 px-4 sm:px-6"
+    <!-- === HERO === -->
+    <header
+      class="relative max-w-6xl mx-auto px-4 sm:px-8 mt-4 overflow-hidden rounded-3xl shadow-lg"
     >
-      <h1 class="text-2xl sm:text-3xl font-semibold text-white drop-shadow">
-        {{ store?.nombre_tienda || slug || "Tienda" }}
-      </h1>
+      <img
+        [src]="
+          store?.banner_url ||
+          store?.portada_url ||
+          store?.imagen_portada ||
+          'https://placehold.co/1200x400?text=Tienda'
+        "
+        [alt]="'Portada ' + (store?.nombre_tienda || slug || 'Tienda')"
+        class="absolute inset-0 w-full h-full object-cover brightness-75"
+      />
+      <div
+        class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"
+      ></div>
 
-      <!-- Rubros -->
-      <div *ngIf="rubros().length" class="mt-4 text-sm">
-        <span class="font-medium">Rubros:&nbsp;</span>
-        <span class="inline-flex flex-wrap gap-1 align-middle">
-          <span
-            *ngFor="let r of rubros()"
-            class="px-2 py-0.5 rounded-full bg-[var(--secondary)]/20 text-[var(--secondary)]"
+      <!-- === INFO HERO === -->
+      <div
+        class="relative z-10 p-6 sm:p-10 text-white flex flex-col justify-end h-64 sm:h-80"
+      >
+        <h1 class="text-3xl sm:text-4xl font-bold drop-shadow-md">
+          {{ store?.nombre_tienda || slug || "Tienda" }}
+        </h1>
+
+        <div
+          *ngIf="store?.descripcion"
+          class="mt-2 text-white/80 text-sm max-w-2xl line-clamp-2"
+          [innerHTML]="store.descripcion"
+        ></div>
+
+        <div class="flex flex-wrap gap-2 mt-3 text-sm text-white/80">
+          <span *ngIf="store?.tiempo_entrega">{{ store?.tiempo_entrega }}</span>
+          <span *ngIf="store?.costo_envio"
+            >·
+            {{ store.costo_envio | currency : "ARS" : "symbol-narrow" }}
+            envío</span
           >
-            {{ r }}
+          <span *ngIf="store?.pedido_minimo">
+            · Mínimo
+            {{ store.pedido_minimo | currency : "ARS" : "symbol-narrow" }}
           </span>
-        </span>
-      </div>
+        </div>
 
-      <!-- Descripción -->
-      <p
-        *ngIf="store?.descripcion"
-        class="text-white/90 text-sm mt-1 line-clamp-2"
-        [innerHTML]="store.descripcion"
-      ></p>
-
-      <!-- Línea de info -->
-      <p class="text-white/90 text-sm mt-1 flex flex-wrap gap-x-2 gap-y-0.5">
-        <span *ngIf="store?.tiempo_entrega">{{ store?.tiempo_entrega }}</span>
-        <span
-          *ngIf="
-            store?.tiempo_entrega &&
-            (store?.costo_envio || store?.pedido_minimo)
-          "
-          >·</span
-        >
-        <span *ngIf="store?.costo_envio">
-          {{
-            store.costo_envio | currency : "ARS" : "symbol-narrow" : "1.0-0"
-          }}
-          envío
-        </span>
-        <span *ngIf="store?.costo_envio && store?.pedido_minimo">·</span>
-        <span *ngIf="store?.pedido_minimo">
-          Mínimo
-          {{
-            store.pedido_minimo | currency : "ARS" : "symbol-narrow" : "1.0-0"
-          }}
-        </span>
-      </p>
-
-      <!-- Buscador -->
-      <div class="mt-3 w-full max-w-3xl">
-        <div class="relative">
-          <input
-            type="text"
-            placeholder="Buscar productos..."
-            class="w-full h-10 sm:h-11 rounded-full pl-4 pr-12 text-[var(--text)] placeholder-slate-400 shadow-md focus:outline-none"
-          />
-          <button
-            type="button"
-            class="absolute right-1.5 top-1.5 h-7 w-7 sm:h-8 sm:w-8 rounded-full grid place-items-center shadow"
-            aria-label="Buscar"
-            [ngStyle]="{ backgroundColor: 'var(--secondary)' }"
-          >
-            <mat-icon class="!text-white !text-[18px] sm:!text-[20px]"
-              >search</mat-icon
+        <div class="mt-4 w-full max-w-md">
+          <div class="relative">
+            <input
+              type="text"
+              placeholder="Buscar productos..."
+              class="w-full h-11 pl-4 pr-12 rounded-full text-gray-700 shadow-lg focus:ring-2 focus:ring-[var(--secondary)] focus:outline-none placeholder:text-gray-400"
+            />
+            <button
+              type="button"
+              class="absolute right-1.5 top-1.5 h-8 w-8 rounded-full grid place-items-center shadow-md hover:scale-105 transition-transform"
+              [ngStyle]="{ backgroundColor: 'var(--secondary)' }"
             >
-          </button>
+              <i class="pi pi-search text-white text-sm"></i>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  </header>
-</div>
+    </header>
 
-
-
-    <main class="max-w-6xl mx-auto px-4 sm:px-8 pb-10 mt-6 space-y-10">
+    <!-- === MAIN === -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-8 py-10 space-y-10">
       <!-- 🌟 CATEGORÍAS DESTACADAS -->
-      <!-- 🌟 CATEGORÍAS DESTACADAS -->
-      <section *ngIf="featuredCategories.length">
+      <section *ngIf="featuredCategories.length" class="animate-fadeIn">
         <div
-          class="rounded-2xl border shadow-lg p-4 transition-colors"
+          class="rounded-3xl p-6 shadow-lg border transition-all duration-300 hover:shadow-xl"
           [ngStyle]="{
             backgroundColor: 'var(--surface)',
-            color: 'var(--text)',
             borderColor:
               store?.background_color === 'dark'
-                ? 'rgba(255,255,255,0.08)'
+                ? 'rgba(255,255,255,0.05)'
                 : '#e5e7eb'
           }"
         >
-          <h3 class="text-sm font-semibold flex items-center gap-2 mb-4">
-            <mat-icon
-              class="!text-[18px]"
-              [ngStyle]="{ color: 'var(--primary)' }"
-              >star</mat-icon
-            >
-            Categorías destacadas
-          </h3>
+          <div class="flex items-center gap-2 mb-5">
+            <i class="pi pi-star-fill text-[var(--primary)]"></i>
+            <h2 class="font-semibold text-lg">Categorías destacadas</h2>
+          </div>
 
           <p-carousel
             [value]="featuredCategories"
             [numVisible]="2"
             [numScroll]="1"
             [circular]="true"
-            [autoplayInterval]="4000"
+            [autoplayInterval]="5000"
             styleClass="custom-carousel"
           >
             <ng-template pTemplate="item" let-cat>
               <a
                 [routerLink]="['/store', slug, 'categoria', cat.slug]"
-                class="block rounded-2xl border shadow hover:shadow-lg transition p-4 h-full bg-[var(--surface)]"
+                class="group block p-5 rounded-2xl border transition-all hover:shadow-xl hover:-translate-y-1"
                 [ngStyle]="{
-                  color: 'var(--text)',
+                  backgroundColor: 'var(--surface)',
                   borderColor:
                     store?.background_color === 'dark'
-                      ? 'rgba(255,255,255,0.1)'
+                      ? 'rgba(255,255,255,0.08)'
                       : '#e5e7eb'
                 }"
               >
-                <div class="flex flex-col items-center text-center gap-2">
+                <div class="flex flex-col items-center gap-3 text-center">
                   <img
                     [src]="cat.imageUrl || '../../../assets/lomito.jpg'"
                     [alt]="cat.name"
-                    class="h-20 w-20 object-contain rounded-xl"
+                    class="h-24 w-24 object-cover rounded-xl shadow-sm group-hover:scale-105 transition-transform"
                   />
-                  <div
-                    class="font-semibold text-sm"
-                    [ngStyle]="{ color: 'var(--secondary)' }"
-                  >
+                  <div class="font-semibold text-[var(--secondary)]">
                     {{ cat.name }}
                   </div>
-                  <div class="text-xs text-slate-500">
+                  <div class="text-xs text-gray-500">
                     {{ cat.count }}
                     {{ cat.count === 1 ? "producto" : "productos" }}
                   </div>
-                  <p-tag
-                    *ngIf="cat.type"
-                    [value]="cat.type"
-                    severity="warning"
-                    class="mt-2 text-xs uppercase"
-                  ></p-tag>
                 </div>
               </a>
             </ng-template>
@@ -186,73 +143,67 @@
       </section>
 
       <!-- 🏷️ CATEGORÍAS NORMALES -->
-      <section *ngIf="normalCategories.length">
+      <section *ngIf="normalCategories.length" class="animate-fadeIn">
         <div
-          class="rounded-2xl border shadow-lg p-4 transition-colors"
+          class="rounded-3xl p-6 shadow-lg border transition-all duration-300 hover:shadow-xl"
           [ngStyle]="{
             backgroundColor: 'var(--surface)',
-            color: 'var(--text)',
             borderColor:
               store?.background_color === 'dark'
-                ? 'rgba(255,255,255,0.08)'
+                ? 'rgba(255,255,255,0.05)'
                 : '#e5e7eb'
           }"
         >
-          <h3 class="text-sm font-semibold flex items-center gap-2">
-            <mat-icon
-              class="!text-[18px]"
-              [ngStyle]="{ color: 'var(--primary)' }"
-              >category</mat-icon
+          <div class="flex items-center gap-2 mb-5">
+            <i class="pi pi-tags text-[var(--primary)]"></i>
+            <h2 class="font-semibold text-lg">Categorías</h2>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+            <a
+              *ngFor="let c of normalCategories"
+              [routerLink]="['/store', slug, 'categoria', c.slug]"
+              class="group p-5 text-center transition-all duration-300 rounded-2xl overflow-hidden border relative"
+              [ngStyle]="{
+                backgroundColor: 'var(--surface)',
+                color: 'var(--text)',
+                borderColor:
+                  store?.background_color === 'dark'
+                    ? 'rgba(255,255,255,0.15)'
+                    : 'rgba(0,0,0,0.08)',
+                boxShadow:
+                  store?.background_color === 'dark'
+                    ? 'inset 1px 1px 3px rgba(255,255,255,0.05), 3px 3px 8px rgba(0,0,0,0.6)'
+                    : 'inset 1px 1px 3px rgba(255,255,255,0.3), 3px 3px 8px rgba(0,0,0,0.15)'
+              }"
             >
-            Categorías
-          </h3>
+              <img
+                [src]="c.imageUrl || '../../../assets/lomito.jpg'"
+                [alt]="c.name"
+                class="h-24 w-24 object-cover mx-auto rounded-xl shadow-sm group-hover:scale-105 transition-transform duration-300"
+              />
 
-          <div class="mt-4">
-            <ng-container *ngIf="normalCategories.length; else noCat">
-              <p-dataView [value]="normalCategories" layout="grid" [rows]="6">
-                <ng-template pTemplate="grid" let-items>
-                  <div
-                    class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 w-full"
-                  >
-                    <div *ngFor="let c of items" class="col">
-                      <a
-                        [routerLink]="['/store', slug, 'categoria', c.slug]"
-                        class="block rounded-2xl border shadow-2xl hover:shadow-lg transition p-4"
-                        [ngStyle]="{
-                          backgroundColor: 'var(--surface)',
-                          color: 'var(--text)'
-                        }"
-                      >
-                        <div class="w-full flex justify-center mb-3">
-                          <img
-                            [src]="c.imageUrl || '../../../assets/lomito.jpg'"
-                            [alt]="c.name"
-                            class="h-20 w-20 object-contain rounded-xl"
-                          />
-                        </div>
+              <div
+                class="mt-3 font-semibold"
+                [ngStyle]="{ color: 'var(--secondary)' }"
+              >
+                {{ c.name }}
+              </div>
 
-                        <div class="text-center">
-                          <div
-                            class="font-semibold text-sm"
-                            [ngStyle]="{ color: 'var(--secondary)' }"
-                          >
-                            {{ c.name }}
-                          </div>
-                          <div class="text-xs mt-1 text-slate-500">
-                            {{ c.count }}
-                            {{ c.count === 1 ? "producto" : "productos" }}
-                          </div>
-                        </div>
-                      </a>
-                    </div>
-                  </div>
-                </ng-template>
-              </p-dataView>
-            </ng-container>
+              <div class="text-xs mt-1 opacity-80">
+                {{ c.count }} {{ c.count === 1 ? "producto" : "productos" }}
+              </div>
 
-            <ng-template #noCat>
-              <p class="text-slate-400">Sin categorías aún.</p>
-            </ng-template>
+              <!-- 🌟 Brillo sutil al hover -->
+              <div
+                class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"
+                [ngStyle]="{
+                  boxShadow:
+                    store?.background_color === 'dark'
+                      ? 'inset 0 0 6px rgba(255,255,255,0.08)'
+                      : 'inset 0 0 8px rgba(0,0,0,0.05)'
+                }"
+              ></div>
+            </a>
           </div>
         </div>
       </section>

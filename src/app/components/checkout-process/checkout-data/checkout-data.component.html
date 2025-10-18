@@ -1,273 +1,343 @@
 <div>
   <form
-  [formGroup]="form"
- class="max-h-[100dvh]mx-auto p-6 space-y-6 rounded-2xl shadow-lg transition-colors"
-  [style.--primary]="store?.primary_color || '#ff4081'"
-  [style.--secondary]="store?.secondary_color || '#00bfa5'"
-  [style.--bg]="store?.background_color === 'dark' ? '#202123' : '#ffffff'"
-  [style.--surface]="store?.background_color === 'dark' ? '#2a2b32' : '#f9fafb'"
-  [style.--text]="store?.background_color === 'dark' ? '#f5f5f5' : '#111827'"
-  [ngStyle]="{
-    backgroundColor: 'var(--bg)',
-    color: 'var(--text)'
-  }"
->
-  <!-- Header -->
-  <header class="flex items-center justify-between">
-    <h1 class="text-xl font-bold" [ngStyle]="{ color: 'var(--primary)' }">
-      Checkout
-    </h1>
-  </header>
+    [formGroup]="form"
+    class="max-h-[100dvh]mx-auto p-6 space-y-6 rounded-2xl shadow-lg transition-colors"
+    [style.--primary]="store?.primary_color || '#ff4081'"
+    [style.--secondary]="store?.secondary_color || '#00bfa5'"
+    [style.--bg]="store?.background_color === 'dark' ? '#202123' : '#ffffff'"
+    [style.--surface]="
+      store?.background_color === 'dark' ? '#2a2b32' : '#f9fafb'
+    "
+    [style.--text]="store?.background_color === 'dark' ? '#f5f5f5' : '#111827'"
+    [ngStyle]="{
+      backgroundColor: 'var(--bg)',
+      color: 'var(--text)'
+    }"
+  >
+    <!-- Header -->
+    <header class="flex items-center justify-between">
+      <h1 class="text-xl font-bold" [ngStyle]="{ color: 'var(--primary)' }">
+        Checkout
+      </h1>
+    </header>
 
-  <!-- Cliente -->
-  <section class="space-y-2">
-    <h2 class="font-semibold" [ngStyle]="{ color: 'var(--primary)' }">
-      Cliente
-    </h2>
-    <label class="text-sm">Nombre</label>
-    <input
-      pInputText
-      formControlName="customerName"
-      placeholder="Ej: Juan Pérez"
-      type="text"
-      class="w-full bg-[var(--surface)] text-[var(--text)] border rounded-lg px-3 py-2"
-    />
-  </section>
+    <!-- 💳 MÉTODO DE PAGO -->
+    <section class="space-y-4 px-6">
+      <h2 class="font-semibold text-lg" [ngStyle]="{ color: 'var(--primary)' }">
+        Método de pago
+      </h2>
 
-  <section class="space-y-2">
-    <label class="text-sm">Correo electrónico</label>
-    <input
-      pInputText
-      formControlName="customerEmail"
-      type="email"
-      placeholder="tu@email.com"
-      class="w-full bg-[var(--surface)] text-[var(--text)] border rounded-lg px-3 py-2"
-    />
-  </section>
+      <!-- 🔹 Contenedor scroll horizontal -->
+      <div
+        class="flex gap-4 px-6 overflow-x-auto pb-2 pt-2 snap-x snap-mandatory hide-scrollbar"
+      >
+        <!-- 🔸 Tarjeta Mercado Pago 
+        <label
+          for="mp"
+          class="relative cursor-pointer flex-shrink-0 w-64 rounded-2xl overflow-hidden border-2 transition-all duration-300 snap-start"
+          [ngClass]="{
+            'ring-4 ring-sky-300 scale-[1.02] border-sky-400 shadow-lg':
+              form.get('paymentMethod')?.value === 'Mercado Pago',
+            'border-transparent shadow-md':
+              form.get('paymentMethod')?.value !== 'Mercado Pago'
+          }"
+          [ngStyle]="{
+            background: 'linear-gradient(135deg, #00B1EA 0%, #007BBF 100%)',
+            color: '#fff'
+          }"
+        >
+          <div
+            class="flex flex-col items-center justify-center p-5 gap-3 text-center"
+          >
+            <div class="flex items-center justify-center gap-2">
+              <i class="pi pi-credit-card text-2xl"></i>
+              <span class="text-lg font-semibold">Mercado Pago</span>
+            </div>
+            <p class="text-sm opacity-90">
+              Pagá con tu cuenta de Mercado Pago.
+            </p>
+            <p-radioButton
+              name="paymentMethod"
+              value="Mercado Pago"
+              formControlName="paymentMethod"
+              inputId="mp"
+              class="absolute top-3 right-3"
+            ></p-radioButton>
+          </div>
+        </label> -->
 
-  <!-- Contacto -->
-  <section class="space-y-2">
-    <label class="text-sm">Número de WhatsApp</label>
-    <input
-      pInputText
-      formControlName="customerWhatsapp"
-      type="tel"
-      placeholder="+54 9 11 ..."
-      class="w-full bg-[var(--surface)] text-[var(--text)] border rounded-lg px-3 py-2"
-    />
-    <p class="text-xs opacity-70">
-      Usá formato internacional. Ej: +5491123456789
-    </p>
-  </section>
+        <!-- 🔸 Tarjeta Efectivo -->
+        <label
+          for="cash"
+          class="relative cursor-pointer flex-shrink-0 w-64 rounded-2xl overflow-hidden border-2 transition-all duration-300 snap-start"
+          [ngClass]="{
+            'ring-4 ring-green-300 scale-[1.02] border-green-500 shadow-lg':
+              form.get('paymentMethod')?.value === 'Efectivo',
+            'border-transparent shadow-md':
+              form.get('paymentMethod')?.value !== 'Efectivo'
+          }"
+          [ngStyle]="{
+            background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+            color: '#fff'
+          }"
+        >
+          <div
+            class="flex flex-col items-center justify-center p-5 gap-3 text-center"
+          >
+            <div class="flex items-center justify-center gap-2">
+              <i class="pi pi-money-bill text-2xl"></i>
+              <span class="text-lg font-semibold">Efectivo</span>
+            </div>
+            <p class="text-sm opacity-90">
+              Pagás en el momento de recibir o retirar tu pedido.
+            </p>
+            <p-radioButton
+              name="paymentMethod"
+              value="Efectivo"
+              formControlName="paymentMethod"
+              inputId="cash"
+              class="absolute top-3 right-3"
+            ></p-radioButton>
+          </div>
+        </label>
 
-  <!-- Entrega -->
-  <section>
-    <h2 class="font-semibold mb-2" [ngStyle]="{ color: 'var(--primary)' }">
-      Entrega
-    </h2>
-    <div class="flex flex-col gap-2">
-      <div class="flex items-center gap-2">
-        <p-radioButton
-          name="deliveryMethod"
-          value="delivery"
-          formControlName="deliveryMethod"
-          inputId="delivery"
-        />
-        <label for="delivery">Delivery ({{ deliveryFee | currency : "ARS" }})</label>
+        <!-- 🔸 Tarjeta Transferencia Bancaria -->
+        <label
+          for="bank"
+          class="relative cursor-pointer flex-shrink-0 w-64 rounded-2xl overflow-hidden border-2 transition-all duration-300 snap-start"
+          [ngClass]="{
+            'ring-4 ring-cyan-300 scale-[1.02] border-cyan-400 shadow-lg':
+              form.get('paymentMethod')?.value === 'Transferencia Bancaria',
+            'border-transparent shadow-md':
+              form.get('paymentMethod')?.value !== 'Transferencia Bancaria'
+          }"
+          [ngStyle]="{
+            background: 'linear-gradient(135deg, #0891b2 0%, #0e7490 100%)',
+            color: '#fff'
+          }"
+        >
+          <div
+            class="flex flex-col items-center justify-center p-5 gap-3 text-center"
+          >
+            <div class="flex items-center justify-center gap-2">
+              <i class="pi pi-wallet text-2xl"></i>
+              <span class="text-lg font-semibold">Transferencia</span>
+            </div>
+            <p class="text-sm opacity-90">
+              Transferí el monto directamente a nuestra cuenta.
+            </p>
+            <p-radioButton
+              name="paymentMethod"
+              value="Transferencia Bancaria"
+              formControlName="paymentMethod"
+              inputId="bank"
+              class="absolute top-3 right-3"
+            ></p-radioButton>
+          </div>
+        </label>
       </div>
+    </section>
 
-      <div class="flex items-center gap-2">
-        <p-radioButton
-          name="deliveryMethod"
-          value="pickup"
-          formControlName="deliveryMethod"
-          inputId="pickup"
-        />
-        <label for="pickup">Retiro en tienda (gratis)</label>
-      </div>
-    </div>
-  </section>
-
-  <!-- Dirección (si delivery) -->
-  <section *ngIf="form.value.deliveryMethod === 'delivery'" class="space-y-2">
-    <h2 class="font-semibold" [ngStyle]="{ color: 'var(--primary)' }">
-      Dirección
-    </h2>
-    <input
-      pInputText
-      formControlName="address"
-      placeholder="Calle y número"
-      class="w-full bg-[var(--surface)] text-[var(--text)] border rounded-lg px-3 py-2"
-    />
-    <div class="grid grid-cols-2 gap-2">
+    <!-- Contacto -->
+    <section class="space-y-2">
+      <label class="text-sm">Número de WhatsApp</label>
       <input
         pInputText
-        formControlName="city"
-        placeholder="Ciudad"
+        formControlName="customerWhatsapp"
+        type="tel"
+        placeholder="+54 9 11 ..."
         class="w-full bg-[var(--surface)] text-[var(--text)] border rounded-lg px-3 py-2"
       />
-      <input
-        pInputText
-        formControlName="province"
-        placeholder="Provincia"
-        class="w-full bg-[var(--surface)] text-[var(--text)] border rounded-lg px-3 py-2"
-      />
-    </div>
-    <input
-      pInputText
-      formControlName="postalCode"
-      placeholder="Código Postal"
-      class="w-full bg-[var(--surface)] text-[var(--text)] border rounded-lg px-3 py-2"
-    />
-  </section>
+      <p class="text-xs opacity-70">
+        Usá formato internacional. Ej: +5491123456789
+      </p>
+    </section>
 
-  <!-- Programación -->
-  <section *ngIf="form.value.deliveryMethod === 'pickup'" class="space-y-2">
-    <h2 class="font-semibold" [ngStyle]="{ color: 'var(--primary)' }">
-      Programar (opcional)
-    </h2>
-    <div class="grid grid-cols-2 gap-2">
-      <input
-        pInputText
-        formControlName="scheduleDate"
-        type="date"
-        class="w-full bg-[var(--surface)] text-[var(--text)] border rounded-lg px-3 py-2"
-      />
-      <input
-        pInputText
-        formControlName="scheduleTime"
-        type="time"
-        class="w-full bg-[var(--surface)] text-[var(--text)] border rounded-lg px-3 py-2"
-      />
-    </div>
-  </section>
+    <!-- Entrega -->
+    <section>
+      <h2 class="font-semibold mb-2" [ngStyle]="{ color: 'var(--primary)' }">
+        Entrega
+      </h2>
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <p-radioButton
+            name="deliveryMethod"
+            value="delivery"
+            formControlName="deliveryMethod"
+            inputId="delivery"
+          />
+          <label for="delivery"
+            >Delivery ({{ deliveryFee | currency : "ARS" }})</label
+          >
+        </div>
 
-  <!-- Pago -->
-  <section class="space-y-2">
-    <h2 class="font-semibold" [ngStyle]="{ color: 'var(--primary)' }">Pago</h2>
-    <div class="flex flex-col gap-2">
-      <div class="flex items-center gap-2">
-        <p-radioButton
-          name="paymentMethod"
-          value="Mercado Pago"
-          formControlName="paymentMethod"
-          inputId="mp"
-        />
-        <label for="mp">Mercado Pago</label>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <p-radioButton
-          name="paymentMethod"
-          value="Efectivo"
-          formControlName="paymentMethod"
-          inputId="cash"
-        />
-        <label for="cash">Efectivo (pago en el momento)</label>
-      </div>
-    </div>
-  </section>
-
-  <!-- Notas -->
-  <section>
-    <label class="font-semibold text-sm">¿Deseas agregar un comentario?</label>
-    <textarea
-      pInputTextarea
-      formControlName="notes"
-      rows="2"
-      class="w-full bg-[var(--surface)] text-[var(--text)] border rounded-lg px-3 py-2"
-    ></textarea>
-  </section>
-
-  <!-- Artículos -->
-  <section>
-    <h2 class="font-semibold mb-2" [ngStyle]="{ color: 'var(--primary)' }">
-      Artículos
-    </h2>
-    <div
-      *ngFor="let item of items"
-      class="flex items-center justify-between rounded-xl p-3 mb-2 shadow-md"
-      [ngStyle]="{
-        backgroundColor: 'var(--surface)',
-        borderColor:
-          cart?.store?.background_color === 'dark'
-            ? 'rgba(255,255,255,0.08)'
-            : '#e5e7eb'
-      }"
-    >
-      <img
-        [src]="item.product?.imagen_url?.[0] || 'https://placehold.co/80x80'"
-        class="w-14 h-14 object-cover rounded-md"
-      />
-      <div class="flex-1 px-3">
-        <p class="text-sm font-medium">{{ item.product?.nombre_producto }}</p>
-        <p class="text-sm opacity-70">
-          {{ item.precio_unit | currency : "ARS" }}
-        </p>
-        <div class="flex items-center mt-1 gap-2">
-          <button
-            pButton
-            type="button"
-            icon="pi pi-minus"
-            (click)="decrement(item)"
-            [disabled]="item.cantidad <= 1"
-            class="p-button-text p-button-sm"
-          ></button>
-          <span class="px-2">{{ item.cantidad }}</span>
-          <button
-            pButton
-            type="button"
-            icon="pi pi-plus"
-            (click)="increment(item)"
-            class="p-button-text p-button-sm"
-          ></button>
+        <div class="flex items-center gap-2">
+          <p-radioButton
+            name="deliveryMethod"
+            value="pickup"
+            formControlName="deliveryMethod"
+            inputId="pickup"
+          />
+          <label for="pickup">Retiro en tienda (gratis)</label>
         </div>
       </div>
-      <button
-        pButton
-        type="button"
-        icon="pi pi-times"
-        class="p-button-rounded p-button-text p-button-danger"
-        (click)="remove(item.id)"
-      ></button>
-    </div>
-  </section>
+    </section>
 
-  <!-- Resumen -->
-  <section class="border-t pt-3 space-y-1 text-sm">
-    <div class="flex justify-between">
-      <span>Subtotal</span>
-      <span>{{ subtotal | currency : "ARS" }}</span>
-    </div>
-    <div class="flex justify-between">
-      <span>Envío</span>
-      <span>{{ envio | currency : "ARS" }}</span>
-    </div>
-    <div class="flex justify-between font-bold text-lg">
-      <span>Total</span>
-      <span>{{ total | currency : "ARS" }}</span>
-    </div>
-  </section>
+    <!-- Dirección (si delivery) -->
+    <section *ngIf="form.value.deliveryMethod === 'delivery'" class="space-y-2">
+      <h2 class="font-semibold" [ngStyle]="{ color: 'var(--primary)' }">
+        Dirección
+      </h2>
+      <input
+        pInputText
+        formControlName="address"
+        placeholder="Calle y número"
+        class="w-full bg-[var(--surface)] text-[var(--text)] border rounded-lg px-3 py-2"
+      />
+      <div class="grid grid-cols-2 gap-2">
+        <input
+          pInputText
+          formControlName="city"
+          placeholder="Ciudad"
+          class="w-full bg-[var(--surface)] text-[var(--text)] border rounded-lg px-3 py-2"
+        />
+        <input
+          pInputText
+          formControlName="province"
+          placeholder="Provincia"
+          class="w-full bg-[var(--surface)] text-[var(--text)] border rounded-lg px-3 py-2"
+        />
+      </div>
+      <input
+        pInputText
+        formControlName="postalCode"
+        placeholder="Código Postal"
+        class="w-full bg-[var(--surface)] text-[var(--text)] border rounded-lg px-3 py-2"
+      />
+    </section>
 
-  <!-- Botón -->
-  <button
-    pButton
-    type="button"
-    [label]="
-      loading
-        ? 'Procesando...'
-        : form.value.paymentMethod === 'Mercado Pago'
-        ? 'Pagar con Mercado Pago'
-        : 'Enviar pedido por WhatsApp'
-    "
-    class="w-full py-3 rounded-full"
-    [disabled]="loading"
-    [ngStyle]="{
-      backgroundColor: 'var(--secondary)',
-      color: '#fff'
-    }"
-    (click)="placeOrder()"
-  ></button>
-</form>
+    <!-- Programación -->
+    <section *ngIf="form.value.deliveryMethod === 'pickup'" class="space-y-2">
+      <h2 class="font-semibold" [ngStyle]="{ color: 'var(--primary)' }">
+        Programar (opcional)
+      </h2>
+      <div class="grid grid-cols-2 gap-2">
+        <input
+          pInputText
+          formControlName="scheduleDate"
+          type="date"
+          class="w-full bg-[var(--surface)] text-[var(--text)] border rounded-lg px-3 py-2"
+        />
+        <input
+          pInputText
+          formControlName="scheduleTime"
+          type="time"
+          class="w-full bg-[var(--surface)] text-[var(--text)] border rounded-lg px-3 py-2"
+        />
+      </div>
+    </section>
+
+    <!-- Notas -->
+    <section>
+      <label class="font-semibold text-sm"
+        >¿Deseas agregar un comentario?</label
+      >
+      <textarea
+        pInputTextarea
+        formControlName="notes"
+        rows="2"
+        class="w-full bg-[var(--surface)] text-[var(--text)] border rounded-lg px-3 py-2"
+      ></textarea>
+    </section>
+
+    <!-- Artículos -->
+    <section>
+      <h2 class="font-semibold mb-2" [ngStyle]="{ color: 'var(--primary)' }">
+        Artículos
+      </h2>
+      <div
+        *ngFor="let item of items"
+        class="flex items-center justify-between rounded-xl p-3 mb-2 shadow-md"
+        [ngStyle]="{
+          backgroundColor: 'var(--surface)',
+          borderColor:
+            cart?.store?.background_color === 'dark'
+              ? 'rgba(255,255,255,0.08)'
+              : '#e5e7eb'
+        }"
+      >
+        <img
+          [src]="item.product?.imagen_url?.[0] || 'https://placehold.co/80x80'"
+          class="w-14 h-14 object-cover rounded-md"
+        />
+        <div class="flex-1 px-3">
+          <p class="text-sm font-medium">{{ item.product?.nombre_producto }}</p>
+          <p class="text-sm opacity-70">
+            {{ item.precio_unit | currency : "ARS" }}
+          </p>
+          <div class="flex items-center mt-1 gap-2">
+            <button
+              pButton
+              type="button"
+              icon="pi pi-minus"
+              (click)="decrement(item)"
+              [disabled]="item.cantidad <= 1"
+              class="p-button-text p-button-sm"
+            ></button>
+            <span class="px-2">{{ item.cantidad }}</span>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-plus"
+              (click)="increment(item)"
+              class="p-button-text p-button-sm"
+            ></button>
+          </div>
+        </div>
+        <button
+          pButton
+          type="button"
+          icon="pi pi-times"
+          class="p-button-rounded p-button-text p-button-danger"
+          (click)="remove(item.id)"
+        ></button>
+      </div>
+    </section>
+
+    <!-- Resumen -->
+    <section class="border-t pt-3 space-y-1 text-sm">
+      <div class="flex justify-between">
+        <span>Subtotal</span>
+        <span>{{ subtotal | currency : "ARS" }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span>Envío</span>
+        <span>{{ envio | currency : "ARS" }}</span>
+      </div>
+      <div class="flex justify-between font-bold text-lg">
+        <span>Total</span>
+        <span>{{ total | currency : "ARS" }}</span>
+      </div>
+    </section>
+
+    <!-- Botón -->
+    <button
+      pButton
+      type="button"
+      [label]="
+        loading
+          ? 'Procesando...'
+          : form.value.paymentMethod === 'Mercado Pago'
+          ? 'Pagar con Mercado Pago'
+          : 'Enviar pedido por WhatsApp'
+      "
+      class="w-full py-3 rounded-full"
+      [disabled]="loading"
+      [ngStyle]="{
+        backgroundColor: 'var(--secondary)',
+        color: '#fff'
+      }"
+      (click)="placeOrder()"
+    ></button>
+  </form>
 </div>
-
