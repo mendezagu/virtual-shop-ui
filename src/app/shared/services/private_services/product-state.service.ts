@@ -6,7 +6,8 @@ import { PaginatedResponse, ProductService } from './product.service';
 @Injectable({ providedIn: 'root' })
 export class ProductStateService {
   /** 🔹 Estado interno */
-  private productsSubject = new BehaviorSubject<PaginatedResponse<Producto> | null>(null);
+  private productsSubject =
+    new BehaviorSubject<PaginatedResponse<Producto> | null>(null);
   products$ = this.productsSubject.asObservable();
 
   private categoriesSubject = new BehaviorSubject<any[] | null>(null);
@@ -22,26 +23,32 @@ export class ProductStateService {
   constructor(private productService: ProductService) {}
 
   /** Inicializar datos con tienda */
-init(storeId: string, storeSlug: string) {
-  this.storeId = storeId;
-  this.storeSlug = storeSlug;
+  init(storeId: string, storeSlug: string) {
+    this.storeId = storeId;
+    this.storeSlug = storeSlug;
 
-  // Solo cargar si aún no hay datos
-  if (!this.productsSubject.value) {
-    this.loadProducts();
-  }
+    // Solo cargar si aún no hay datos
+    if (!this.productsSubject.value) {
+      this.loadProducts();
+    }
 
-  if (!this.categoriesSubject.value) {
-    this.loadCategories();
+    if (!this.categoriesSubject.value) {
+      this.loadCategories();
+    }
   }
-}
 
   /** Obtener productos desde API y guardar en estado */
   loadProducts(forceRefresh = false) {
     if (!this.storeId) return;
 
     this.productService
-      .getProductsByStore(this.storeId, this.page, this.limit, this.searchTerm, forceRefresh)
+      .getProductsByStore(
+        this.storeId,
+        this.page,
+        this.limit,
+        this.searchTerm,
+        forceRefresh
+      )
       .subscribe({
         next: (res) => this.productsSubject.next(res),
         error: () => this.productsSubject.next(null),
@@ -49,13 +56,11 @@ init(storeId: string, storeSlug: string) {
   }
 
   /** Obtener categorías públicas de la tienda */
-/** Obtener categorías públicas de la tienda */
-loadCategories(forceRefresh = false) {
-  if (!this.storeSlug) return;
+  /** Obtener categorías públicas de la tienda */
+  loadCategories(forceRefresh = false) {
+    if (!this.storeSlug) return;
 
-  this.productService
-    .getCategories(this.storeSlug, forceRefresh)
-    .subscribe({
+    this.productService.getCategories(this.storeSlug, forceRefresh).subscribe({
       next: (res) => {
         const cats = Array.isArray(res)
           ? res
@@ -66,25 +71,24 @@ loadCategories(forceRefresh = false) {
       },
       error: () => this.categoriesSubject.next(null),
     });
-}
-
+  }
 
   /** Cambiar página */
-setPage(page: number) {
-  if (page !== this.page) {
-    this.page = page;
-    this.loadProducts(true); // fuerza recarga solo si cambia
+  setPage(page: number) {
+    if (page !== this.page) {
+      this.page = page;
+      this.loadProducts(true); // fuerza recarga solo si cambia
+    }
   }
-}
 
   /** Cambiar límite */
-setLimit(limit: number) {
-  if (limit !== this.limit) {
-    this.limit = limit;
-    this.page = 1; // reset a la primera página
-    this.loadProducts(true);
+  setLimit(limit: number) {
+    if (limit !== this.limit) {
+      this.limit = limit;
+      this.page = 1; // reset a la primera página
+      this.loadProducts(true);
+    }
   }
-}
 
   /** Buscar */
   setSearch(term: string) {

@@ -163,7 +163,7 @@ export class SidebarComponent {
       attachTo: { element: '#tour-categories', on: 'right' },
       buttons: [
         { text: 'Atrás', action: () => tour.back() },
-         { text: 'Siguiente', action: () => tour.next() },
+        { text: 'Siguiente', action: () => tour.next() },
       ],
     });
 

@@ -11,6 +11,7 @@ import { StoreContactComponent } from '../../../components/stores/store-contact/
 import { StoreUbicationScheduleComponent } from '../../../components/stores/store-ubication-schedule/store-ubication-schedule.component';
 import { StorePersonalizationComponent } from '../../../components/stores/store-personalization/store-personalization.component';
 import { PageHeaderComponent } from "../page-header/page-header.component";
+import { StoreBankAccountComponent } from "../../../components/stores/store-bank-account/store-bank-account.component";
 
 @Component({
   selector: 'app-stepper',
@@ -25,18 +26,21 @@ import { PageHeaderComponent } from "../page-header/page-header.component";
     StoreContactComponent,
     StoreUbicationScheduleComponent,
     StorePersonalizationComponent,
-    PageHeaderComponent
+    PageHeaderComponent,
+    StoreBankAccountComponent
 ],
   templateUrl: './stepper.component.html',
   styleUrls: ['./stepper.component.scss'],
 })
 export class StepperComponent {
+  
   activeStepIndex = 0;
   mobileStepsOpen = false;
   storeData: any = null;
 
   stepTitles = [
     'Información básica',
+    'Pagos y logística',
     'Contacto',
     'Ubicación y horarios',
     'Personalización',
@@ -44,6 +48,7 @@ export class StepperComponent {
 
   stepSubtitles = [
     'Nombre, rubros y descripción',
+    'Medios de pago y logística de tu tienda',
     'Teléfono, email y redes sociales',
     'Dirección y zona de entrega',
     'Colores, logo y portada',

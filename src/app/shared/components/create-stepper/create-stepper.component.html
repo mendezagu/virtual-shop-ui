@@ -1,13 +1,24 @@
 <div class="flex flex-col min-h-[100dvh] bg-neutral-50">
   <main class="flex-1 relative w-full">
-    <div class="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8 transition-all duration-300">
+    <div
+      class="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8 transition-all duration-300"
+    >
       <!-- 💻 Tabs horizontales en desktop -->
       <p-tabView
         [(activeIndex)]="activeStepIndex"
         class="rounded-2xl shadow-sm bg-white overflow-hidden border border-slate-200"
       >
         <p-tabPanel header="Información básica">
-          <app-basic-store-info (saved)="onBasicInfoSaved($event)"></app-basic-store-info>
+          <app-basic-store-info
+            (saved)="onBasicInfoSaved($event)"
+          ></app-basic-store-info>
+        </p-tabPanel>
+
+        <p-tabPanel header="Pagos y logística">
+          <app-store-bank-account
+            (back)="goPrev()"
+            (saved)="onStepSaved()"
+          ></app-store-bank-account>
         </p-tabPanel>
 
         <p-tabPanel header="Contacto">

@@ -3,10 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map, tap, shareReplay } from 'rxjs/operators';
 import { CreateStoreDto, Store, UpdateStoreDto } from '../../models/store.model';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class StoreService {
-  private baseUrl = 'http://localhost:3000/api/stores';
+
+  private readonly apiUrl = `${environment.apiUrl}/stores`;
 
   /** Cache en memoria de /my-stores */
   private myStoresCache$?: Observable<Store[]>;
@@ -15,7 +17,7 @@ export class StoreService {
 
   /** Crea tienda y limpia cache para que la próxima lectura traiga datos frescos */
   createStore(data: CreateStoreDto): Observable<Store> {
-  return this.http.post<Store>(this.baseUrl, data).pipe(
+  return this.http.post<Store>(this.apiUrl, data).pipe(
     tap((store) => {
       const selectedPlan = localStorage.getItem('selectedPlan');
       if (selectedPlan === 'gratis') {
@@ -42,7 +44,7 @@ export class StoreService {
   getMyStores(forceRefresh = false): Observable<Store[]> {
     if (!this.myStoresCache$ || forceRefresh) {
       this.myStoresCache$ = this.http
-        .get<Store[]>(`${this.baseUrl}/my-stores`)
+        .get<Store[]>(`${this.apiUrl}/my-stores`)
         .pipe(shareReplay(1));
     }
     return this.myStoresCache$;
@@ -55,7 +57,7 @@ export class StoreService {
 
   /** Actualiza tienda y limpia cache */
   updateStore(id_tienda: string, data: UpdateStoreDto): Observable<Store> {
-    return this.http.put<Store>(`${this.baseUrl}/${id_tienda}`, data).pipe(
+    return this.http.put<Store>(`${this.apiUrl}/${id_tienda}`, data).pipe(
       tap(() => this.clearCache())
     );
   }

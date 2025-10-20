@@ -16,67 +16,31 @@ export class StoreStateService {
     }
   }
 
-  /** Guardar un nuevo store en memoria y sesión */
-  setStore(store: any) {
+ setStore(store: any) {
     if (!store) return;
-
-    const data = {
-      ...store,
-      _savedAt: Date.now(),
-    };
-
+    const data = { ...store, _savedAt: Date.now() };
     this.storeSubject.next(data);
-
-    // ✅ Solo guardar si estamos en navegador
     if (isPlatformBrowser(this.platformId)) {
-      try {
-        sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
-      } catch (err) {
-        console.warn('No se pudo guardar el store en sessionStorage', err);
-      }
+      sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
     }
   }
 
-  /** Obtener el valor actual sin suscribirse */
   getStore() {
     return this.storeSubject.value;
   }
 
-  /** Borrar el store del estado y del sessionStorage */
   clearStore() {
     this.storeSubject.next(null);
-
     if (isPlatformBrowser(this.platformId)) {
-      try {
-        sessionStorage.removeItem(this.STORAGE_KEY);
-      } catch (err) {
-        console.warn('No se pudo eliminar el store de sessionStorage', err);
-      }
+      sessionStorage.removeItem(this.STORAGE_KEY);
     }
   }
 
-  /** Restaurar el store si está en sesión y no expiró */
   private restoreFromSession() {
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    try {
-      const saved = sessionStorage.getItem(this.STORAGE_KEY);
-      if (!saved) return;
-
+    const saved = sessionStorage.getItem(this.STORAGE_KEY);
+    if (saved) {
       const parsed = JSON.parse(saved);
-      const savedAt = parsed?._savedAt || 0;
-      const isExpired = Date.now() - savedAt > this.EXPIRATION_TIME;
-
-      if (isExpired) {
-        console.info('⏰ Store expirado, se limpia la sesión');
-        this.clearStore();
-        return;
-      }
-
       this.storeSubject.next(parsed);
-    } catch (err) {
-      console.warn('Error al restaurar el store desde sesión', err);
-      this.clearStore();
     }
   }
 }

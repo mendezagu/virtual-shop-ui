@@ -18,6 +18,14 @@
           <app-basic-store-info (saved)="onBasicInfoSaved($event)"></app-basic-store-info>
         </p-tabPanel>
 
+        
+        <p-tabPanel header="Pagos y logística">
+          <app-store-bank-account
+            (back)="goPrev()"
+            (saved)="onStepSaved()"
+          ></app-store-bank-account>
+        </p-tabPanel>
+
         <p-tabPanel header="Contacto">
           <app-store-contact
             [storeData]="storeData"
@@ -61,22 +69,29 @@
               (saved)="onBasicInfoSaved($event)"
             ></app-basic-store-info>
 
+
+          <app-store-bank-account
+           *ngSwitchCase="1"
+            (back)="goPrev()"
+            (saved)="onStepSaved()"
+          ></app-store-bank-account>
+
             <app-store-contact
-              *ngSwitchCase="1"
+              *ngSwitchCase="2"
               [storeData]="storeData"
               (saved)="onStepSaved()"
               (back)="goPrev()"
             ></app-store-contact>
 
             <app-store-ubication-schedule
-              *ngSwitchCase="2"
+              *ngSwitchCase="3"
               [storeData]="storeData"
               (saved)="onStepSaved()"
               (back)="goPrev()"
             ></app-store-ubication-schedule>
 
             <app-store-personalization
-              *ngSwitchCase="3"
+              *ngSwitchCase="4"
               [storeData]="storeData"
               (back)="goPrev()"
               (saved)="onStepSaved()"

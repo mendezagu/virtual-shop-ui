@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { SessionService } from './session.service';
+import { environment } from '../../../../environments/environment';
 
 export type MPItem = {
   title: string;
@@ -29,7 +30,7 @@ export type PaymentStatus =
   providedIn: 'root'
 })
 export class PaymentsService {
-  private base = 'http://localhost:3000/api/payments';
+  private readonly apiUrl = `${environment.apiUrl}/payments`;
 
   constructor(private http: HttpClient, private session: SessionService) {}
 
@@ -42,7 +43,7 @@ export class PaymentsService {
     const body = { items, external_reference: externalRef, payer_email: payerEmail };
 
     const pref = await firstValueFrom(
-      this.http.post<CreatePreferenceResponse>(`${this.base}/checkout-pro`, body, {
+      this.http.post<CreatePreferenceResponse>(`${this.apiUrl}/checkout-pro`, body, {
         headers: this.headers()
       })
     );
@@ -81,7 +82,7 @@ export class PaymentsService {
     }
 
     // Consultamos a tu API para el estado definitivo
-    const res = await firstValueFrom(this.http.get<any>(`${this.base}/${paymentId}`));
+    const res = await firstValueFrom(this.http.get<any>(`${this.apiUrl}/${paymentId}`));
     const status: PaymentStatus = (res?.status as PaymentStatus) || hintedStatus;
 
     return { status, paymentId, external_reference };
@@ -100,7 +101,7 @@ async payWithCard(body: {
   };
 
   return await firstValueFrom(
-    this.http.post(`${this.base}/card`, safeBody, { headers: this.headers() })
+    this.http.post(`${this.apiUrl}/card`, safeBody, { headers: this.headers() })
   );
 }
 }

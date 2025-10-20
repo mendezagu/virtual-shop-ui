@@ -1,0 +1,304 @@
+<div class="mt-5 px-4 sm:px-8 w-full">
+  <div class="flex flex-col lg:grid lg:grid-cols-5 gap-8 items-start w-full">
+    <div class="lg:col-span-3 flex flex-col w-full">
+      <!-- Encabezado -->
+      <div class="flex gap-3 font-semibold items-center mb-3">
+        <i class="pi pi-question-circle text-gray-600 text-lg"></i>
+        <span class="text-gray-700">Informacion de pagos y logística</span>
+      </div>
+
+      <!-- Card informativa -->
+      <div
+        class="rounded-2xl border border-gray-200 bg-white shadow-md p-5 hover:shadow-lg transition-all"
+      >
+        <div class="flex gap-2 mb-3">
+          <i class="pi pi-info-circle text-gray-500 mt-1"></i>
+          <small class="block text-gray-500 leading-relaxed font-medium">
+            Selecciona los medios de pagos que queres habilitar para tu tienda,
+            cuando selecciones un metodo de pago la opcion seleccionada se
+            pondra de color
+          </small>
+        </div>
+        <div class="flex gap-2 mb-3">
+          <i class="pi pi-info-circle text-gray-500 mt-1"></i>
+          <small class="block text-gray-500 leading-relaxed font-medium">
+            Si seleccionas la opcion de transferencia se habilitaran unos campos
+            para que ingreses los datos de la cuanta bancaria en la cual queres
+            recibir los pagos de tus productos vendidos
+          </small>
+        </div>
+      </div>
+
+      <!-- 💳 MÉTODOS DE PAGO ACEPTADOS -->
+      <section class="space-y-4 mt-6">
+        <h2 class="font-semibold text-lg text-[var(--primary)]">
+          Medios de pago aceptados
+        </h2>
+
+        <!-- Scroll horizontal -->
+        <div
+          class="flex gap-4 px-2 overflow-x-auto pb-2 pt-2 snap-x snap-mandatory hide-scrollbar"
+        >
+          <!-- Mercado Pago 
+          <div
+            class="flex-shrink-0 w-64 rounded-2xl p-5 text-center text-white font-semibold cursor-pointer transition-all duration-300 snap-start"
+            [class]="
+              isSelected('Mercado Pago')
+                ? 'bg-gradient-to-r from-sky-400 to-sky-600 scale-105 shadow-lg ring-4 ring-sky-300'
+                : 'bg-gradient-to-r from-sky-400 to-sky-600 filter grayscale brightness-75 opacity-70'
+            "
+            (click)="togglePayment('Mercado Pago')"
+          >
+            <div class="flex flex-col items-center justify-center gap-2">
+              <i class="pi pi-credit-card text-2xl"></i>
+              <span class="text-lg">Mercado Pago</span>
+              <p class="text-sm font-normal opacity-90">
+                Pagá con tu cuenta de Mercado Pago.
+              </p>
+              <i
+                *ngIf="isSelected('Mercado Pago')"
+                class="pi pi-check-circle text-white text-lg mt-2"
+              ></i>
+            </div>
+          </div> -->
+
+          <!-- Efectivo -->
+          <div
+            class="flex-shrink-0 w-64 rounded-2xl p-5 text-center text-white font-semibold cursor-pointer transition-all duration-300 snap-start"
+            [class]="
+              isSelected('Efectivo')
+                ? 'bg-gradient-to-r from-green-500 to-green-600 scale-105 shadow-lg ring-4 ring-green-300'
+                : 'bg-gradient-to-r from-green-500 to-green-600 filter grayscale brightness-75 opacity-70'
+            "
+            (click)="togglePayment('Efectivo')"
+          >
+            <div class="flex flex-col items-center justify-center gap-2">
+              <i class="pi pi-money-bill text-2xl"></i>
+              <span class="text-lg">Efectivo</span>
+              <p class="text-sm font-normal opacity-90">
+                Tus clientes pueden pagarte al momento de recibir o retirar su
+                compra.
+              </p>
+              <i
+                *ngIf="isSelected('Efectivo')"
+                class="pi pi-check-circle text-white text-lg mt-2"
+              ></i>
+            </div>
+          </div>
+
+          <!-- Transferencia Bancaria -->
+          <div
+            class="flex-shrink-0 w-64 rounded-2xl p-5 text-center text-white font-semibold cursor-pointer transition-all duration-300 snap-start"
+            [class]="
+              isSelected('Transferencia Bancaria')
+                ? 'bg-gradient-to-r from-cyan-600 to-sky-700 scale-105 shadow-lg ring-4 ring-cyan-300'
+                : 'bg-gradient-to-r from-cyan-600 to-sky-700 filter grayscale brightness-75 opacity-70'
+            "
+            (click)="togglePayment('Transferencia Bancaria')"
+          >
+            <div class="flex flex-col items-center justify-center gap-2">
+              <i class="pi pi-wallet text-2xl"></i>
+              <span class="text-lg">Transferencia</span>
+              <p class="text-sm font-normal opacity-90">
+                Transferí el monto directamente a tu cuenta bancaria.
+              </p>
+              <i
+                *ngIf="isSelected('Transferencia Bancaria')"
+                class="pi pi-check-circle text-white text-lg mt-2"
+              ></i>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="space-y-4 mt-6">
+        <h2 class="font-semibold text-lg text-[var(--primary)]">
+          Medios de logística
+        </h2>
+        <!-- LOGÍSTICA -->
+        <div
+          class="flex gap-4 px-2 overflow-x-auto pb-2 pt-2 snap-x snap-mandatory hide-scrollbar"
+        >
+          <!-- 🚚 Envío a domicilio -->
+          <div
+            class="flex-shrink-0 w-64 rounded-2xl p-5 text-center text-white font-semibold cursor-pointer transition-all duration-300 snap-start"
+            [class]="
+              isLogisticSelected('Envío a domicilio')
+                ? 'bg-gradient-to-r from-blue-500 to-indigo-600 scale-105 shadow-lg ring-4 ring-blue-300'
+                : 'bg-gradient-to-r from-blue-500 to-indigo-600 filter grayscale brightness-75 opacity-70'
+            "
+            (click)="toggleLogistic('Envío a domicilio')"
+          >
+            <div class="flex flex-col items-center justify-center gap-2">
+              <i class="pi pi-truck text-2xl"></i>
+              <span class="text-lg">Envío a domicilio</span>
+              <p class="text-sm font-normal opacity-90">
+                Tus clientes pueden recibir los productos en su dirección.
+              </p>
+              <i
+                *ngIf="isLogisticSelected('Envío a domicilio')"
+                class="pi pi-check-circle text-white text-lg mt-2"
+              ></i>
+            </div>
+          </div>
+
+          <!-- 🏬 Retiro en tienda -->
+          <div
+            class="flex-shrink-0 w-64 rounded-2xl p-5 text-center text-white font-semibold cursor-pointer transition-all duration-300 snap-start"
+            [class]="
+              isLogisticSelected('Retiro en tienda')
+                ? 'bg-gradient-to-r from-amber-500 to-orange-600 scale-105 shadow-lg ring-4 ring-amber-300'
+                : 'bg-gradient-to-r from-amber-500 to-orange-600 filter grayscale brightness-75 opacity-70'
+            "
+            (click)="toggleLogistic('Retiro en tienda')"
+          >
+            <div class="flex flex-col items-center justify-center gap-2">
+              <i class="pi pi-shopping-bag text-2xl"></i>
+              <span class="text-lg">Retiro en tienda</span>
+              <p class="text-sm font-normal opacity-90">
+                Los clientes pueden pasar a buscar sus compras.
+              </p>
+              <i
+                *ngIf="isLogisticSelected('Retiro en tienda')"
+                class="pi pi-check-circle text-white text-lg mt-2"
+              ></i>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 🏦 FORMULARIO (solo si transferencia seleccionada) -->
+      <form
+        *ngIf="isSelected('Transferencia Bancaria')"
+        [formGroup]="bankForm"
+        (ngSubmit)="saveData()"
+        class="space-y-6 mt-6 w-full animate-[fadeIn_0.35s_ease-in-out]"
+      >
+        <div class="flex flex-col">
+          <label class="font-medium"
+            >Número de identificación (CUIT o DNI)</label
+          >
+          <small class="text-gray-600">Ej: 20-12345678-9</small>
+          <input
+            pInputText
+            formControlName="numero_identificacion"
+            placeholder="Ingresá tu CUIT o DNI"
+            class="w-full border rounded-lg p-2 mt-1"
+          />
+        </div>
+
+        <div class="flex flex-col">
+          <label class="font-medium">Nombre del Banco</label>
+          <small class="text-gray-600">Seleccioná o escribí tu banco</small>
+          <p-dropdown
+            [options]="bancos"
+            formControlName="nombre_banco"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Seleccioná tu banco"
+            [showClear]="true"
+            [editable]="true"
+            class="w-full mt-1"
+          ></p-dropdown>
+        </div>
+
+        <div class="flex flex-col">
+          <label class="font-medium">CBU / CVU</label>
+          <small class="text-gray-600"
+            >Debe tener entre 10 y 30 caracteres</small
+          >
+          <input
+            pInputText
+            formControlName="cvu_cbu"
+            placeholder="Ej: 0000003100012345678901"
+            class="w-full border rounded-lg p-2 mt-1"
+          />
+        </div>
+
+        <div class="flex flex-col">
+          <label class="font-medium">Alias</label>
+          <small class="text-gray-600">Alias único asociado a tu cuenta</small>
+          <input
+            pInputText
+            formControlName="alias"
+            placeholder="Ej: mi.tienda.banco"
+            class="w-full border rounded-lg p-2 mt-1"
+          />
+        </div>
+      </form>
+    </div>
+
+    <!-- Vista previa -->
+    <div
+      class="lg:col-span-2 flex justify-center lg:justify-end w-full mt-6 lg:mt-0"
+    >
+      <div
+        class="relative w-[320px] aspect-[9/16] bg-black rounded-[2.3rem] shadow-2xl border-[10px] border-black overflow-hidden transform scale-95 lg:scale-100"
+      >
+        <div class="absolute inset-0 bg-white rounded-[2rem] p-5 text-center">
+          <h3 class="text-lg font-bold text-slate-800 mb-1">
+            {{ bankForm.value.nombre_banco || "Banco no seleccionado" }}
+          </h3>
+          <p class="text-sm text-slate-500 mb-2">
+            {{
+              bankForm.value.numero_identificacion || "CUIT/DNI no ingresado"
+            }}
+          </p>
+          <div class="text-left space-y-2 text-[13px] text-slate-600 mt-3">
+            <p>
+              <strong>CBU / CVU:</strong> {{ bankForm.value.cvu_cbu || "----" }}
+            </p>
+            <p><strong>Alias:</strong> {{ bankForm.value.alias || "----" }}</p>
+            <p class="pt-3">
+              <strong>Métodos aceptados:</strong>
+              {{ selectedPayments.join(", ") || "Ninguno seleccionado" }}
+            </p>
+
+            <p class="pt-3">
+              <strong>Métodos aceptados:</strong>
+              {{ selectedPayments.join(", ") || "Ninguno seleccionado" }}
+            </p>
+            <p class="pt-2">
+              <strong>Logística:</strong>
+              {{ selectedLogistics.join(", ") || "Ninguna seleccionada" }}
+            </p>
+          </div>
+          <div class="mt-8 text-gray-400 text-xs italic">
+            <i class="pi pi-lock mr-1"></i> Tus datos son privados y seguros.
+          </div>
+        </div>
+        <div
+          class="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-4 bg-black rounded-b-2xl"
+        ></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botones -->
+  <div
+    class="flex justify-end gap-3 mt-8 w-full lg:max-w-5xl mx-auto flex-wrap"
+  >
+    <p-button
+      type="button"
+      label="Atrás"
+      severity="secondary"
+      [outlined]="true"
+      [rounded]="true"
+      size="small"
+      class="flex-1 sm:flex-none min-w-[120px]"
+    ></p-button>
+
+    <p-button
+      type="button"
+      (click)="saveData()"
+      [disabled]="
+        isSaving || (isSelected('Transferencia Bancaria') && bankForm.invalid)
+      "
+      label="Guardar datoooos"
+      severity="success"
+      [rounded]="true"
+      size="small"
+      class="flex-1 sm:flex-none min-w-[120px]"
+    ></p-button>
+  </div>
+</div>

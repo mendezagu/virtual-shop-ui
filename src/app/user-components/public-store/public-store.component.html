@@ -158,9 +158,9 @@
             <i class="pi pi-tags text-[var(--primary)]"></i>
             <h2 class="font-semibold text-lg">Categorías</h2>
           </div>
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div class="grid sm:grid-cols-3 lg:grid-cols-4 gap-6">
             <a
-              *ngFor="let c of normalCategories"
+              *ngFor="let c of visibleNormalCategories"
               [routerLink]="['/store', slug, 'categoria', c.slug]"
               class="group p-5 text-center transition-all duration-300 rounded-2xl overflow-hidden border relative"
               [ngStyle]="{
@@ -205,6 +205,92 @@
               ></div>
             </a>
           </div>
+          <!-- Botón para cargar más -->
+          <div class="flex justify-center mt-8">
+            <button
+              *ngIf="!allCategoriesLoaded()"
+              (click)="loadMoreCategories()"
+              class="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow transition-all duration-300"
+            >
+              + Cargar más categorías
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 💳 MÉTODOS DE PAGO -->
+      <section *ngIf="store?.metodos_pago?.length" class="mt-12 animate-fadeIn">
+        <span class="font-semibold text-xl block mb-6 text-[var(--text)]">
+          Métodos de pago aceptados
+        </span>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+          <p-card
+            *ngFor="let metodo of store.metodos_pago"
+            [style]="{
+              'border-radius': '1rem',
+              'box-shadow': '0 2px 8px rgba(0,0,0,0.1)',
+              'background-color': 'var(--surface)',
+              color: 'var(--text)'
+            }"
+            class="hover:shadow-xl transition-all duration-300"
+          >
+            <div
+              class="flex flex-col items-center justify-center p-4 text-center"
+            >
+              <!-- Icono ilustrativo según el método -->
+              <i
+                class="pi"
+                [ngClass]="getPaymentIcon(metodo)"
+                style="
+                  font-size: 2rem;
+                  color: var(--primary);
+                  margin-bottom: 0.5rem;
+                "
+              ></i>
+              <span class="font-semibold text-[var(--text)]">
+                {{ formatPaymentMethod(metodo) }}
+              </span>
+            </div>
+          </p-card>
+        </div>
+      </section>
+
+      <!-- 🚚 MÉTODOS DE LOGÍSTICA -->
+      <section *ngIf="store?.logistica?.length" class="mt-12 animate-fadeIn">
+        <span class="font-semibold text-xl block mb-6 text-[var(--text)]">
+          Métodos de logística disponibles
+        </span>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+          <p-card
+            *ngFor="let metodo of store.logistica"
+            [style]="{
+              'border-radius': '1rem',
+              'box-shadow': '0 2px 8px rgba(0,0,0,0.1)',
+              'background-color': 'var(--surface)',
+              color: 'var(--text)'
+            }"
+            class="hover:shadow-xl transition-all duration-300"
+          >
+            <div
+              class="flex flex-col items-center justify-center p-4 text-center"
+            >
+              <!-- Icono ilustrativo según la logística -->
+              <i
+                class="pi"
+                [ngClass]="getLogisticIcon(metodo)"
+                style="
+                  font-size: 2rem;
+                  color: var(--primary);
+                  margin-bottom: 0.5rem;
+                "
+              ></i>
+              <span class="font-semibold text-[var(--text)]">
+                {{ formatLogisticMethod(metodo) }}
+              </span>
+            </div>
+          </p-card>
         </div>
       </section>
     </main>

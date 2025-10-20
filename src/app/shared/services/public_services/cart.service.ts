@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { SessionService } from './session.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
 
 export interface CartItem {
   id: string;
@@ -46,7 +47,7 @@ export type CheckoutResponse = CheckoutResponseMP | CheckoutResponseCash;
   providedIn: 'root'
 })
 export class CartService {
-  private base = 'http://localhost:3000/api/cart/public';
+   private readonly apiUrl = `${environment.apiUrl}/cart/public`;
 
   // 👉 BehaviorSubject con valor inicial (nunca null)
   private cartSubject = new BehaviorSubject<CartResponse>({
@@ -75,31 +76,31 @@ export class CartService {
 
   getCart(slug: string): Observable<CartResponse> {
     return this.http
-      .get<CartResponse>(`${this.base}/${slug}`, { headers: this.headers() })
+      .get<CartResponse>(`${this.apiUrl}/${slug}`, { headers: this.headers() })
       .pipe(tap(cart => this.cartSubject.next(cart)));
   }
 
   add(slug: string, body: { productId: string; cantidad: number; variantId?: string }): Observable<CartResponse> {
     return this.http
-      .post<CartResponse>(`${this.base}/${slug}/add`, body, { headers: this.headers() })
+      .post<CartResponse>(`${this.apiUrl}/${slug}/add`, body, { headers: this.headers() })
       .pipe(tap(cart => this.cartSubject.next(cart)));
   }
 
   update(slug: string, itemId: string, cantidad: number): Observable<CartResponse> {
     return this.http
-      .patch<CartResponse>(`${this.base}/${slug}/update`, { itemId, cantidad }, { headers: this.headers() })
+      .patch<CartResponse>(`${this.apiUrl}/${slug}/update`, { itemId, cantidad }, { headers: this.headers() })
       .pipe(tap(cart => this.cartSubject.next(cart)));
   }
 
   remove(slug: string, itemId: string): Observable<CartResponse> {
     return this.http
-      .delete<CartResponse>(`${this.base}/${slug}/item/${itemId}`, { headers: this.headers() })
+      .delete<CartResponse>(`${this.apiUrl}/${slug}/item/${itemId}`, { headers: this.headers() })
       .pipe(tap(cart => this.cartSubject.next(cart)));
   }
 
   clear(slug: string): Observable<CartResponse> {
     return this.http
-      .delete<CartResponse>(`${this.base}/${slug}/clear`, { headers: this.headers() })
+      .delete<CartResponse>(`${this.apiUrl}/${slug}/clear`, { headers: this.headers() })
       .pipe(tap(cart => this.cartSubject.next(cart)));
   }
 

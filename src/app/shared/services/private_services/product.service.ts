@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { tap, shareReplay } from 'rxjs/operators';
 import { Producto } from '../../models/product.model';
+import { environment } from '../../../../environments/environment';
 
 // DTOs
 export interface CreateProductPayload {
@@ -34,7 +35,8 @@ export interface PaginatedResponse<T> {
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
-  private baseUrl = 'http://localhost:3000/api/products';
+  private readonly apiUrl = `${environment.apiUrl}/products`;
+  
 
   /** Cache de productos: clave = id_tienda + page + limit + search */
   private productCache: Record<string, Observable<PaginatedResponse<Producto>>> = {};
@@ -46,17 +48,17 @@ export class ProductService {
 
   /** 🟢 Crear producto y limpiar cache */
   createProduct(id_tienda: string, producto: Producto): Observable<any> {
-    const url = `${this.baseUrl}/${id_tienda}`;
+    const url = `${this.apiUrl}/${id_tienda}`;
     return this.http.post(url, producto).pipe(tap(() => this.clearCache(id_tienda)));
   }
 
   /** 🟡 Obtener categorías (con cache por tienda pública) */
   getCategories(storeSlug?: string, forceRefresh = false): Observable<any> {
-    if (!storeSlug) return this.http.get(`${this.baseUrl}/categories`);
+    if (!storeSlug) return this.http.get(`${this.apiUrl}/categories`);
 
     if (!this.categoryCache[storeSlug] || forceRefresh) {
       this.categoryCache[storeSlug] = this.http
-        .get(`${this.baseUrl}/public/store/${storeSlug}/categories`)
+        .get(`${this.apiUrl}/public/store/${storeSlug}/categories`)
         .pipe(shareReplay(1));
     }
 
@@ -74,7 +76,7 @@ export class ProductService {
     const key = `${id_tienda}-p${page}-l${limit}-s${searchTerm.trim().toLowerCase()}`;
 
     if (!this.productCache[key] || forceRefresh) {
-      let url = `${this.baseUrl}/shop/${id_tienda}?page=${page}&limit=${limit}`;
+      let url = `${this.apiUrl}/shop/${id_tienda}?page=${page}&limit=${limit}`;
       if (searchTerm.trim()) url += `&search=${encodeURIComponent(searchTerm)}`;
 
       this.productCache[key] = this.http
@@ -90,13 +92,13 @@ export class ProductService {
     id_producto: string,
     producto: Partial<CreateProductPayload>
   ): Observable<any> {
-    const url = `${this.baseUrl}/${id_producto}`;
+    const url = `${this.apiUrl}/${id_producto}`;
     return this.http.put(url, producto).pipe(tap(() => this.clearCache()));
   }
 
   /** 🔴 Eliminar producto y limpiar cache */
   deleteProduct(id_producto: string): Observable<any> {
-    const url = `${this.baseUrl}/${id_producto}`;
+    const url = `${this.apiUrl}/${id_producto}`;
     return this.http.delete(url).pipe(tap(() => this.clearCache()));
   }
 

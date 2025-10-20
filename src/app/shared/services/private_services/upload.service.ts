@@ -8,7 +8,7 @@ import { environment } from '../../../../environments/environment';
   providedIn: 'root',
 })
 export class UploadService {
-  private apiUrl = 'http://localhost:3000/api/s3'; // 👈 cambia a tu backend en producción
+  private readonly apiUrl = `${environment.apiUrl}/s3`; // 👈 cambia a tu backend en producción
 
   constructor(private http: HttpClient) {}
 

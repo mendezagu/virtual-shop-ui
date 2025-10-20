@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../../../environments/environment';
 
 export type OrderStatus =
   | 'RECIBIDO'
@@ -32,7 +33,7 @@ export interface Order {
 
 @Injectable({ providedIn: 'root' })
 export class OrdersService {
-  private base = 'http://localhost:3000/api/orders';
+   private readonly apiUrl = `${environment.apiUrl}/orders`;
 
   constructor(private http: HttpClient, private auth: AuthService) {}
 
@@ -49,7 +50,7 @@ export class OrdersService {
     metodo_pago: 'EFECTIVO' | 'MERCADOPAGO';
     direccion_envio?: string;
   }): Observable<Order | { order: Order; preference_id: string; init_point: string }> {
-    return this.http.post<Order | any>(this.base, payload, {
+    return this.http.post<Order | any>(this.apiUrl, payload, {
       headers: this.headers(),
     });
   }
@@ -57,23 +58,23 @@ export class OrdersService {
 
   // 🔹 Obtener pedidos por tienda (para vendedor)
   getOrdersByStore(storeId: string): Observable<Order[]> {
-  return this.http.get<Order[]>(`${this.base}/store/${storeId}`, {
+  return this.http.get<Order[]>(`${this.apiUrl}/store/${storeId}`, {
     headers: this.headers(),
   });
 }
 
 // 🔹 🔥 NUEVO: obtener estados desde el backend
   getOrderStatuses(): Observable<{ value: string; label: string }[]> {
-    return this.http.get<{ value: string; label: string }[]>(`${this.base}/statuses`);
+    return this.http.get<{ value: string; label: string }[]>(`${this.apiUrl}/statuses`);
   }
 
   updateOrderStatus(orderId: string, estado: string): Observable<Order> {
-    return this.http.patch<Order>(`${this.base}/${orderId}/status`, { estado });
+    return this.http.patch<Order>(`${this.apiUrl}/${orderId}/status`, { estado });
   }
 
 updatePayment(orderId: string, paymentStatus: string): Observable<Order> {
   return this.http.patch<Order>(
-    `${this.base}/${orderId}/payment`,
+    `${this.apiUrl}/${orderId}/payment`,
     { paymentStatus }, // 👈 debe coincidir con UpdatePaymentStatusDto
     { headers: this.headers() }
   );
@@ -82,7 +83,7 @@ updatePayment(orderId: string, paymentStatus: string): Observable<Order> {
 
   // 🔹 Trae todos los pedidos del vendedor
   getMyOrders(): Observable<Order[]> {
-    return this.http.get<Order[]>(`${this.base}/mine`);
+    return this.http.get<Order[]>(`${this.apiUrl}/mine`);
   }
 
 }

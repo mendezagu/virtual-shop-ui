@@ -9,6 +9,7 @@ import { MyStoreComponent } from '../../../components/stores/store-basic-info/st
 import { StoreContactComponent } from '../../../components/stores/store-contact/store-contact.component';
 import { StoreUbicationScheduleComponent } from '../../../components/stores/store-ubication-schedule/store-ubication-schedule.component';
 import { StorePersonalizationComponent } from '../../../components/stores/store-personalization/store-personalization.component';
+import { StoreBankAccountComponent } from "../../../components/stores/store-bank-account/store-bank-account.component";
 
 @Component({
   selector: 'app-create-stepper',
@@ -22,7 +23,8 @@ import { StorePersonalizationComponent } from '../../../components/stores/store-
     StoreContactComponent,
     StoreUbicationScheduleComponent,
     StorePersonalizationComponent,
-  ],
+    StoreBankAccountComponent
+],
   templateUrl: './create-stepper.component.html',
   styleUrls: ['./create-stepper.component.scss'],
 })
@@ -35,6 +37,7 @@ export class CreateStepperComponent {
   /** Listado de pasos */
   stepTitles = [
     'Información básica',
+    'Pagos y logística',
     'Contacto',
     'Ubicación y horarios',
     'Personalización',
@@ -42,6 +45,7 @@ export class CreateStepperComponent {
 
   stepSubtitles = [
     'Datos iniciales de la tienda',
+    'Medios de pago y logística de tu tienda',
     'Teléfono, email y redes sociales',
     'Dirección y zona de entrega',
     'Colores, logo y portada',

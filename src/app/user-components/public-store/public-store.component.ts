@@ -9,6 +9,7 @@ import { StoreStateService } from '../../shared/services/private_services/store-
 import { DataViewModule } from 'primeng/dataview';
 import { CarouselModule } from 'primeng/carousel';
 import { TagModule } from 'primeng/tag';
+import { CardModule } from 'primeng/card';
 
 @Component({
   selector: 'app-public-store',
@@ -16,10 +17,10 @@ import { TagModule } from 'primeng/tag';
   imports: [
     RouterModule,
     CommonModule,
-    MatIcon,
     DataViewModule,
     CarouselModule,
     TagModule,
+    CardModule,
   ],
   templateUrl: './public-store.component.html',
   styleUrl: './public-store.component.scss',
@@ -28,6 +29,11 @@ export class PublicStoreComponent {
   categories: any[] = [];
   featuredCategories: any[] = [];
   normalCategories: any[] = [];
+  // 👇 NUEVO: control de paginado local
+  visibleNormalCategories: any[] = [];
+  itemsToShow = 4; // Cuántas categorías mostrar inicialmente
+  step = 4; // Cuántas agregar cada vez que se hace clic
+
   slug!: string;
   store: any;
 
@@ -53,8 +59,14 @@ export class PublicStoreComponent {
         // 🎨 Aplicar colores a nivel local (este componente)
         const el = document.querySelector('app-public-store') as HTMLElement;
         if (el) {
-          el.style.setProperty('--primary', this.store.primary_color || '#ff4081');
-          el.style.setProperty('--secondary', this.store.secondary_color || '#00bfa5');
+          el.style.setProperty(
+            '--primary',
+            this.store.primary_color || '#ff4081'
+          );
+          el.style.setProperty(
+            '--secondary',
+            this.store.secondary_color || '#00bfa5'
+          );
           el.style.setProperty(
             '--bg',
             this.store.background_color === 'dark' ? '#202123' : '#ffffff'
@@ -67,11 +79,19 @@ export class PublicStoreComponent {
 
         // 🎨 Aplicar colores también a nivel global (document root)
         const root = document.documentElement;
-        root.style.setProperty('--primary', this.store.primary_color || '#ff4081');
-        root.style.setProperty('--secondary', this.store.secondary_color || '#00bfa5');
+        root.style.setProperty(
+          '--primary',
+          this.store.primary_color || '#ff4081'
+        );
+        root.style.setProperty(
+          '--secondary',
+          this.store.secondary_color || '#00bfa5'
+        );
         root.style.setProperty(
           '--bg',
-          this.store.background_color === 'dark' ? '#202123' : this.store.background_color || '#ffffff'
+          this.store.background_color === 'dark'
+            ? '#202123'
+            : this.store.background_color || '#ffffff'
         );
         root.style.setProperty(
           '--text',
@@ -97,7 +117,30 @@ export class PublicStoreComponent {
       this.normalCategories = this.categories.filter(
         (c) => !c.type || c.type === 'NORMAL'
       );
+      // 👇 Mostrar solo las primeras 4
+      this.visibleNormalCategories = this.normalCategories.slice(
+        0,
+        this.itemsToShow
+      );
     });
+  }
+
+  // 👇 NUEVA FUNCIÓN: para mostrar más categorías
+  loadMoreCategories() {
+    const currentLength = this.visibleNormalCategories.length;
+    const nextItems = this.normalCategories.slice(
+      currentLength,
+      currentLength + this.step
+    );
+    this.visibleNormalCategories = [
+      ...this.visibleNormalCategories,
+      ...nextItems,
+    ];
+  }
+
+  // 👇 Para ocultar el botón cuando ya se cargaron todas
+  allCategoriesLoaded(): boolean {
+    return this.visibleNormalCategories.length >= this.normalCategories.length;
   }
 
   // Helpers
@@ -130,5 +173,74 @@ export class PublicStoreComponent {
     };
     const key = (c.slug || '').toLowerCase();
     return map[key] ?? null;
+  }
+
+  getPaymentIcon(metodo: string): string {
+    const icons: Record<string, string> = {
+      EFECTIVO: 'pi-money-bill',
+      TARJETA: 'pi-credit-card',
+      TRANSFERENCIA: 'pi-wallet',
+      MERCADOPAGO: 'pi-paypal',
+      DEBITO: 'pi-credit-card',
+      CREDITO: 'pi-credit-card',
+      PIX: 'pi-globe',
+      OTRO: 'pi-question-circle',
+    };
+
+    return icons[metodo.toUpperCase()] || 'pi-wallet';
+  }
+
+  formatPaymentMethod(metodo: string): string {
+    if (!metodo) return '';
+
+    const map: Record<string, string> = {
+      EFECTIVO: 'Efectivo',
+      TRANSFERENCIA_BANCARIA: 'Transferencia',
+      TARJETA: 'Tarjeta',
+      MERCADOPAGO: 'Mercado Pago',
+      DEBITO: 'Débito',
+      CREDITO: 'Crédito',
+    };
+
+    // Si existe en el mapa, devolvemos la traducción
+    if (map[metodo.toUpperCase()]) return map[metodo.toUpperCase()];
+
+    // Si no está en el mapa, lo convertimos genéricamente:
+    // - Reemplazamos guiones bajos por espacios
+    // - Ponemos mayúscula inicial
+    const clean = metodo.toLowerCase().replace(/_/g, ' ').trim();
+
+    return clean.charAt(0).toUpperCase() + clean.slice(1);
+  }
+
+  getLogisticIcon(metodo: string): string {
+    if (!metodo) return 'pi-question-circle';
+
+    const icons: Record<string, string> = {
+      ENVIO_DOMICILIO: 'pi-truck',
+      RETIRO_TIENDA: 'pi-shopping-bag',
+      MOTO_MENSAJERIA: 'pi-send',
+      PICKUP_POINT: 'pi-map-marker',
+    };
+
+    return icons[metodo.toUpperCase()] || 'pi-truck';
+  }
+
+  formatLogisticMethod(metodo: string): string {
+    if (!metodo) return '';
+
+    const map: Record<string, string> = {
+      ENVIO_DOMICILIO: 'Envío a domicilio',
+      RETIRO_TIENDA: 'Retiro en tienda',
+      MOTO_MENSAJERIA: 'Moto mensajería',
+      PICKUP_POINT: 'Punto de retiro',
+    };
+
+    // Si existe en el mapa, devolvemos su nombre legible
+    if (map[metodo.toUpperCase()]) return map[metodo.toUpperCase()];
+
+    // Si no está en el mapa, generamos uno genérico (reemplaza guiones y pone mayúscula inicial)
+    const clean = metodo.toLowerCase().replace(/_/g, ' ').trim();
+    return clean.charAt(0).toUpperCase() + clean.slice(1);
   }
 }

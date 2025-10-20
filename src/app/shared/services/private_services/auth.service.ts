@@ -4,6 +4,7 @@ import { BehaviorSubject, map, Observable, tap } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { JwtPayload } from '../../../shared/models/jwt-payload.model';
 import jwtDecode from 'jwt-decode';
+import { environment } from '../../../../environments/environment';
 
 interface LoginResponse {
   access_token: string;
@@ -21,7 +22,7 @@ export interface RegisterData {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly apiUrl = 'http://localhost:3000/api/auth';
+  private readonly apiUrl = `${environment.apiUrl}/auth`;
   private readonly TOKEN_KEY = 'auth_token';
 
   private loggedInSubject = new BehaviorSubject<boolean>(this.hasToken());

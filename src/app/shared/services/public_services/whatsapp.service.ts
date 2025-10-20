@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { SessionService } from './session.service';
 import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 
 export interface WhatsAppCheckoutPayload {
   cartId?: string;
@@ -21,7 +22,7 @@ export interface WhatsAppCheckoutPayload {
 
 @Injectable({ providedIn: 'root' })
 export class WhatsAppService {
-  private base = 'http://localhost:3000/api/whatsapp/public';
+  private readonly apiUrl = `${environment.apiUrl}/whatsapp/public`;
 
   constructor(private http: HttpClient, private session: SessionService) {}
 
@@ -31,7 +32,7 @@ export class WhatsAppService {
 
   createLink(slug: string, payload: WhatsAppCheckoutPayload): Observable<{ url: string }> {
     return this.http.post<{ url: string }>(
-      `${this.base}/${slug}/link`,
+      `${this.apiUrl}/${slug}/link`,
       payload,
       { headers: this.headers() }
     );
