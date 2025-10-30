@@ -1,3 +1,5 @@
+import { Producto } from "./product.model";
+
 // shared/models/store.model.ts
 export interface Store {
   nombre_tienda: string;
@@ -22,6 +24,7 @@ export interface Store {
   background_color?: string;
   logo_url?: string
   portada_url?: string
+  products?: Producto[];
 }
 
 // Lo que ENVIÁS al crear

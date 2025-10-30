@@ -1,51 +1,14 @@
-:host {
-  ::ng-deep .p-card,
-  ::ng-deep .p-dataview .p-dataview-content,
-  .block {
-    background: var(--bg) !important;
-    color: var(--text) !important;
-
-    // Borde sutil pero notorio
-   // border: 1px solid rgba(255, 255, 255, 0.08) !important;
-
-    // Sombras más visibles
-    //box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
-
-    border-radius: 1rem; // redondeo más marcado
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-
-  // Para diferenciar aún más el contenido dentro del dark mode
-  [style*="background-color: #202123"] .p-card,
-  [style*="background-color: #202123"] .p-dataview .p-dataview-content,
-  [style*="background-color: #202123"] .block {
-    background: #2a2b32 !important; // un gris un poco más claro que el fondo
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-
-::ng-deep .custom-carousel .p-carousel-content {
-  padding: 0 0.5rem;
-}
-
-::ng-deep .custom-carousel .p-carousel-item {
-  padding: 0.5rem;
-}
-
-::ng-deep .p-carousel-item a {
-  display: block;
-  height: 100%;
-  text-decoration: none;
-}
-
-::ng-deep .p-carousel-item a:hover {
-  transform: translateY(-2px);
-  transition: transform 0.2s ease;
-}
-
-::ng-deep .p-tag {
-  font-size: 0.7rem !important;
-  letter-spacing: 0.5px;
-  background-color: var(--secondary) !important;
-  color: #fff !important;
-  border: none !important;
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease-out both;
 }

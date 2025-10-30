@@ -29,6 +29,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { SkeletonModule } from 'primeng/skeleton';
+import { FieldsetModule } from 'primeng/fieldset';
 
 // Estado reactivo
 import { ProductStateService } from '../../../shared/services/private_services/product-state.service';
@@ -57,7 +58,8 @@ import { PageHeaderComponent } from "../../../shared/components/page-header/page
     ToastModule,
     ConfirmDialogModule,
     SkeletonModule,
-    PageHeaderComponent
+    PageHeaderComponent,
+      FieldsetModule,
 ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './my-products.component.html',
@@ -87,6 +89,8 @@ export class MyProductsComponent implements OnInit {
   editVisible = false;
   createVisible = false;
 
+  showFilters = false;
+
   constructor(
     private productService: ProductService,
     private storeService: StoreService,
@@ -94,6 +98,36 @@ export class MyProductsComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private productState: ProductStateService
   ) {}
+
+sortOptions = [
+  { label: 'Más nuevo', value: 'date_desc' },
+  { label: 'Más antiguo', value: 'date_asc' },
+  { label: 'Mayor stock', value: 'stock_desc' },
+  { label: 'Menor stock', value: 'stock_asc' },
+  { label: 'Mayor precio', value: 'price_desc' },
+  { label: 'Menor precio', value: 'price_asc' },
+];
+
+conditionOptions = [
+  { label: 'Todas', value: '' },
+  { label: 'Nuevos', value: 'NUEVO' },
+  { label: 'Usados', value: 'USADO' },
+  { label: 'Reacondicionados', value: 'REACONDICIONADO' },
+];
+
+availableOptions = [
+  { label: 'Todos', value: '' },
+  { label: 'Disponibles', value: 'true' },
+  { label: 'No disponibles', value: 'false' },
+];
+
+unidadOptions = [
+  { label: 'Todas', value: '' },
+  { label: 'Unidad', value: 'UNIDAD' },
+  { label: 'Kilogramo', value: 'KILOGRAMO' },
+  { label: 'Litro', value: 'LITRO' },
+  { label: 'Pack', value: 'PACK' },
+];
 
 ngOnInit(): void {
     /** 🔹 Cargar tienda del usuario solo una vez */
@@ -227,4 +261,41 @@ getMinPrice(product: Producto): number {
   trackByVariant(index: number, variant: ProductVariant): string {
     return variant.id_variant || variant.nombre;
   }
+
+
+onSortChange(v: string) {
+  this.productState.setSort(v);
+}
+onConditionChange(v: string) {
+  this.productState.setCondition(v);
+}
+onAvailableChange(v: string) {
+  this.productState.setAvailable(v);
+}
+onUnidadChange(v: string) {
+  this.productState.setUnidad(v);
+}
+onGrupoChange(v: string) {
+  this.productState.setGrupo(v);
+}
+onPriceChange(min: string, max: string) {
+  this.productState.setPriceRange(min, max);
+}
+
+clearFilters() {
+  // Reset visual
+  this.showFilters = false;
+  
+  // Reset interno
+  this.productState.setSort('');
+  this.productState.setCondition('');
+  this.productState.setAvailable('');
+  this.productState.setUnidad('');
+  this.productState.setGrupo('');
+  this.productState.setPriceRange('', '');
+  this.searchCtrl.setValue('');
+
+  // Recargar productos
+  this.productState.loadProducts(true);
+}
 }

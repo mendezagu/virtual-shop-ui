@@ -22,6 +22,7 @@ import { EditorModule } from 'primeng/editor';
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from "primeng/skeleton";
 import { DialogModule } from 'primeng/dialog';
+import { MultiSelectModule } from 'primeng/multiselect';
 
 interface Category {
   name: string;
@@ -44,7 +45,8 @@ interface Category {
     EditorModule,
     ButtonModule,
     SkeletonModule,
-    DialogModule
+    DialogModule,
+    MultiSelectModule
 ],
   templateUrl: './store-basic-info.component.html',
   styleUrls: ['./store-basic-info.component.scss'],
@@ -63,22 +65,40 @@ export class MyStoreComponent implements OnInit {
 
   actionLabel: string = 'Siguiente paso';
 
-  categories: Category[] = [
-    { name: 'Tecnologia', code: 'Tech' },
-    { name: 'Electronica', code: 'Elec' },
-    { name: 'Limpieza', code: 'Limp' },
-  ];
+categories: Category[] = [
+  { name: 'Tecnología', code: 'Tech' },
+  { name: 'Electrónica', code: 'Elec' },
+  { name: 'Limpieza', code: 'Limp' },
+  { name: 'Gastronomía', code: 'Gast' },
+  { name: 'Ropa y Moda', code: 'Moda' },
+  { name: 'Hogar y Decoración', code: 'Hogar' },
+  { name: 'Deportes', code: 'Dep' },
+  { name: 'Salud y Belleza', code: 'Salud' },
+  { name: 'Automotriz', code: 'Auto' },
+  { name: 'Juguetería', code: 'Jugu' },
+  { name: 'Jardinería', code: 'Jard' },
+  { name: 'Oficina', code: 'Ofi' },
+  { name: 'Mascotas', code: 'Masc' },
+  { name: 'Papelería', code: 'Pape' },
+  { name: 'Construcción', code: 'Const' },
+  { name: 'Ferretería', code: 'Ferr' },
+  { name: 'Viajes y Turismo', code: 'Tur' },
+  { name: 'Arte y Manualidades', code: 'Arte' },
+  { name: 'Videojuegos', code: 'Games' },
+  { name: 'Instrumentos Musicales', code: 'Music' },
+];
+
 
   constructor(private storeService: StoreService, private fb: FormBuilder) {}
 
 ngOnInit(): void {
-
   // 🔹 Detectar si es mobile
   this.isMobile = window.innerWidth < 1024;
-
   window.addEventListener('resize', () => {
     this.isMobile = window.innerWidth < 1024;
   });
+
+  // 🔹 Mensaje inicial
   this.messages = [
     {
       severity: 'info',
@@ -87,17 +107,18 @@ ngOnInit(): void {
     },
   ];
 
+  // 🔹 Formulario
   this.storeForm = this.fb.group({
     nombre_tienda: ['', [Validators.required, Validators.minLength(2)]],
-    rubro: ['', Validators.required],
+    rubro: [[], Validators.required], // ✅ array vacío
     descripcion: [''],
     link_tienda: [''],
   });
 
-  // Ejemplo: preseleccionar categoría
-  this.storeForm.patchValue({ rubro: this.categories[0] });
+  // 🔹 Preseleccionar categoría de ejemplo (puedes quitarlo luego)
+  this.storeForm.patchValue({ rubro: [this.categories[0]] });
 
-  // 🔥 Auto-generar link a partir del nombre
+  // 🔹 Auto-generar link a partir del nombre
   this.storeForm.get('nombre_tienda')?.valueChanges.subscribe((nombre: string) => {
     if (nombre) {
       const slug = nombre
@@ -108,7 +129,7 @@ ngOnInit(): void {
 
       this.storeForm.patchValue(
         { link_tienda: `https://${slug}` },
-        { emitEvent: false } // evita loop infinito
+        { emitEvent: false }
       );
     } else {
       this.storeForm.patchValue(
@@ -118,23 +139,32 @@ ngOnInit(): void {
     }
   });
 
-  // Si traes datos de backend:
+  // 🔹 Obtener datos del backend
   this.storeService.getMyStores().subscribe({
     next: (stores: Store[]) => {
       if (stores?.length > 0) {
         this.storeData = stores[0];
+
+        // ✅ Adaptar rubro siempre a un array de objetos
+        let rubrosSeleccionados: Category[] = [];
+
+ const rubroData = this.storeData?.rubro;
+
+if (Array.isArray(rubroData)) {
+  rubrosSeleccionados = this.categories.filter((c) => rubroData.includes(c.code));
+} else if (typeof rubroData === 'string') {
+  const found = this.categories.find((c) => c.code === rubroData);
+  if (found) rubrosSeleccionados = [found];
+}
+
         this.storeForm.patchValue({
           ...this.storeData,
-          rubro:
-            this.categories.find((c) =>
-              Array.isArray(this.storeData?.rubro)
-                ? this.storeData?.rubro.includes(c.code)
-                : c.code === this.storeData?.rubro
-            ) || null,
+          rubro: rubrosSeleccionados, // 🔥 siempre un array
         });
       } else {
         this.storeData = null;
       }
+
       this.isLoading = false;
     },
     error: () => {
@@ -142,6 +172,7 @@ ngOnInit(): void {
     },
   });
 }
+
 
   get f() {
     return this.storeForm.controls;
@@ -156,7 +187,7 @@ saveChanges() {
   const v = this.storeForm.value;
   const payload = {
     ...v,
-    rubro: v.rubro ? [v.rubro.code] : [],
+     rubro: (v.rubro || []).map((r: any) => r.code),
   };
   delete (payload as any).link_tienda;
 

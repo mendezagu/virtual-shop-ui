@@ -75,18 +75,26 @@ export class StoreUbicationScheduleComponent {
         ciudad: [''],
         latitud: [null],
         longitud: [null],
-        horario_apertura: [null, Validators.required],
-        horario_cierre: [null, Validators.required],
+        horario_apertura_manana: [null, Validators.required],
+        horario_cierre_manana: [null, Validators.required],
+        horario_apertura_tarde: [null, Validators.required],
+        horario_cierre_tarde: [null, Validators.required],
       },
       { validators: this.horarioValidator }
     );
 
     // 🔹 Escuchar cambios de hora y mostrar mensaje si hay error
     this.form
-      .get('horario_apertura')
+      .get('horario_apertura_manana')
       ?.valueChanges.subscribe(() => this.checkHorario());
     this.form
-      .get('horario_cierre')
+      .get('horario_cierre_manana')
+      ?.valueChanges.subscribe(() => this.checkHorario());
+    this.form
+      .get('horario_apertura_tarde')
+      ?.valueChanges.subscribe(() => this.checkHorario());
+    this.form
+      .get('horario_cierre_tarde')
       ?.valueChanges.subscribe(() => this.checkHorario());
 
     // 🔹 Cargar tienda existente
@@ -99,16 +107,20 @@ export class StoreUbicationScheduleComponent {
             ciudad: this.storeData.ciudad ?? '',
             latitud: this.storeData.latitud ?? null,
             longitud: this.storeData.longitud ?? null,
-            horario_apertura: this.parseTime(this.storeData.horario_apertura),
-            horario_cierre: this.parseTime(this.storeData.horario_cierre),
+            horario_apertura_manana: this.parseTime(this.storeData.horario_apertura_manana),
+            horario_cierre_manana: this.parseTime(this.storeData.horario_cierre_manana),
+            horario_apertura_tarde: this.parseTime(this.storeData.horario_apertura_tarde),
+            horario_cierre_tarde: this.parseTime(this.storeData.horario_cierre_tarde),
           });
 
           // ✅ Cambiar texto del botón si hay datos previos
           if (
             this.storeData.direccion ||
             this.storeData.ciudad ||
-            this.storeData.horario_apertura ||
-            this.storeData.horario_cierre
+            this.storeData.horario_apertura_manana ||
+            this.storeData.horario_cierre_manana ||
+            this.storeData.horario_apertura_tarde ||
+            this.storeData.horario_cierre_tarde
           ) {
             this.actionLabel = 'Actualizar datos';
           }
@@ -128,8 +140,10 @@ export class StoreUbicationScheduleComponent {
       if (
         v.direccion?.trim() ||
         v.ciudad ||
-        v.horario_apertura ||
-        v.horario_cierre
+        v.horario_apertura_manana ||
+        v.horario_cierre_manana ||
+        v.horario_apertura_tarde ||
+        v.horario_cierre_tarde
       ) {
         this.actionLabel = 'Actualizar datos';
       } else {
@@ -152,8 +166,10 @@ export class StoreUbicationScheduleComponent {
   }
 
   horarioValidator(group: FormGroup) {
-    const apertura = group.get('horario_apertura')?.value;
-    const cierre = group.get('horario_cierre')?.value;
+    const apertura = group.get('horario_apertura_manana')?.value;
+    const cierre = group.get('horario_cierre_manana')?.value;
+    const aperturaTarde = group.get('horario_apertura_tarde')?.value;
+    const cierreTarde = group.get('horario_cierre_tarde')?.value;
 
     if (apertura && cierre) {
       const aperturaDate = new Date(apertura);
@@ -202,8 +218,10 @@ export class StoreUbicationScheduleComponent {
       ciudad: v.ciudad || undefined,
       latitud: v.latitud != null ? Number(v.latitud) : undefined,
       longitud: v.longitud != null ? Number(v.longitud) : undefined,
-      horario_apertura: this.formatTime(v.horario_apertura),
-      horario_cierre: this.formatTime(v.horario_cierre),
+      horario_apertura_manana: this.formatTime(v.horario_apertura_manana),
+      horario_cierre_manana: this.formatTime(v.horario_cierre_manana),
+      horario_apertura_tarde: this.formatTime(v.horario_apertura_tarde),
+      horario_cierre_tarde: this.formatTime(v.horario_cierre_tarde),
     };
 
     this.storeService.updateStore(this.storeData.id_tienda, payload).subscribe({

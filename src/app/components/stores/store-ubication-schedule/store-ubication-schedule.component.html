@@ -75,17 +75,23 @@
           </div>
 
           <!-- Horarios -->
+           <h3>
+            <span class="text-lg font-semibold text-slate-700"
+              >Horario de atención</span
+            >
+           </h3>
+           <!--HORARIO MAÑANA-->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div class="flex flex-col w-full">
               <label class="mb-1 text-sm font-medium text-slate-700"
-                >Horario de apertura</label
+                >Horario de apertura (mañana)</label
               >
               <p-calendar
-                formControlName="horario_apertura"
+                formControlName="horario_apertura_manana"
                 [iconDisplay]="'input'"
                 [showIcon]="true"
                 [timeOnly]="true"
-                inputId="horario_apertura"
+                inputId="horario_apertura_manana"
                 class="w-full"
               >
                 <ng-template
@@ -102,10 +108,10 @@
 
             <div class="flex flex-col w-full">
               <label class="mb-1 text-sm font-medium text-slate-700"
-                >Horario de cierre</label
+                >Horario de cierre (mañana)</label
               >
               <p-calendar
-                formControlName="horario_cierre"
+                formControlName="horario_cierre_manana"
                 [iconDisplay]="'input'"
                 [showIcon]="true"
                 [timeOnly]="true"
@@ -124,6 +130,57 @@
               </p-calendar>
             </div>
           </div>
+          <!--HORARIO TARDE-->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div class="flex flex-col w-full">
+              <label class="mb-1 text-sm font-medium text-slate-700"
+                >Horario de apertura (tarde)</label
+              >
+              <p-calendar
+                formControlName="horario_apertura_tarde"
+                [iconDisplay]="'input'"
+                [showIcon]="true"
+                [timeOnly]="true"
+                inputId="horario_apertura_tarde"
+                class="w-full"
+              >
+                <ng-template
+                  pTemplate="inputicon"
+                  let-clickCallBack="clickCallBack"
+                >
+                  <i
+                    class="pi pi-clock pointer-events-none"
+                    (click)="clickCallBack($event)"
+                  ></i>
+                </ng-template>
+              </p-calendar>
+            </div>
+
+            <div class="flex flex-col w-full">
+              <label class="mb-1 text-sm font-medium text-slate-700"
+                >Horario de cierre (tarde)</label
+              >
+              <p-calendar
+                formControlName="horario_cierre_tarde"
+                [iconDisplay]="'input'"
+                [showIcon]="true"
+                [timeOnly]="true"
+                inputId="horario_cierre_tarde"
+                class="w-full"
+              >
+                <ng-template
+                  pTemplate="inputicon"
+                  let-clickCallBack="clickCallBack"
+                >
+                  <i
+                    class="pi pi-clock pointer-events-none"
+                    (click)="clickCallBack($event)"
+                  ></i>
+                </ng-template>
+              </p-calendar>
+            </div>
+          </div>
+          
         </form>
       </ng-container>
 

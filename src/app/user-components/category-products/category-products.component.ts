@@ -12,7 +12,10 @@ import { CardModule } from 'primeng/card';
 import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { StoreStateService } from '../../shared/services/private_services/store-state.service';
-import { BadgeModule } from "primeng/badge"; // ✅ agregado
+import { BadgeModule } from "primeng/badge";
+import { SidebarModule } from "primeng/sidebar";
+import { CheckboxModule } from "primeng/checkbox";
+import { RadioButtonModule } from "primeng/radiobutton"; // ✅ agregado
 
 @Component({
   standalone: true,
@@ -27,7 +30,10 @@ import { BadgeModule } from "primeng/badge"; // ✅ agregado
     CarouselModule,
     MultiSelectModule,
     ReactiveFormsModule,
-    BadgeModule
+    BadgeModule,
+    SidebarModule,
+    CheckboxModule,
+    RadioButtonModule
 ],
   templateUrl: './category-products.component.html',
 })
@@ -49,6 +55,8 @@ export class CategoryProductsComponent {
   limit = 12;
 
   formGroup!: FormGroup;
+
+  showFilters = false;
 
   responsiveOptions = [
     { breakpoint: '1200px', numVisible: 3, numScroll: 1 },
@@ -94,6 +102,19 @@ export class CategoryProductsComponent {
     this.formGroup.get('selectedSubcategories')?.valueChanges.subscribe((value) => {
       this.filterBySubcategories(value);
     });
+
+      // 🧩 3️⃣ Formulario reactivo unificado
+  this.formGroup = new FormGroup({
+    selectedSubcategories: new FormControl([]),
+    minPrice: new FormControl(null),
+    maxPrice: new FormControl(null),
+    condition: new FormControl(''),
+  });
+
+  // 🔸 Reaccionar a cualquier cambio en los filtros
+  this.formGroup.valueChanges.subscribe(() => {
+    this.applyFilters();
+  });
   }
 
   /** ================================
@@ -194,6 +215,13 @@ export class CategoryProductsComponent {
       });
   }
 
+  toggleSubcategory(current: string[], value: string): string[] {
+  if (!current) return [value];
+  return current.includes(value)
+    ? current.filter((v) => v !== value)
+    : [...current, value];
+}
+
   /** ================================
    * 🔹 Cambiar categoría
    * ================================ */
@@ -238,4 +266,38 @@ export class CategoryProductsComponent {
       this.fetch();
     }
   }
+
+
+  applyFilters() {
+  this.isLoading = true;
+
+  const { selectedSubcategories, minPrice, maxPrice, condition } = this.formGroup.value;
+
+  const filters: any = {
+    category: this.categorySlug,
+    subcategories: selectedSubcategories || [],
+    minPrice: minPrice || undefined,
+    maxPrice: maxPrice || undefined,
+    condition: condition || undefined,
+    page: this.page,
+    limit: this.limit,
+  };
+
+  this.publicStoreService.getFilteredProducts(this.slug, filters).subscribe({
+    next: (res) => {
+      this.products = res.data;
+      this.meta = res.meta;
+      this.isLoading = false;
+    },
+    error: (err) => {
+      console.error('Error aplicando filtros:', err);
+      this.isLoading = false;
+    },
+  });
+}
+
+goToProduct(productId: string) {
+  this.router.navigate(['/producto', productId]);
+}
+  
 }

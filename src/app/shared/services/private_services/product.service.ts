@@ -66,26 +66,42 @@ export class ProductService {
   }
 
   /** 🟣 Obtener productos de una tienda (cacheados por página y búsqueda) */
-  getProductsByStore(
-    id_tienda: string,
-    page = 1,
-    limit = 5,
-    searchTerm: string = '',
-    forceRefresh = false
-  ): Observable<PaginatedResponse<Producto>> {
-    const key = `${id_tienda}-p${page}-l${limit}-s${searchTerm.trim().toLowerCase()}`;
+getProductsByStore(
+  id_tienda: string,
+  page = 1,
+  limit = 10,
+  searchTerm = '',
+  sort = '',
+  condition = '',
+  available = '',
+  unidad = '',
+  grupo = '',
+  minPrice = '',
+  maxPrice = '',
+  forceRefresh = false
+): Observable<PaginatedResponse<Producto>> {
+  const key = `${id_tienda}-p${page}-l${limit}-s${searchTerm}-${sort}-${condition}-${available}-${unidad}-${grupo}-${minPrice}-${maxPrice}`;
 
-    if (!this.productCache[key] || forceRefresh) {
-      let url = `${this.apiUrl}/shop/${id_tienda}?page=${page}&limit=${limit}`;
-      if (searchTerm.trim()) url += `&search=${encodeURIComponent(searchTerm)}`;
+  if (!this.productCache[key] || forceRefresh) {
+    let url = `${this.apiUrl}/shop/${id_tienda}?page=${page}&limit=${limit}`;
+    if (searchTerm) url += `&search=${encodeURIComponent(searchTerm)}`;
+    if (sort) url += `&sort=${sort}`;
+    if (condition) url += `&condition=${condition}`;
+    if (available) url += `&available=${available}`;
+    if (unidad) url += `&unidad=${unidad}`;
+    if (grupo) url += `&grupo=${encodeURIComponent(grupo)}`;
+    if (minPrice) url += `&minPrice=${minPrice}`;
+    if (maxPrice) url += `&maxPrice=${maxPrice}`;
 
-      this.productCache[key] = this.http
-        .get<PaginatedResponse<Producto>>(url)
-        .pipe(shareReplay(1));
-    }
-
-    return this.productCache[key];
+    this.productCache[key] = this.http
+      .get<PaginatedResponse<Producto>>(url)
+      .pipe(shareReplay(1));
   }
+
+  return this.productCache[key];
+}
+
+
 
   /** 🔵 Actualizar producto y limpiar cache */
   updateProduct(

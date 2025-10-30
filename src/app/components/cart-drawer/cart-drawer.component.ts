@@ -7,16 +7,18 @@ import { RouterModule } from '@angular/router';
 // PrimeNG
 import { OrderListModule } from 'primeng/orderlist';
 import { ButtonModule } from 'primeng/button';
+import { InputNumberModule } from "primeng/inputnumber";
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-cart-drawer',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, RouterModule, OrderListModule, ButtonModule],
+  imports: [CommonModule, MatButtonModule, RouterModule, OrderListModule, ButtonModule, InputNumberModule, FormsModule],
   templateUrl: './cart-drawer.component.html',
   styleUrls:  ['./cart-drawer.component.scss'] 
 })
 export class CartDrawerComponent {
-   @Input() open = false;
+  @Input() open = false;
   @Input() items: CartItem[] = [];
   @Input() total = 0;
   @Input() slug!: string;  

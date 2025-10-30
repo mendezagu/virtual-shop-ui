@@ -9,33 +9,119 @@
     icon="pi pi-shopping-bag"
   ></app-page-header>
 
-  <!-- 🔹 Barra de acciones -->
-  <div class="px-4 sm:px-12 mb-4">
-    <div
-      class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4"
-    >
-      <div class="flex items-center">
-        <i class="pi pi-search text-slate-400 mr-2"></i>
-        <input
-          type="text"
-          pInputText
-          [formControl]="searchCtrl"
-          placeholder="Buscar producto"
-          class="flex-1 bg-transparent text-slate-700 placeholder:text-slate-400"
-        />
-      </div>
+<!-- 🔹 Toolbar de filtros -->
+<div class="px-4 sm:px-12 mb-6 flex flex-wrap gap-3 items-center justify-between">
+  <!-- 🔍 Buscador -->
+  <div class="flex items-center gap-2 flex-1 min-w-[220px]">
+    <i class="pi pi-search text-slate-400"></i>
+    <input
+      type="text"
+      pInputText
+      [formControl]="searchCtrl"
+      placeholder="Buscar por nombre, SKU o código"
+      class="flex-1 bg-transparent text-slate-700 placeholder:text-slate-400"
+    />
+  </div>
 
-      <div class="flex-1"></div>
+  <!-- 🔘 Botón para mostrar filtros -->
+  <button
+    pButton
+    label="Filtros"
+    icon="pi pi-sliders-h"
+    class="p-button-outlined p-button-sm rounded-full"
+    (click)="showFilters = !showFilters"
+  ></button>
 
+  <!-- 🟣 Botón crear producto -->
+  <button
+    pButton
+    label="Agregar producto"
+    icon="pi pi-plus"
+    class="rounded-full px-5 py-2.5 font-semibold text-white shadow-md bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90 transition"
+    (click)="openCreateDialog()"
+  ></button>
+</div>
+
+<!-- 🔹 Contenedor de filtros avanzados (toggle) -->
+<p-fieldset
+  *ngIf="showFilters"
+  legend="Filtros avanzados"
+  [toggleable]="true"
+  [collapsed]="false"
+  class="mx-4 sm:mx-12 mb-6 shadow-sm border border-slate-200 rounded-2xl bg-white"
+>
+  <div class="flex flex-wrap gap-4 items-center">
+    <p-dropdown
+      [options]="sortOptions"
+      placeholder="Ordenar por"
+      optionLabel="label"
+      optionValue="value"
+      (onChange)="onSortChange($event.value)"
+      class="w-44"
+    ></p-dropdown>
+
+    <p-dropdown
+      [options]="conditionOptions"
+      placeholder="Condición"
+      optionLabel="label"
+      optionValue="value"
+      (onChange)="onConditionChange($event.value)"
+      class="w-40"
+    ></p-dropdown>
+
+    <p-dropdown
+      [options]="availableOptions"
+      placeholder="Disponibilidad"
+      optionLabel="label"
+      optionValue="value"
+      (onChange)="onAvailableChange($event.value)"
+      class="w-44"
+    ></p-dropdown>
+
+    <p-dropdown
+      [options]="unidadOptions"
+      placeholder="Unidad"
+      optionLabel="label"
+      optionValue="value"
+      (onChange)="onUnidadChange($event.value)"
+      class="w-40"
+    ></p-dropdown>
+
+    <div class="flex items-center gap-2">
+      <input
+        type="number"
+        pInputText
+        placeholder="Min $"
+        class="w-24"
+        #minPrice
+      />
+      <input
+        type="number"
+        pInputText
+        placeholder="Max $"
+        class="w-24"
+        #maxPrice
+      />
       <button
         pButton
-        label="Agregar producto"
-        icon="pi pi-plus"
-        class="rounded-full px-5 py-2.5 font-semibold text-white shadow-md bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90 transition"
-        (click)="openCreateDialog()"
+        icon="pi pi-filter"
+        class="p-button-outlined p-button-sm"
+        (click)="onPriceChange(minPrice.value, maxPrice.value)"
       ></button>
     </div>
+
+    <!-- 🧼 Botón limpiar filtros -->
+    <button
+      pButton
+      label="Limpiar filtros"
+      icon="pi pi-times"
+      class="p-button-text p-button-sm text-slate-500"
+      (click)="clearFilters()"
+    ></button>
   </div>
+</p-fieldset>
+
+
 
   <!-- 🔹 Contenido principal -->
   <div class="px-4 sm:px-12">

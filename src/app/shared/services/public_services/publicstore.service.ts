@@ -14,6 +14,7 @@ export class PublicStoreService {
   // Obtener info de la tienda
   getStoreBySlug(slug: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/stores/public/${slug}`);
+ 
   }
 
   // Obtener productos de la tienda
@@ -60,4 +61,21 @@ export class PublicStoreService {
       { params }
     );
   }
+
+getFilteredProducts(slug: string, filters: any) {
+  const query = new URLSearchParams();
+  if (filters.category) query.set('category', filters.category);
+  if (filters.condition) query.set('condition', filters.condition);
+  if (filters.minPrice) query.set('minPrice', String(filters.minPrice));
+  if (filters.maxPrice) query.set('maxPrice', String(filters.maxPrice));
+  if (filters.page) query.set('page', String(filters.page));
+  if (filters.limit) query.set('limit', String(filters.limit));
+
+ 
+
+  return this.http.get<any>(
+    `${this.apiUrl}/products/public/store/${slug}?${query.toString()}`
+);
+}
+
 }

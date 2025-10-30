@@ -1,223 +1,163 @@
 <div
-  class="min-h-[100dvh] w-full"
-  [style.--primary]="products[0]?.store?.primary_color || '#ff4081'"
-  [style.--secondary]="products[0]?.store?.secondary_color || '#00bfa5'"
-  [style.--bg]="
-    products[0]?.store?.background_color === 'dark' ? '#202123' : '#ffffff'
-  "
-  [style.--text]="
-    products[0]?.store?.background_color === 'dark' ? '#f5f5f5' : '#111827'
-  "
-  [style.--surface]="
-    products[0]?.store?.background_color === 'dark' ? '#2a2b32' : '#f9fafb'
-  "
-  [ngStyle]="{ backgroundColor: 'var(--bg)', color: 'var(--text)' }"
-  [style.--surface-card]="'var(--surface)'"
-  [style.--surface-ground]="'var(--bg)'"
-  [style.--surface-section]="'var(--surface)'"
-  [style.--text-color]="'var(--text)'"
-  [style.--text-color-secondary]="
-    products[0]?.store?.background_color === 'dark'
-      ? 'rgba(255,255,255,.7)'
-      : 'rgba(17,24,39,.7)'
-  "
-  [style.--card-shadow]="'0 4px 12px rgba(0,0,0,.4)'"
-  [ngStyle]="{ backgroundColor: 'var(--bg)', color: 'var(--text)' }"
+  class="min-h-screen w-full bg-white text-gray-900 font-[Inter,ui-sans-serif] transition-colors duration-300"
 >
-  <!-- Carrusel de chips -->
-  <!-- Carrusel de chips -->
-  <div class="relative mb-4 px-2">
-    <p-carousel
-      [value]="categoriesWithAll"
-      [numVisible]="2"
-      [numScroll]="1"
-      [circular]="false"
-      [showIndicators]="false"
-      [showNavigators]="true"
-      class="w-full"
-      styleClass="custom-chip-carousel"
-      [responsiveOptions]="responsiveOptions"
-    >
-      <ng-template let-cat pTemplate="item">
+  <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-12 gap-8">
+<!-- === SIDEBAR FILTROS === -->
+<aside
+  class="col-span-12 md:col-span-3 lg:col-span-3 text-sm text-gray-800 font-[Inter,ui-sans-serif]"
+>
+  <div
+    class="border border-gray-200 rounded-2xl overflow-hidden bg-white shadow-lg hover:shadow transition-all duration-300"
+  >
+    <!-- CATEGORÍAS -->
+    <section class="border-b border-gray-100 p-5">
+      <h2 class="text-base font-semibold mb-4 text-gray-900">Categorías</h2>
+      <div class="flex flex-col gap-2">
+        <label
+          *ngFor="let cat of categories"
+          class="flex items-center justify-between cursor-pointer group"
+        >
+          <div class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              class="w-4 h-4 accent-indigo-600 border-gray-300 rounded focus:ring-0"
+              [checked]="categorySlug === cat.slug"
+              (change)="selectCategory(cat.slug)"
+            />
+            <span
+              class="group-hover:text-gray-900 transition-colors duration-200"
+              >{{ cat.name }}</span
+            >
+          </div>
+        </label>
+      </div>
+    </section>
+
+<!-- PRECIO -->
+<section class="border-b border-gray-100 p-5" [formGroup]="formGroup">
+  <h2 class="text-base font-semibold mb-4 text-gray-900">Precio</h2>
+  <div class="flex items-center gap-3">
+    <input
+      type="number"
+      formControlName="minPrice"
+      placeholder="Min"
+      class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+    />
+    <span class="text-gray-400">–</span>
+    <input
+      type="number"
+      formControlName="maxPrice"
+      placeholder="Max"
+      class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+    />
+  </div>
+</section>
+
+<!-- CONDICIÓN -->
+<section class="p-5" [formGroup]="formGroup">
+  <h2 class="text-base font-semibold mb-4 text-gray-900">Condición</h2>
+  <div class="flex flex-col gap-3">
+    <label class="flex items-center gap-2 cursor-pointer group">
+      <input
+        type="radio"
+        formControlName="condition"
+        value="NUEVO"
+        class="w-4 h-4 accent-indigo-600 focus:ring-0"
+      />
+      <span class="group-hover:text-gray-900 transition-colors duration-200">Nuevo</span>
+    </label>
+
+    <label class="flex items-center gap-2 cursor-pointer group">
+      <input
+        type="radio"
+        formControlName="condition"
+        value="USADO"
+        class="w-4 h-4 accent-indigo-600 focus:ring-0"
+      />
+      <span class="group-hover:text-gray-900 transition-colors duration-200">Usado</span>
+    </label>
+
+    <label class="flex items-center gap-2 cursor-pointer group">
+      <input
+        type="radio"
+        formControlName="condition"
+        value="REACONDICIONADO"
+        class="w-4 h-4 accent-indigo-600 focus:ring-0"
+      />
+      <span class="group-hover:text-gray-900 transition-colors duration-200">Reacondicionado</span>
+    </label>
+
+
+    <label class="flex items-center gap-2 cursor-pointer group">
+      <input
+        type="radio"
+        formControlName="condition"
+        value=""
+        class="w-4 h-4 accent-indigo-600 focus:ring-0"
+      />
+      <span class="group-hover:text-gray-900 transition-colors duration-200">Todas</span>
+    </label>
+  </div>
+</section>
+
+
+  </div>
+</aside>
+
+
+
+
+    <!-- === LISTADO DE PRODUCTOS === -->
+    <main class="col-span-12 md:col-span-9 lg:col-span-9">
+      <!-- Barra de búsqueda y filtro -->
+      <div class="flex items-center justify-between mb-6">
+        <div class="relative w-full max-w-sm">
+          <i
+            class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+          ></i>
+          <input
+            type="text"
+            placeholder="Buscar"
+            class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+        <!--<button
+          class="ml-4 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition"
+        >
+          Filtros
+        </button> -->
+      </div>
+
+      <!-- Grid de productos -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Producto -->
         <div
-          class="p-3 flex items-center gap-3 cursor-pointer transition-all duration-200 rounded-xl border shadow-md"
-          style="margin: 0 8px"
-          [ngStyle]="{
-            backgroundColor:
-              cat.slug === categorySlug || (!cat.slug && !categorySlug)
-                ? 'var(--primary)'
-                : 'var(--surface)',
-            borderColor:
-              cat.slug === categorySlug || (!cat.slug && !categorySlug)
-                ? 'var(--primary)'
-                : 'var(--text)',
-            color:
-              cat.slug === categorySlug || (!cat.slug && !categorySlug)
-                ? '#fff'
-                : 'var(--text)'
-          }"
-          (click)="selectCategory(cat.slug)"
+          *ngFor="let p of products"
+          class="border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all"
         >
           <img
-            class="w-12 h-12 flex-shrink-0 rounded-lg object-cover"
-            [src]="cat.image || '../../../assets/lomito.jpg'"
-            [alt]="cat.name"
+            [src]="p.imagen_url || 'https://placehold.co/400x300'"
+            [alt]="p.nombre_producto"
+            class="w-full h-52 object-cover"
           />
-
-          <div class="flex-1 flex flex-col overflow-hidden">
-            <span
-              class="font-bold text-sm whitespace-nowrap overflow-hidden text-ellipsis"
-            >
-              {{ cat.name || "Todos" }}
-            </span>
-            <div
-              class="flex items-center gap-1 text-xs opacity-80 whitespace-nowrap overflow-hidden text-ellipsis"
-            >
-              <i class="pi pi-tag text-xs"></i>
-              <span>{{ cat.count || 0 }} productos</span>
-            </div>
-          </div>
-        </div>
-      </ng-template>
-    </p-carousel>
-  </div>
-
-  <h1 class="px-4">filtros</h1>
-
-  <!-- MultiSelect Subcategorías -->
-  <form [formGroup]="formGroup" class="mb-6 px-4">
-    <p-multiSelect
-      [options]="subcategories"
-      formControlName="selectedSubcategories"
-      optionLabel="name"
-      optionValue="slug"
-      placeholder="Selecciona subcategorías"
-      display="chip"
-      class="w-full"
-    ></p-multiSelect>
-  </form>
-
-  <!-- Listado de productos -->
-  <div class="px-4">
-    <div
-      class="rounded-2xl border shadow-lg p-4 transition-colors"
-      [ngStyle]="{
-        backgroundColor: 'var(--surface)',
-        color: 'var(--text)',
-        borderColor:
-          products[0]?.store?.background_color === 'dark'
-            ? 'rgba(255,255,255,0.08)'
-            : '#e5e7eb'
-      }"
-    >
-      <h1
-        class="text-2xl font-semibold mb-4"
-        [ngStyle]="{ color: 'var(--primary)' }"
-      >
-        Categoría: {{ meta?.categoria || (categorySlug | titlecase) }}
-      </h1>
-
-      <div *ngIf="isLoading" class="opacity-80 mt-4">Cargando…</div>
-      <div *ngIf="!isLoading && hasError" class="text-rose-600 mt-4">
-        Error al cargar.
-      </div>
-      <div
-        *ngIf="!isLoading && !hasError && products.length === 0"
-        class="opacity-80 mt-4"
-      >
-        No hay productos en esta categoría.
-      </div>
-
-      <div
-        *ngIf="!isLoading && !hasError && products.length"
-        class="flex flex-col gap-4 md:grid md:grid-cols-3 xl:grid-cols-4 md:gap-6"
-      >
-        <p-card
-          *ngFor="let p of products"
-          [routerLink]="['/producto', p.id_producto]"
-          [styleClass]="'!bg-transparent !rounded-xl !border shadow-lg'"
-          [ngStyle]="{
-            width: '100%',
-            color: 'var(--text)',
-            borderColor:
-              products[0]?.store?.background_color === 'dark'
-                ? 'rgba(255,255,255,0.08)'
-                : '#e5e7eb'
-          }"
-        >
-          <ng-template pTemplate="header">
-            <img
-              [src]="
-                (p.imagen_url && p.imagen_url[0]) ||
-                '../../../assets/lomito.jpg'
-              "
-              [alt]="p.nombre_producto"
-              class="w-full h-40 object-cover rounded-t-lg"
-            />
-          </ng-template>
-          <div class="flex justify-between items-center mb-1">
-            <h3
-              class="text-lg font-semibold line-clamp-1"
-              [ngStyle]="{ color: 'var(--primary)' }"
-            >
+          <div class="p-4">
+            <h3 class="font-semibold text-gray-900 text-base mb-1 line-clamp-1">
               {{ p.nombre_producto }}
             </h3>
-
-            <div class="flex items-center gap-1">
-              <small
-                class="text-xs font-medium"
-                [ngStyle]="{
-                  color:
-                    products[0]?.store?.background_color === 'dark'
-                      ? 'var(--text)'
-                      : 'var(--primary)'
-                }"
-              >
-                Stock:
-              </small>
-
-              <p-badge
-  [value]="p.stock"
-  [style]="{
-    '--p-badge-bg': p.stock === 0 ? '#ef4444' : 'var(--secondary)',
-    '--p-badge-color': '#fff'
-  }"
-></p-badge>
-            </div>
-          </div>
-
-          <p class="text-sm opacity-90 truncate">
-            {{ p.descripcion }}
-          </p>
-          <p
-            class="text-base font-bold mt-2"
-            [ngStyle]="{ color: 'var(--secondary)' }"
-          >
-            {{
-      p.presentacion_multiple
-        ? (p.variants?.[0]?.precio || p.precio)
-        : (p.precio | currency:'ARS':'symbol-narrow':'1.0-0')
-            }}
-          </p>
-
-          <div class="flex items-center justify-center mt-4">
+            <p class="text-emerald-600 font-bold mb-3">
+              {{ p.precio | currency : 'EUR' : 'symbol-narrow' : '1.0-0' }}
+            </p>
             <button
               pButton
               type="button"
-              class="w-max rounded-full font-medium flex items-center justify-between px-3 py-2 text-sm"
-              [ngStyle]="{
-                backgroundColor: 'var(--secondary)',
-                borderColor: 'var(--secondary)',
-                color: '#fff',
-                lineHeight: '1.1'
-              }"
+              class="w-full rounded-lg bg-emerald-600 text-white font-medium py-2 hover:bg-emerald-700 transition"
+                (click)="goToProduct(p.id_producto)"
             >
-              <i class="pi pi-eye text-xs"></i>
-              <span>Ver detalles</span>
+              Ver Producto
             </button>
           </div>
-        </p-card>
+        </div>
       </div>
-    </div>
+    </main>
   </div>
 </div>

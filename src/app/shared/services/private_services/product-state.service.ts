@@ -1,43 +1,41 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, tap } from 'rxjs';
 import { Producto } from '../../models/product.model';
 import { PaginatedResponse, ProductService } from './product.service';
 
 @Injectable({ providedIn: 'root' })
 export class ProductStateService {
-  /** 🔹 Estado interno */
-  private productsSubject =
-    new BehaviorSubject<PaginatedResponse<Producto> | null>(null);
+  private productsSubject = new BehaviorSubject<PaginatedResponse<Producto> | null>(null);
   products$ = this.productsSubject.asObservable();
 
   private categoriesSubject = new BehaviorSubject<any[] | null>(null);
   categories$ = this.categoriesSubject.asObservable();
 
-  /** 🔹 Parámetros de estado */
   private storeId: string | null = null;
   private storeSlug: string | null = null;
+
   private page = 1;
   private limit = 10;
   private searchTerm = '';
 
+  // 🔹 Nuevos filtros
+  private sort = '';
+  private condition = '';
+  private available = '';
+  private unidad = '';
+  private grupo = '';
+  private minPrice = '';
+  private maxPrice = '';
+
   constructor(private productService: ProductService) {}
 
-  /** Inicializar datos con tienda */
   init(storeId: string, storeSlug: string) {
     this.storeId = storeId;
     this.storeSlug = storeSlug;
-
-    // Solo cargar si aún no hay datos
-    if (!this.productsSubject.value) {
-      this.loadProducts();
-    }
-
-    if (!this.categoriesSubject.value) {
-      this.loadCategories();
-    }
+    this.loadProducts(true);
+    if (!this.categoriesSubject.value) this.loadCategories();
   }
 
-  /** Obtener productos desde API y guardar en estado */
   loadProducts(forceRefresh = false) {
     if (!this.storeId) return;
 
@@ -47,6 +45,13 @@ export class ProductStateService {
         this.page,
         this.limit,
         this.searchTerm,
+        this.sort,
+        this.condition,
+        this.available,
+        this.unidad,
+        this.grupo,
+        this.minPrice,
+        this.maxPrice,
         forceRefresh
       )
       .subscribe({
@@ -55,73 +60,63 @@ export class ProductStateService {
       });
   }
 
-  /** Obtener categorías públicas de la tienda */
-  /** Obtener categorías públicas de la tienda */
-  loadCategories(forceRefresh = false) {
-    if (!this.storeSlug) return;
-
-    this.productService.getCategories(this.storeSlug, forceRefresh).subscribe({
-      next: (res) => {
-        const cats = Array.isArray(res)
-          ? res
-          : Array.isArray(res?.data)
-          ? res.data
-          : []; // fallback seguro
-        this.categoriesSubject.next(res?.data ?? []);
-      },
-      error: () => this.categoriesSubject.next(null),
-    });
-  }
-
-  /** Cambiar página */
   setPage(page: number) {
-    if (page !== this.page) {
-      this.page = page;
-      this.loadProducts(true); // fuerza recarga solo si cambia
-    }
+    this.page = page;
+    this.loadProducts(true);
   }
 
-  /** Cambiar límite */
   setLimit(limit: number) {
-    if (limit !== this.limit) {
-      this.limit = limit;
-      this.page = 1; // reset a la primera página
-      this.loadProducts(true);
-    }
+    this.limit = limit;
+    this.page = 1;
+    this.loadProducts(true);
   }
 
-  /** Buscar */
   setSearch(term: string) {
     this.searchTerm = term;
     this.loadProducts();
   }
 
-  /** Crear producto y refrescar */
-  createProduct(product: Producto) {
-    if (!this.storeId) return;
-    this.productService.createProduct(this.storeId, product).subscribe({
-      next: () => this.loadProducts(true),
-    });
-  }
-
-  /** Eliminar producto y refrescar */
-  deleteProduct(id_producto: string) {
-    this.productService.deleteProduct(id_producto).subscribe({
-      next: () => this.loadProducts(true),
-    });
-  }
-
-  /** Refrescar manual */
-  refresh() {
+  // 🟢 Nuevos setters
+  setSort(sort: string) {
+    this.sort = sort;
     this.loadProducts(true);
-    this.loadCategories(true);
   }
 
-  /** Limpiar estado (logout o cambio de tienda) */
-  clear() {
-    this.productsSubject.next(null);
-    this.categoriesSubject.next(null);
-    this.storeId = null;
-    this.storeSlug = null;
+  setCondition(condition: string) {
+    this.condition = condition;
+    this.loadProducts(true);
+  }
+
+  setAvailable(value: string) {
+    this.available = value;
+    this.loadProducts(true);
+  }
+
+  setUnidad(value: string) {
+    this.unidad = value;
+    this.loadProducts(true);
+  }
+
+  setGrupo(value: string) {
+    this.grupo = value;
+    this.loadProducts(true);
+  }
+
+  setPriceRange(min: string, max: string) {
+    this.minPrice = min;
+    this.maxPrice = max;
+    this.loadProducts(true);
+  }
+
+  loadCategories(forceRefresh = false) {
+    if (!this.storeSlug) return;
+    this.productService.getCategories(this.storeSlug, forceRefresh).subscribe({
+      next: (res) => this.categoriesSubject.next(res?.data ?? []),
+      error: () => this.categoriesSubject.next(null),
+    });
+  }
+
+  deleteProduct(id_producto: string) {
+    return this.productService.deleteProduct(id_producto).pipe(tap(() => this.loadProducts(true)));   
   }
 }
