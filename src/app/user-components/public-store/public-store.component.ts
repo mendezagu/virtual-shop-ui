@@ -11,7 +11,7 @@ import { CarouselModule } from 'primeng/carousel';
 import { TagModule } from 'primeng/tag';
 import { CardModule } from 'primeng/card';
 
-import * as L from 'leaflet';
+
 
 @Component({
   selector: 'app-public-store',
@@ -38,6 +38,9 @@ export class PublicStoreComponent {
 
   slug!: string;
   store: any;
+
+  shippingResult: { distanceKm: number; totalCost: number; pricePerKm: number } | null = null;
+
 
   isLoading = true;
   hasError = false;
@@ -242,6 +245,51 @@ ngOnInit(): void {
     return clean.charAt(0).toUpperCase() + clean.slice(1);
   }
 
+  async calculateShippingCost(latA: number, lonA: number, latB: number, lonB: number) {
+  // Asegurate de usar la URL correcta según tu main.ts (con /api si corresponde)
+  const url = 'http://localhost:3000/api/shipping/calculate'; // <-- usa /api si app.setGlobalPrefix('api')
+  const body = {
+    storeId: this.store?.id_tienda ?? this.store?.id ?? this.store?.storeId, // ajusta al campo real de tu store
+    latA,
+    lonA,
+    latB,
+    lonB,
+  };
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ message: 'Error desconocido' }));
+      console.error('Error calcular envío', err);
+      alert(err.message || 'Error al calcular el envío');
+      return;
+    }
+
+    const data = await res.json();
+    // Guardar resultado para mostrar en la UI
+    this.shippingResult = {
+      distanceKm: data.distanceKm,
+      totalCost: data.totalCost,
+      pricePerKm: data.pricePerKm,
+    };
+
+    // Ejemplo: mostrar en popup o alert
+    alert(`Distancia: ${data.distanceKm.toFixed(2)} km\nCosto: $${data.totalCost.toFixed(2)}`);
+
+  } catch (error) {
+    console.error('fetch error', error);
+    alert('No se pudo calcular el envío. Revisa la consola.');
+  }
+}
+
+
+  
+
 async initMap(address: string) {
   const { isPlatformBrowser } = await import('@angular/common');
   if (!isPlatformBrowser(this.platformId)) return;
@@ -262,22 +310,33 @@ async initMap(address: string) {
     .then((res) => res.json())
     .then((data) => {
       if (data.length > 0) {
-        const lat = parseFloat(data[0].lat);
-        const lon = parseFloat(data[0].lon);
-        map.setView([lat, lon], 15);
+  const lat = parseFloat(data[0].lat);
+  const lon = parseFloat(data[0].lon);
+  map.setView([lat, lon], 15);
 
-        const marker = L.marker([lat, lon]).addTo(map);
-        marker.bindPopup(`<b>${this.store.nombre_tienda}</b><br>${address}`).openPopup();
+  const marker = L.marker([lat, lon]).addTo(map);
+  marker.bindPopup(`<b>${this.store.nombre_tienda}</b><br>${address}`).openPopup();
 
-        // 🔹 Click en el marcador abre Google Maps
-        marker.on('click', () => {
-          window.open(`https://www.google.com/maps?q=${lat},${lon}`, '_blank');
-        });
+  // Click en el marcador abre Google Maps (mantener)
+  marker.on('click', () => {
+    window.open(`https://www.google.com/maps?q=${lat},${lon}`, '_blank');
+  });
 
-        // 🔹 Click en el mapa abre Google Maps también
-        map.on('click', () => {
-          window.open(`https://www.google.com/maps?q=${lat},${lon}`, '_blank');
-        });
+  // Click en el mapa: el usuario selecciona SU ubicación (destino)
+  map.on('click', (e: any) => {
+    // eliminar marker del usuario anterior si querés (mejor UX)
+    // aquí asumimos que sólo agregamos uno
+    const userLat = e.latlng.lat;
+    const userLon = e.latlng.lng;
+
+    // agregar marcador del usuario (puedes guardar la referencia para removerlo después)
+    const userMarker = L.marker([userLat, userLon], { icon: undefined }).addTo(map);
+    userMarker.bindPopup('📍 Tu ubicación seleccionada').openPopup();
+
+    // Llamar al backend para calcular el envío
+    this.calculateShippingCost(lat, lon, userLat, userLon);
+  });
+
 
         // ✅ Crear botón flotante encima del mapa
         const mapContainer = document.getElementById('storeMap');

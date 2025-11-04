@@ -8,7 +8,8 @@ export interface Store {
   link_tienda: string;   // generado por backend
   usuario_login: string;
   password_hash: string;
-  id_tienda: string;     // generado por backend
+  id_tienda: string;
+  provincia?: string;     // generado por backend
 
   // si sumaste opcionales en backend:
   email_contacto?: string;

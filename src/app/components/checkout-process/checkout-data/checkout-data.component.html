@@ -11,72 +11,70 @@
       </p>
     </header>
 
-<!-- 💳 MÉTODO DE PAGO -->
-<div class="flex gap-4 overflow-x-auto pb-2 hide-scrollbar">
-  <!-- Efectivo -->
-  <label
-    for="cash"
-    class="relative flex-shrink-0 w-60 rounded-xl cursor-pointer transition-all duration-300 overflow-hidden border-2 hover:scale-[1.02]"
-    [ngClass]="{
-      'border-[#008060] ring-2 ring-[#008060]/40 shadow-lg':
-        form.get('paymentMethod')?.value === 'Efectivo',
-      'border-[#e5e7eb] shadow-sm':
-        form.get('paymentMethod')?.value !== 'Efectivo'
-    }"
-  >
-    <div
-      class="flex flex-col items-center justify-center p-3 text-center bg-gradient-to-br from-[#10b981] to-[#059669] text-white h-[100px]"
-    >
-      <div class="flex flex-col items-center gap-1 leading-tight">
-        <i class="pi pi-money-bill text-xl"></i>
-        <span class="font-semibold text-sm mt-0.5">Efectivo</span>
-        <p class="text-[11px] opacity-90">
-          Pagás al recibir o retirar tu pedido
-        </p>
-      </div>
-      <p-radioButton
-        name="paymentMethod"
-        value="Efectivo"
-        formControlName="paymentMethod"
-        inputId="cash"
-        class="absolute top-2 right-2"
-      ></p-radioButton>
+    <!-- 💳 MÉTODO DE PAGO -->
+    <div class="flex gap-4 overflow-x-auto pb-2 hide-scrollbar">
+      <!-- Efectivo -->
+      <label
+        for="cash"
+        class="relative flex-shrink-0 w-60 rounded-xl cursor-pointer transition-all duration-300 overflow-hidden border-2 hover:scale-[1.02]"
+        [ngClass]="{
+          'border-[#008060] ring-2 ring-[#008060]/40 shadow-lg':
+            form.get('paymentMethod')?.value === 'Efectivo',
+          'border-[#e5e7eb] shadow-sm':
+            form.get('paymentMethod')?.value !== 'Efectivo'
+        }"
+      >
+        <div
+          class="flex flex-col items-center justify-center p-3 text-center bg-gradient-to-br from-[#10b981] to-[#059669] text-white h-[100px]"
+        >
+          <div class="flex flex-col items-center gap-1 leading-tight">
+            <i class="pi pi-money-bill text-xl"></i>
+            <span class="font-semibold text-sm mt-0.5">Efectivo</span>
+            <p class="text-[11px] opacity-90">
+              Pagás al recibir o retirar tu pedido
+            </p>
+          </div>
+          <p-radioButton
+            name="paymentMethod"
+            value="Efectivo"
+            formControlName="paymentMethod"
+            inputId="cash"
+            class="absolute top-2 right-2"
+          ></p-radioButton>
+        </div>
+      </label>
+
+      <!-- Transferencia -->
+      <label
+        for="bank"
+        class="relative flex-shrink-0 w-60 rounded-xl cursor-pointer transition-all duration-300 overflow-hidden border-2 hover:scale-[1.02]"
+        [ngClass]="{
+          'border-[#008060] ring-2 ring-[#008060]/40 shadow-lg':
+            form.get('paymentMethod')?.value === 'Transferencia Bancaria',
+          'border-[#e5e7eb] shadow-sm':
+            form.get('paymentMethod')?.value !== 'Transferencia Bancaria'
+        }"
+      >
+        <div
+          class="flex flex-col items-center justify-center p-3 text-center bg-gradient-to-br from-[#38bdf8] to-[#0ea5e9] text-white h-[100px]"
+        >
+          <div class="flex flex-col items-center gap-1 leading-tight">
+            <i class="pi pi-wallet text-xl"></i>
+            <span class="font-semibold text-sm mt-0.5">Transferencia</span>
+            <p class="text-[11px] opacity-90">
+              Transferí el monto directamente a nuestra cuenta
+            </p>
+          </div>
+          <p-radioButton
+            name="paymentMethod"
+            value="Transferencia Bancaria"
+            formControlName="paymentMethod"
+            inputId="bank"
+            class="absolute top-2 right-2"
+          ></p-radioButton>
+        </div>
+      </label>
     </div>
-  </label>
-
-  <!-- Transferencia -->
-  <label
-    for="bank"
-    class="relative flex-shrink-0 w-60 rounded-xl cursor-pointer transition-all duration-300 overflow-hidden border-2 hover:scale-[1.02]"
-    [ngClass]="{
-      'border-[#008060] ring-2 ring-[#008060]/40 shadow-lg':
-        form.get('paymentMethod')?.value === 'Transferencia Bancaria',
-      'border-[#e5e7eb] shadow-sm':
-        form.get('paymentMethod')?.value !== 'Transferencia Bancaria'
-    }"
-  >
-    <div
-      class="flex flex-col items-center justify-center p-3 text-center bg-gradient-to-br from-[#38bdf8] to-[#0ea5e9] text-white h-[100px]"
-    >
-      <div class="flex flex-col items-center gap-1 leading-tight">
-        <i class="pi pi-wallet text-xl"></i>
-        <span class="font-semibold text-sm mt-0.5">Transferencia</span>
-        <p class="text-[11px] opacity-90">
-          Transferí el monto directamente a nuestra cuenta
-        </p>
-      </div>
-      <p-radioButton
-        name="paymentMethod"
-        value="Transferencia Bancaria"
-        formControlName="paymentMethod"
-        inputId="bank"
-        class="absolute top-2 right-2"
-      ></p-radioButton>
-    </div>
-  </label>
-</div>
-
-
 
     <!-- 👤 DATOS DEL CLIENTE -->
     <section class="grid sm:grid-cols-2 gap-4">
@@ -127,7 +125,7 @@
             formControlName="deliveryMethod"
             inputId="delivery"
           />
-          <span>Envío a domicilio ({{ deliveryFee | currency : "ARS" }})</span>
+          <span>Envío a domicilio ({{ envio | currency : "ARS" }})</span>
         </label>
 
         <label class="flex items-center gap-2 cursor-pointer">
@@ -171,6 +169,14 @@
         placeholder="Código Postal"
         class="w-full rounded-lg border border-[#e5e7eb] px-3 py-2 focus:ring-2 focus:ring-[#008060]"
       />
+
+      <!-- 🗺️ MAPA LEAFLET -->
+      <!-- En checkout-data.component.html -->
+<section class="max-w-6xl mx-auto mt-10 px-5 sm:px-10">
+  <h3 class="text-xl font-semibold text-gray-900 mb-3">Ubicación de la tienda</h3>
+  <div id="storeMap" class="w-full h-80 rounded-2xl overflow-hidden shadow-md border"></div>
+</section>
+
     </section>
 
     <!-- 🗓️ PROGRAMAR RETIRO -->

@@ -124,6 +124,7 @@ export class AppComponent {
     root.style.setProperty('--secondary', '#ec4899');
     root.style.setProperty('--bg', '#ffffff');
     root.style.setProperty('--text', '#111827');
+    if (typeof document === 'undefined') return;
   }
 
   /** 🎨 Tema comprador (colores desde backend) */
