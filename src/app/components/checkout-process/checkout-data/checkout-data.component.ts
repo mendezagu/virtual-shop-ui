@@ -1,386 +1,354 @@
-// src/app/pages/checkout-data/checkout-data.component.ts
-import { Component, OnInit, ElementRef, Inject, PLATFORM_ID, AfterViewInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+// src/app/components/checkout-process/checkout-data/checkout-data.component.ts
+import { Component, OnInit, AfterViewInit, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { MatRadioModule } from '@angular/material/radio';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { ActivatedRoute, RouterModule } from '@angular/router';
-import { CartItem, CartResponse, CartService } from '../../../shared/services/public_services/cart.service';
-import { WhatsAppService } from '../../../shared/services/public_services/whatsapp.service';
-import { PaymentsService } from '../../../shared/services/public_services/payments.service';
-import { environment } from '../../../../environments/environment';
+import { ActivatedRoute } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
-// primeng
+// PrimeNG
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { ButtonModule } from 'primeng/button';
 
+// Servicios y modelos
+import { CartService, CartItem, CartResponse } from '../../../shared/services/public_services/cart.service';
 import { PublicStoreService } from '../../../shared/services/public_services/publicstore.service';
-import { Store } from '../../../shared/models/store.model';
 import { StoreStateService } from '../../../shared/services/private_services/store-state.service';
+import { Store } from '../../../shared/models/store.model';
+import { ShippingService } from '../../../shared/services/private_services/shipping.service';
+import { environment } from '../../../../environments/environment';
+import { ReactiveFormsModule } from '@angular/forms';
+
+
+
 
 @Component({
   selector: 'app-checkout-data',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatRadioModule,
-    MatButtonModule,
-    MatInputModule,
-    MatIconModule,
-    RouterModule,
-    InputTextModule,
-    InputTextareaModule,
-    RadioButtonModule,
-    ButtonModule,
-  ],
+  imports: [CommonModule, InputTextModule, InputTextareaModule, RadioButtonModule, ButtonModule, ReactiveFormsModule ],
   templateUrl: './checkout-data.component.html',
   styleUrls: ['./checkout-data.component.scss'],
+ 
 })
 export class CheckoutDataComponent implements OnInit, AfterViewInit {
   form!: FormGroup;
-  items: CartItem[] = [];
-  cart?: CartResponse;
   slug!: string;
 
+  items: CartItem[] = [];
+  cart?: CartResponse;
+
   store: Store | null = null;
-  deliveryFee = 5000;
-  loading = false;
-  usarTarjetaDirecta = false;
-
-  // Coordenadas de la tienda
-  storeLat: number | null = null;
-  storeLon: number | null = null;
-
-  // Coordenadas del buyer
-  buyerLat: number | null = null;
-  buyerLon: number | null = null;
-
-  // Referencias a Leaflet
-  map: any = null;
-  userMarker: any = null;
-  storeMarker: any = null;
 
   shippingResult: { distanceKm: number; totalCost: number; pricePerKm: number } | null = null;
+  loading = false;
+
+  // Totales
+  subtotal = 0;
+  envio = 0;
+  total = 0;
+
+  // Leaflet
+  map: any = null;
+  storeMarker: any = null;
+  userMarker: any = null;
 
   constructor(
     private fb: FormBuilder,
     private cartService: CartService,
-    private route: ActivatedRoute,
-    private wa: WhatsAppService,
-    private payments: PaymentsService,
     private publicStoreService: PublicStoreService,
-    private elRef: ElementRef<HTMLElement>,
     private storeState: StoreStateService,
+    private shippingService: ShippingService,
+    private route: ActivatedRoute,
+    private elRef: ElementRef<HTMLElement>,
+    private http: HttpClient,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.slug = this.route.snapshot.paramMap.get('slug')!;
 
-    // =====================
-    // 1️⃣ Obtener carrito
-    // =====================
-    this.cartService.getCart(this.slug).subscribe((c) => {
-      this.cart = c;
-      this.items = c.items;
-    });
+    
 
-    // =====================
-    // 2️⃣ Obtener tienda
-    // =====================
-    this.publicStoreService.getStoreBySlug(this.slug).subscribe({
-      next: (s) => {
-        this.store = s;
-        this.storeState.setStore(s);
-
-        this.storeLat = s.latitud || null;
-        this.storeLon = s.longitud || null;
-
-        // 🎨 Aplicar colores del backend
-        const primary = s.primary_color || '#ff4081';
-        const secondary = s.secondary_color || '#00bfa5';
-        const bg = s.background_color === 'dark' ? '#202123' : s.background_color || '#ffffff';
-        const text = s.background_color === 'dark' ? '#f5f5f5' : '#111827';
-        const surface = s.background_color === 'dark' ? '#2a2b32' : '#f9fafb';
-
-        const host = this.elRef.nativeElement;
-        host.style.setProperty('--primary', primary);
-        host.style.setProperty('--secondary', secondary);
-        host.style.setProperty('--bg', bg);
-        host.style.setProperty('--text', text);
-        host.style.setProperty('--surface', surface);
-
-        const root = document.documentElement;
-        root.style.setProperty('--primary', primary);
-        root.style.setProperty('--secondary', secondary);
-        root.style.setProperty('--bg', bg);
-        root.style.setProperty('--text', text);
-
-        // Inicializar mapa si hay coordenadas y estamos en browser
-        if (isPlatformBrowser(this.platformId) && this.store) {
-          setTimeout(() => {
-            const address = `${this.store?.direccion || ''}, ${this.store?.ciudad || ''}, ${this.store?.provincia || ''}`;
-            if (address.trim() !== ', ,') {
-              this.initMap(address);
-            }
-          }, 500);
-        }
-      },
-      error: (err) => console.error('Error cargando tienda:', err),
-    });
-
-    // =====================
-    // 3️⃣ Configurar formulario
-    // =====================
+    // Inicializar formulario
     this.form = this.fb.group({
       customerName: ['', Validators.required],
+      customerEmail: ['', [Validators.required, Validators.email]],
       customerWhatsapp: ['', Validators.required],
       deliveryMethod: ['delivery', Validators.required],
-      customerEmail: ['', [Validators.required, Validators.email]],
+      paymentMethod: ['Efectivo', Validators.required],
       address: [''],
       city: [''],
       province: [''],
       postalCode: [''],
       scheduleDate: [''],
       scheduleTime: [''],
-      paymentMethod: ['Efectivo'],
       notes: [''],
     });
-  }
 
-  ngAfterViewInit() {}
-
-  // =====================
-  // 4️⃣ Inicializar Leaflet
-  // =====================
-  async initMap(address: string) {
-    const { isPlatformBrowser } = await import('@angular/common');
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    const L = await import('leaflet');
-
-    // 🔹 Configurar iconos de Leaflet
-    delete (L.Icon.Default.prototype as any)._getIconUrl;
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
-      iconUrl: 'assets/leaflet/marker-icon.png',
-      shadowUrl: 'assets/leaflet/marker-shadow.png',
+    this.form.valueChanges.subscribe(() => {
+      this.calculateTotals();
     });
 
-    // Vista inicial por defecto
-    const map = L.map('storeMap').setView([-31.4201, -64.1888], 13);
+    this.loadCart();
+    this.loadStore();
+  }
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap',
-    }).addTo(map);
+  ngAfterViewInit(): void {
+    // Se inicializa Leaflet en loadStore()
+  }
 
-    // 🔹 Geocodificar dirección de la tienda
-    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.length > 0) {
-          const lat = parseFloat(data[0].lat);
-          const lon = parseFloat(data[0].lon);
-          map.setView([lat, lon], 15);
+  // =====================
+  // Cargar carrito
+  // =====================
+  private loadCart(): void {
+    this.cartService.getCart(this.slug).subscribe((c) => {
+      this.cart = c;
+      this.items = c.items;
+      this.calculateTotals();
+    });
+  }
 
-          // Marker de la tienda
-          const storeMarker = L.marker([lat, lon]).addTo(map);
-          storeMarker.bindPopup(`<b>${this.store?.nombre_tienda}</b><br>${address}`).openPopup();
+  // =====================
+  // Cargar tienda
+  // =====================
+  private loadStore(): void {
+    this.publicStoreService.getStoreBySlug(this.slug).subscribe((s: Store) => {
+      this.store = s;
+      this.storeState.setStore(s);
 
-          storeMarker.on('click', () => {
-            window.open(`https://www.google.com/maps?q=${lat},${lon}`, '_blank');
-          });
+      // Inicializar mapa
+      if (isPlatformBrowser(this.platformId)) {
+        const address = `${s.direccion}, ${s.ciudad}, ${s.provincia}`;
+        this.initMap(address);
+      }
 
-          // Click en el mapa para seleccionar ubicación del usuario
-          let userMarker: any;
-          map.on('click', (e: any) => {
-            const userLat = e.latlng.lat;
-            const userLon = e.latlng.lng;
+      this.getShippingData(s.id_tienda);
+    });
+  }
 
-            if (userMarker) map.removeLayer(userMarker);
 
-            userMarker = L.marker([userLat, userLon]).addTo(map);
-            userMarker.bindPopup('📍 Tu ubicación seleccionada').openPopup();
+async updateMap(address: string, city: string, province: string) {
+  if (typeof window === 'undefined') return; // evitar error SSR
+  const L = await import('leaflet');
 
-            // Llamada a backend para calcular envío
-            this.calculateShippingCost({ latA: lat, lonA: lon, latB: userLat, lonB: userLon });
-          });
+  const fullAddress = `${address}, ${city}, ${province}`;
+  this.http.get<any>(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}`)
+    .subscribe((res) => {
+      if (res && res.length > 0) {
+        const lat = parseFloat(res[0].lat);
+        const lon = parseFloat(res[0].lon);
 
-          // Botón flotante Google Maps
-          const mapContainer = document.getElementById('storeMap');
-          if (mapContainer) {
-            const button = document.createElement('button');
-            button.innerHTML = `<i class="pi pi-map-marker mr-1"></i> Ver en Google Maps`;
-            button.className =
-              'absolute bottom-4 right-4 z-[999] flex items-center gap-2 bg-[#008060] hover:bg-[#00684a] text-white text-sm font-medium px-4 py-2 rounded-full shadow-lg transition-all duration-200';
-            button.onclick = () => window.open(`https://www.google.com/maps?q=${lat},${lon}`, '_blank');
-            mapContainer.appendChild(button);
-          }
+        if (this.userMarker) {
+          this.userMarker.setLatLng([lat, lon]);
+        } else {
+          this.userMarker = L.marker([lat, lon], {
+            icon: L.icon({ iconUrl: 'assets/user-marker.png', iconSize: [25, 41] })
+          }).addTo(this.map);
         }
-      });
-  }
 
+        this.map.setView([lat, lon], 14);
+      }
+    });
+}
+
+
+
+ 
   // =====================
-  // 5️⃣ Calcular envío
-  // =====================
-  async calculateShippingCost(data: { latA: number; lonA: number; latB: number; lonB: number }) {
-    if (!this.store?.id_tienda) return;
+// Método initMap actualizado
+// =====================
+async initMap(address: string) {
+  if (!isPlatformBrowser(this.platformId)) return;
 
-    const url = 'http://localhost:3000/api/shipping/calculate';
-    const body = { storeId: this.store.id_tienda, ...data };
+  const L = await import('leaflet');
 
-    try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
+  delete (L.Icon.Default.prototype as any)._getIconUrl;
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
+    iconUrl: 'assets/leaflet/marker-icon.png',
+    shadowUrl: 'assets/leaflet/marker-shadow.png',
+  });
 
-      if (!res.ok) throw new Error('Error en cálculo de envío');
+  // Inicializar mapa
+  this.map = L.map('storeMap').setView([-31.4201, -64.1888], 13);
 
-      const result = await res.json();
-      this.shippingResult = {
-        distanceKm: result.distanceKm,
-        totalCost: result.totalCost,
-        pricePerKm: result.pricePerKm,
-      };
-    } catch (err) {
-      console.error('Error calculando envío:', err);
-    }
-  }
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap',
+  }).addTo(this.map);
 
+  // Geocodificar dirección de la tienda
+  const res = await fetch(
+    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`
+  ).then((r) => r.json());
 
-  // =====================
-  // GETTERS de totales
-  // =====================
-  get subtotal() {
-    return this.items.reduce((acc, it) => acc + it.subtotal, 0);
-  }
+  if (res.length > 0) {
+    const lat = parseFloat(res[0].lat);
+    const lon = parseFloat(res[0].lon);
 
-  get envio() {
-    if (this.form.value.deliveryMethod !== 'delivery') return 0;
-    return this.shippingResult?.totalCost || this.deliveryFee;
-  }
+    // Marcador tienda
+    this.storeMarker = L.marker([lat, lon]).addTo(this.map).bindPopup('Tienda').openPopup();
+    this.map.setView([lat, lon], 15);
 
-  get total() {
-    return this.subtotal + this.envio;
-  }
+    // Marcador usuario (draggable)
+    this.userMarker = L.marker([lat, lon], { draggable: true })
+      .addTo(this.map)
+      .bindPopup('Tu ubicación')
+      .openPopup();
 
-  // =====================
-  // Carrito
-  // =====================
-  increment(item: CartItem) {
-    this.cartService.update(this.slug, item.id, item.cantidad + 1).subscribe();
-  }
+    // 🔹 PASO 3: Escuchar drag del marcador para recalcular envío
+   this.userMarker.on('dragend', async () => {
+  const pos = this.userMarker.getLatLng();
 
-  decrement(item: CartItem) {
-    if (item.cantidad > 1) {
-      this.cartService.update(this.slug, item.id, item.cantidad - 1).subscribe();
-    }
-  }
+  // Reverse geocoding usando Nominatim
+  const res = await this.http
+    .get<any>(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.lat}&lon=${pos.lng}`
+    )
+    .toPromise();
 
-  remove(itemId: string) {
-    this.cartService.remove(this.slug, itemId).subscribe();
-  }
+  if (res && res.address) {
+    const { road, house_number, city, town, village, state, postcode } = res.address;
 
-  // =====================
-  // Pagos
-  // =====================
-  private toMPItems() {
-    return this.items.map(it => {
-      const name = it.product?.nombre_producto || 'Producto';
-      const variantName = it?.variant?.nombre ? ` - ${it.variant.nombre}` : '';
-      return {
-        title: name + variantName,
-        quantity: it.cantidad,
-        currency_id: 'ARS',
-        unit_price: Number(it.precio_unit),
-      };
+    // Armar dirección completa
+    const address = [road, house_number].filter(Boolean).join(' ');
+
+    this.form.patchValue({
+      address: address || this.form.value.address,
+      city: city || town || village || this.form.value.city,
+      province: state || this.form.value.province,
+      postalCode: postcode || this.form.value.postalCode,
     });
   }
 
-  private async payWithMercadoPago() {
-    if (!this.cart?.cartId) throw new Error('Carrito no encontrado');
-    const mpItems = this.toMPItems();
-    await this.payments.createPreferenceAndRedirect(mpItems, this.cart.cartId, this.form.value.customerEmail);
-  }
+  // Calcular envío con las nuevas coordenadas
+  await this.calculateShippingFromCoordinates(pos.lat, pos.lng);
+});
 
-  private async payWithCard(token: string) {
-    const body = {
-      token,
-      amount: this.total,
-      payer_email: this.form.value.customerEmail as string,
-      external_reference: this.cart?.cartId ?? undefined,
-      installments: 1,
+  }
+}
+
+
+async calculateShippingFromCoordinates(lat: number, lng: number) {
+  if (!this.store) return;
+
+  this.loading = true;
+
+  // Llamada al backend para calcular envío usando lat/lng
+  this.shippingService.calculateShippingFromCoordinates({
+    storeId: this.store.id_tienda,
+    lat,
+    lng
+  }).subscribe({
+    next: (res) => {
+      this.shippingResult = {
+        distanceKm: res.distanceKm,
+        pricePerKm: res.pricePerKm,
+        totalCost: res.totalCost
+      };
+
+      // Actualizar envío y total
+      this.envio = res.totalCost;
+      this.total = this.subtotal + this.envio;
+
+      this.loading = false;
+    },
+    error: (err) => {
+      console.error(err);
+      this.loading = false;
+    }
+  });
+}
+
+
+
+
+  // =====================
+  // Obtener datos de envío inicial
+  // =====================
+private getShippingData(storeId: string): void {
+  this.shippingService.getShippingByStore(storeId).subscribe((res) => {
+    const distanceKm = this.shippingResult?.distanceKm || 10; // o la que tengas calculada
+    const totalCost = distanceKm * res.pricePerKm;
+
+    this.shippingResult = {
+      distanceKm,
+      pricePerKm: res.pricePerKm,
+      totalCost,
     };
 
-    try {
-      const res = await this.payments.payWithCard(body);
-      console.log("Resultado del pago:", res);
+    this.envio = totalCost;
+    this.calculateTotals();
+  });
+}
 
-      if (res.status === "approved") alert("✅ Pago aprobado");
-      else alert("⏳ Estado del pago: " + res.status);
-    } catch (err: any) {
-      console.error("Error en pago:", err);
-      alert("❌ Error al procesar el pago");
-    }
+
+  
+
+  // =====================
+  // Calcular envío desde dirección
+  // =====================
+async calculateShippingFromAddress(): Promise<void> {
+  if (!this.store?.id_tienda) return;
+
+  this.loading = true;
+
+  const body = {
+    storeId: this.store.id_tienda,
+    address: this.form.value.address,
+    city: this.form.value.city,
+    province: this.form.value.province,
+    postalCode: this.form.value.postalCode,
+  };
+
+  try {
+    const result: any = await this.http.post(`${environment.apiUrl}/shipping/calculate-from-address`, body).toPromise();
+
+    this.shippingResult = {
+      distanceKm: result.distanceKm,
+      totalCost: result.totalCost,
+      pricePerKm: result.pricePerKm,
+    };
+
+    this.envio = result.totalCost;
+    this.calculateTotals();
+
+    // 🔹 Actualizar el mapa con la dirección del cliente
+    this.updateMap(body.address, body.city, body.province);
+
+  } catch (err) {
+    console.error(err);
+    alert('No se pudo calcular el envío');
+  } finally {
+    this.loading = false;
+  }
+}
+
+
+
+  // =====================
+  // Calcular totales
+  // =====================
+  calculateTotals(): void {
+    this.subtotal = this.items.reduce((acc, item) => acc + item.precio_unit * item.cantidad, 0);
+    this.total = this.subtotal + (this.envio || 0);
   }
 
   // =====================
   // Finalizar pedido
   // =====================
-  placeOrder() {
-    if (!this.cart?.cartId || !this.items.length) {
-      alert('Tu carrito está vacío.');
+  placeOrder(): void {
+    if (!this.form.valid) {
+      alert('Completá los campos requeridos');
       return;
     }
 
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      alert('Completá los campos obligatorios.');
-      return;
-    }
-
-    const dto = {
-      customerName: this.form.value.customerName,
-      customerPhone: this.form.value.customerWhatsapp,
-      customerEmail: this.form.value.customerEmail,
-      direccion_envio: this.form.value.deliveryMethod === 'delivery' ? this.form.value.address : undefined,
-      paymentMethod: this.form.value.paymentMethod.toUpperCase() === 'EFECTIVO' ? 'EFECTIVO' : 'MERCADOPAGO',
-    };
-
-    this.loading = true;
-
-    this.cartService.checkout(this.slug, dto).subscribe({
-      next: async (res: any) => {
-        console.log('Orden creada', res);
-
-        if (dto.paymentMethod === 'MERCADOPAGO') {
-          if (this.usarTarjetaDirecta) {
-            const token = "ACA_EL_TOKEN_DEL_BRICK";
-            await this.payWithCard(token);
-          } else {
-            const redirectUrl = !environment.production && res.sandbox_init_point ? res.sandbox_init_point : res.init_point;
-            if (redirectUrl) window.location.href = redirectUrl;
-            else alert('No se pudo iniciar el pago con Mercado Pago');
-          }
-        } else {
-          alert(`Tu pedido ${res.orderCode} fue generado correctamente`);
-          if ('whatsappLink' in res && res.whatsappLink) window.open(res.whatsappLink, '_blank');
-        }
-
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error(err);
-        alert(err?.error?.message || 'Error al generar pedido');
-        this.loading = false;
-      },
+    console.log('Pedido listo:', {
+      form: this.form.value,
+      cart: this.cart,
+      shipping: this.shippingResult,
     });
+
+    alert('Pedido finalizado exitosamente!');
   }
 }

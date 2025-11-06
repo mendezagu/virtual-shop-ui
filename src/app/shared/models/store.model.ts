@@ -9,7 +9,8 @@ export interface Store {
   usuario_login: string;
   password_hash: string;
   id_tienda: string;
-  provincia?: string;     // generado por backend
+  provincia?: string; // generado por backend
+  pricePerKm?: number;    
 
   // si sumaste opcionales en backend:
   email_contacto?: string;
@@ -26,6 +27,9 @@ export interface Store {
   logo_url?: string
   portada_url?: string
   products?: Producto[];
+
+  minShippingCost?: number;
+  freeShippingThreshold?: number;
 }
 
 // Lo que ENVIÁS al crear

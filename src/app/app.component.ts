@@ -7,6 +7,8 @@ import { ButtonModule } from 'primeng/button';
 import { AuthService } from './shared/services/private_services/auth.service';
 import { StoreStateService } from './shared/services/private_services/store-state.service';
 import { filter } from 'rxjs/operators';
+
+
 import {
   CartItem,
   CartService,
@@ -119,30 +121,39 @@ export class AppComponent {
 
   /** 🎨 Tema vendedor */
   private applySellerTheme() {
+    if (isPlatformBrowser(this.platformId)) {
     const root = document.documentElement;
     root.style.setProperty('--primary', '#7e22ce');
     root.style.setProperty('--secondary', '#ec4899');
     root.style.setProperty('--bg', '#ffffff');
     root.style.setProperty('--text', '#111827');
     if (typeof document === 'undefined') return;
+    }
   }
 
   /** 🎨 Tema comprador (colores desde backend) */
-  applyBuyerTheme(store: any) {
-    const root = document.documentElement;
-    root.style.setProperty('--primary', store.primary_color || '#7e22ce');
-    root.style.setProperty('--secondary', store.secondary_color || '#ec4899');
-    root.style.setProperty(
-      '--bg',
-      store.background_color === 'dark'
-        ? '#202123'
-        : store.background_color || '#ffffff'
-    );
-    root.style.setProperty(
-      '--text',
-      store.background_color === 'dark' ? '#f5f5f5' : '#111827'
-    );
+applyBuyerTheme(store: any) {
+  if (!isPlatformBrowser(this.platformId)) {
+    return; // 🚫 Evita ejecutar si no estamos en el navegador
   }
+
+  const root = document.documentElement;
+  root.style.setProperty('--primary', store.primary_color || '#7e22ce');
+  root.style.setProperty('--secondary', store.secondary_color || '#ec4899');
+  root.style.setProperty(
+    '--bg',
+    store.background_color === 'dark'
+      ? '#202123'
+      : store.background_color || '#ffffff'
+  );
+  root.style.setProperty(
+    '--text',
+    store.background_color === 'dark' ? '#f5f5f5' : '#111827'
+  );
+}
+
+
+
 
   /** 🍔 Toggle Sidebar */
   toggleSidebar() {

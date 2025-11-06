@@ -141,6 +141,58 @@
               ></i>
             </div>
           </div>
+          <!-- FORMULARIO DE ENVÍO -->
+           <form
+  *ngIf="isLogisticSelected('Envío a domicilio')"
+  [formGroup]="shippingForm"
+  (ngSubmit)="saveShippingData()"
+  class="space-y-6 mt-6 w-full animate-[fadeIn_0.35s_ease-in-out]"
+>
+  <div class="flex flex-col">
+    <label class="font-medium">Precio por km</label>
+    <input
+      pInputText
+      formControlName="pricePerKm"
+      type="number"
+      placeholder="Ej: 50"
+      class="w-full border rounded-lg p-2 mt-1"
+    />
+  </div>
+
+  <div class="flex flex-col">
+    <label class="font-medium">Monto mínimo de envío</label>
+    <input
+      pInputText
+      formControlName="minShipping"
+      type="number"
+      placeholder="Ej: 200"
+      class="w-full border rounded-lg p-2 mt-1"
+    />
+  </div>
+
+  <div class="flex flex-col">
+    <label class="font-medium">Monto para envío gratis</label>
+    <input
+      pInputText
+      formControlName="freeShipping"
+      type="number"
+      placeholder="Ej: 1000"
+      class="w-full border rounded-lg p-2 mt-1"
+    />
+  </div>
+
+  <p-button
+    type="submit"
+    label="Guardar tarifa de envío"
+    [disabled]="shippingForm.invalid"
+    severity="success"
+    [rounded]="true"
+    size="small"
+    class="flex-1 sm:flex-none min-w-[120px]"
+  ></p-button>
+</form>
+
+      
 
           <!-- 🏬 Retiro en tienda -->
           <div

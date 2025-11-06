@@ -139,45 +139,84 @@
         </label>
       </div>
     </section>
-
     <!-- 📍 DIRECCIÓN -->
-    <section *ngIf="form.value.deliveryMethod === 'delivery'" class="space-y-2">
-      <label class="text-sm font-medium block">Dirección</label>
-      <input
-        pInputText
-        formControlName="address"
-        placeholder="Calle y número"
-        class="w-full rounded-lg border border-[#e5e7eb] px-3 py-2 focus:ring-2 focus:ring-[#008060]"
-      />
-      <div class="grid grid-cols-2 gap-2">
-        <input
-          pInputText
-          formControlName="city"
-          placeholder="Ciudad"
-          class="rounded-lg border border-[#e5e7eb] px-3 py-2 focus:ring-2 focus:ring-[#008060]"
-        />
-        <input
-          pInputText
-          formControlName="province"
-          placeholder="Provincia"
-          class="rounded-lg border border-[#e5e7eb] px-3 py-2 focus:ring-2 focus:ring-[#008060]"
-        />
-      </div>
-      <input
-        pInputText
-        formControlName="postalCode"
-        placeholder="Código Postal"
-        class="w-full rounded-lg border border-[#e5e7eb] px-3 py-2 focus:ring-2 focus:ring-[#008060]"
-      />
+<!-- 📍 DIRECCIÓN Y ENVÍO -->
+<section *ngIf="form.value.deliveryMethod === 'delivery'" class="space-y-4">
+  <label class="text-sm font-medium block">Dirección</label>
 
-      <!-- 🗺️ MAPA LEAFLET -->
-      <!-- En checkout-data.component.html -->
-<section class="max-w-6xl mx-auto mt-10 px-5 sm:px-10">
-  <h3 class="text-xl font-semibold text-gray-900 mb-3">Ubicación de la tienda</h3>
-  <div id="storeMap" class="w-full h-80 rounded-2xl overflow-hidden shadow-md border"></div>
+  <!-- Campos de dirección -->
+  <input
+    pInputText
+    formControlName="address"
+    placeholder="Calle y número"
+    class="w-full rounded-lg border border-[#e5e7eb] px-3 py-2 focus:ring-2 focus:ring-[#008060]"
+  />
+  <div class="grid grid-cols-2 gap-2">
+    <input
+      pInputText
+      formControlName="city"
+      placeholder="Ciudad"
+      class="rounded-lg border border-[#e5e7eb] px-3 py-2 focus:ring-2 focus:ring-[#008060]"
+    />
+    <input
+      pInputText
+      formControlName="province"
+      placeholder="Provincia"
+      class="rounded-lg border border-[#e5e7eb] px-3 py-2 focus:ring-2 focus:ring-[#008060]"
+    />
+  </div>
+  <input
+    pInputText
+    formControlName="postalCode"
+    placeholder="Código Postal"
+    class="w-full rounded-lg border border-[#e5e7eb] px-3 py-2 focus:ring-2 focus:ring-[#008060]"
+  />
+
+  <!-- BOTÓN CALCULAR -->
+  <div class="mt-3 flex items-center gap-3">
+    <button
+      type="button"
+      pButton
+      class="px-4 py-2 rounded-lg bg-[#008060] text-white hover:bg-[#00684a] transition-all duration-150"
+      (click)="calculateShippingFromAddress()"
+      [disabled]="loading"
+    >
+      Calcular envío
+    </button>
+
+    <div *ngIf="loading" class="text-sm text-gray-500">Calculando...</div>
+  </div>
+
+  <!-- 💸 Resultado del cálculo de envío -->
+  <div *ngIf="shippingResult" class="mt-4 bg-[#f3f4f6] rounded-xl p-4 border border-[#e5e7eb]">
+    <h4 class="text-base font-semibold text-[#008060] mb-1">Costo de envío calculado</h4>
+    <p class="text-sm text-gray-700">
+      <b>Distancia:</b> {{ shippingResult.distanceKm | number:'1.2-2' }} km
+    </p>
+    <p class="text-sm text-gray-700">
+      <b>Precio por km:</b> ${{ shippingResult.pricePerKm }}
+    </p>
+    <p class="text-sm text-gray-900 font-semibold">
+      <b>Total:</b> {{ shippingResult.totalCost | currency:'ARS' }}
+    </p>
+  </div>
+
+  <!-- Mensaje de ayuda si aún no se calculó -->
+  <div *ngIf="!shippingResult" class="text-gray-500 text-sm mt-2">
+    🔍 Ingresá tu dirección y hacé clic en <b>“Calcular envío”</b> para estimar el costo.
+  </div>
+
+  <!-- 🗺️ MAPA LEAFLET -->
+  <section class="max-w-6xl mx-auto mt-6 px-5 sm:px-10">
+    <h3 class="text-xl font-semibold text-gray-900 mb-3">Ubicación de la tienda y tu dirección</h3>
+    <div id="storeMap" class="w-full h-80 rounded-2xl overflow-hidden shadow-md border"></div>
+    <p class="text-sm text-gray-500 mt-2">
+      Podés arrastrar el marcador azul para ajustar tu ubicación exacta.
+      El formulario se actualizará automáticamente y recalculará el envío.
+    </p>
+  </section>
 </section>
 
-    </section>
 
     <!-- 🗓️ PROGRAMAR RETIRO -->
     <section *ngIf="form.value.deliveryMethod === 'pickup'">

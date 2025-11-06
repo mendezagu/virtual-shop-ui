@@ -13,6 +13,10 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { StoreService } from '../../../shared/services/private_services/store.service';
 import { StoreStateService } from '../../../shared/services/private_services/store-state.service';
 import { MessageService } from 'primeng/api';
+import { Store } from '../../../shared/models/store.model';
+import { ShippingService } from '../../../shared/services/private_services/shipping.service';
+
+
 
 @Component({
   selector: 'app-store-bank-account',
@@ -34,9 +38,15 @@ export class StoreBankAccountComponent implements OnInit {
   @Output() back = new EventEmitter<void>();
 
   bankForm!: FormGroup;
+  shippingForm!: FormGroup;
   isSaving = false;
   selectedPayments: string[] = [];
   selectedLogistics: string[] = [];
+store: Store = {} as Store; // ⚡ casteo para inicializar
+pricePerKm: number = 0;
+minShippingCost: number = 0;
+freeShippingThreshold: number = 0;
+
 
   bancos = [
     { label: 'Banco Nación', value: 'Banco Nación' },
@@ -53,7 +63,8 @@ export class StoreBankAccountComponent implements OnInit {
     private fb: FormBuilder,
     private storeService: StoreService,
     private storeState: StoreStateService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private shippingService: ShippingService
   ) {}
 
   ngOnInit(): void {
@@ -70,6 +81,13 @@ export class StoreBankAccountComponent implements OnInit {
       ],
       alias: ['', Validators.required],
     });
+
+    this.shippingForm = this.fb.group({
+  pricePerKm: [0, [Validators.required, Validators.min(1)]],
+  minShipping: [0, [Validators.required, Validators.min(0)]],
+  freeShipping: [0, [Validators.required, Validators.min(0)]],
+});
+
 
     const store = this.storeState.getStore();
     if (store) {
@@ -129,6 +147,12 @@ saveData(): void {
     this.bankForm.markAllAsTouched();
     return;
   }
+
+  
+
+  
+
+  
 
   // 🟩 Construimos el payload asegurando formatos válidos para el backend
   const paymentMap: Record<string, string> = {
@@ -195,6 +219,48 @@ saveData(): void {
       console.error(err);
     },
   });
+}
+saveShippingData() {
+  if (this.shippingForm.invalid) {
+    this.shippingForm.markAllAsTouched();
+    return;
+  }
+
+  const payload = {
+    pricePerKm: this.shippingForm.value.pricePerKm ?? 0,
+    minShippingCost: this.shippingForm.value.minShipping ?? 0,
+    freeShippingThreshold: this.shippingForm.value.freeShipping ?? 0,
+  };
+
+  const currentStore = this.storeState.getStore();
+  if (!currentStore?.id_tienda) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Atención',
+      detail: 'No se encontró la tienda activa.',
+    });
+    return;
+  }
+
+  this.shippingService.setShippingPrice(currentStore.id_tienda, payload)
+    .subscribe({
+      next: (res) => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Éxito',
+          detail: 'Tarifa de envío guardada correctamente',
+        });
+        console.log('✅ Tarifa actualizada:', res);
+      },
+      error: (err) => {
+        console.error(err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo guardar la tarifa de envío',
+        });
+      },
+    });
 }
 
   // 🚚 Toggle logística

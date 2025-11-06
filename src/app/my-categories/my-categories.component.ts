@@ -2,6 +2,9 @@ import { Component, ElementRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
+import { Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+
 
 import { StoreService } from '../shared/services/private_services/store.service';
 import { PublicStoreService } from '../shared/services/public_services/publicstore.service';
@@ -115,7 +118,8 @@ export class MyCategoriesComponent implements OnInit {
     private categoryService: CategoryService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private onboardingService: OnboardingService
+    private onboardingService: OnboardingService,
+     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit(): void {
