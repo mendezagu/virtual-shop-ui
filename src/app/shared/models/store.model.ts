@@ -15,6 +15,7 @@ export interface Store {
   redes_sociales?: string[];
   direccion?: string;
   ciudad?: string;
+  provincia?: string;
   horario_apertura?: string;
   horario_cierre?: string;
   latitud?: number;
