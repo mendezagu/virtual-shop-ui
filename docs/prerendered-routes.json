@@ -1,0 +1,19 @@
+{
+  "routes": [
+    "/create-product",
+    "/create-store",
+    "/failed-payment",
+    "/forgot-password",
+    "/landing-home",
+    "/mis-categorias",
+    "/mis-pedidos",
+    "/my-products",
+    "/my-store",
+    "/pending-payment",
+    "/reset-password",
+    "/sign-in",
+    "/sign-up",
+    "/stepper",
+    "/successful-payment"
+  ]
+}
